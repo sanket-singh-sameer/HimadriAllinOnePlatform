@@ -1,0 +1,51 @@
+import mongoose from "mongoose";
+
+const complaintSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    room: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Room",
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    photo: {
+      type: String,
+    },
+    category: {
+      type: String,
+      enum: [
+        "mess-related",
+        "water-supply",
+        "bathroom",
+        "electricity",
+        "internet",
+        "floor-related",
+        "elevator-related",
+        "other",
+      ],
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "resolved", "rejected"],
+      default: "pending",
+    },
+  },
+  { timestamps: true }
+);
+
+const Complaint = mongoose.model("Complaint", complaintSchema);
+
+export default Complaint;
