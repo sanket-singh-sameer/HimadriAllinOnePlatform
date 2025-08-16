@@ -4,6 +4,7 @@ import connectDB from "./config/connectDB.js";
 import { otpVerificationMail } from "./resend/mailConfig.js";
 import authRoutes from "./routes/auth.route.js";
 import cookieParser from "cookie-parser";
+import complaintRoutes from "./routes/complaint.route.js";
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/complaints", complaintRoutes);
 const PORT = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {

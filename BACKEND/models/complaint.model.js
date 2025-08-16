@@ -8,8 +8,7 @@ const complaintSchema = new mongoose.Schema(
       required: true,
     },
     room: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Room",
+      type: "String",
       required: true,
     },
     title: {
@@ -33,13 +32,15 @@ const complaintSchema = new mongoose.Schema(
         "internet",
         "floor-related",
         "elevator-related",
+        "furniture-related",
+        "security-related",
         "other",
       ],
       required: true,
     },
     status: {
       type: String,
-      enum: ["pending", "resolved", "rejected"],
+      enum: ["pending", "under-progress", "resolved", "rejected"],
       default: "pending",
     },
   },
