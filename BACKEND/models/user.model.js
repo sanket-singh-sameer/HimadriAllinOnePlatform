@@ -18,6 +18,20 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    role: {
+      type: String,
+      enum: [
+        "mess-committee",
+        "discipline-committee",
+        "cleaning-committee",
+        "commonroom-committee",
+        "hostel-committee",
+        "student",
+        "admin",
+        "super-admin"
+      ],
+      default: "student",
+    },
     createdAt: {
       type: Date,
       default: Date.now,
@@ -37,7 +51,7 @@ const userSchema = new mongoose.Schema(
       type: Date,
     },
     resetPasswordToken: {
-        type: String,
+      type: String,
     },
     resetPasswordTokenExpiresAt: {
       type: Date,
