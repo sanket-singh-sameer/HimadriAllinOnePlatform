@@ -4,6 +4,7 @@ import AOS from "aos";
 import { Routes, Route } from "react-router-dom";
 import Login from "./Pages/Login";
 import Signup from "./Pages/SignUp";
+import Home from "./Pages/Home";
 import OTPv from "./Pages/OTP-v";
 import Dashboard from "./Pages/Dashboard";
 
@@ -18,7 +19,7 @@ function App() {
   return (
     <main className="main-container">
       <Routes>
-        <Route path="/" element={<Login />}></Route>
+        <Route path="/" element={<Home />}></Route>
         <Route path="/login" element={<Login />}></Route>
         <Route path="/signup" element={<Signup />}></Route>
         <Route path="/otp-verify" element={<OTPv />}></Route>
