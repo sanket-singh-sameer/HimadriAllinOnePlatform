@@ -7,7 +7,11 @@ export default function Home() {
       <p>Your comfort is our priority.</p>
       <p>Your comfort is our priority.</p>
       <p>Your comfort is our priority.</p>
-      <p>Your comfort is our priority.</p>
+
+      
+      <div>
+        added by sanket.
+      </div>
     </div>
   )
 }
