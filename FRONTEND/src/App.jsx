@@ -5,6 +5,7 @@ import { Routes, Route } from "react-router-dom";
 import Login from "./Pages/Login";
 import Signup from "./Pages/SignUp";
 import OTPv from "./Pages/OTP-v";
+import Dashboard from "./Pages/Dashboard";
 
 function App() {
   useEffect(() => {
@@ -21,6 +22,7 @@ function App() {
         <Route path="/login" element={<Login />}></Route>
         <Route path="/signup" element={<Signup />}></Route>
         <Route path="/otp-verify" element={<OTPv />}></Route>
+        <Route path="/dashboard" element={<Dashboard />}></Route>
       </Routes>
     </main>
   );

@@ -1,7 +1,30 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axiosInstance from "../../Utils/axiosInstance";
+import { API_PATHS } from "../../Utils/apiPaths";
 
 export default function Signup() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log({ name, email, password });
+    try {
+      const response = await axiosInstance.post(API_PATHS.SIGNUP, {
+        name,
+        email,
+        password,
+      });
+      if (response.status === 201) {
+        navigate("/otp-verify");
+      }
+    } catch (error) {
+      console.error("Error during signup:", error);
+    }
+  };
   return (
     <>
       <div className="min-h-screen bg-[#272643] px-[clamp(32px,5vw,96px)] flex items-center justify-center text-[#E3F6F5]">
@@ -17,27 +40,39 @@ export default function Signup() {
             </h4>
           </div>
           <div className="mx-8 h-1 sm:h-108 w-108 sm:w-1 bg-white bg-opacity-50 rounded-full"></div>
-          <div className="right-box flex flex-col items-center mt-6 sm:mt-0 sm:ml-16 text-[#E3F6F5]" data-aos="fade-left">
+          <div
+            className="right-box flex flex-col items-center mt-6 sm:mt-0 sm:ml-16 text-[#E3F6F5]"
+            data-aos="fade-left"
+          >
             <h2 className="!leading-none ">Welcome</h2>
             <h6>Please Sign-up to The Platform</h6>
-            <form className="flex flex-col justify-center gap-4 w-[clamp(12rem,50vw,24rem)] mt-6">
+            <form
+              className="flex flex-col justify-center gap-4 w-[clamp(12rem,50vw,24rem)] mt-6"
+              onSubmit={handleSubmit}
+            >
               <input
+                value={name}
                 type="text"
                 placeholder="Name"
                 className="px-4 py-2 rounded bg-[#E3F6F5] text-[#272643] focus:outline-none"
                 required
+                onChange={({ target }) => setName(target.value)}
               />
               <input
+                value={email}
                 type="email"
                 placeholder="Email"
                 className="px-4 py-2 rounded bg-[#E3F6F5] text-[#272643] focus:outline-none"
                 required
+                onChange={({ target }) => setEmail(target.value)}
               />
               <input
+                value={password}
                 type="password"
                 placeholder="Password"
                 className="px-4 py-2 rounded bg-[#E3F6F5] text-[#272643] focus:outline-none"
                 required
+                onChange={({ target }) => setPassword(target.value)}
               />
               <div className="flex flex-col items-center mt-16">
                 <div className="w-full flex justify-center">
@@ -51,8 +86,13 @@ export default function Signup() {
                   </button>
                 </div>
                 <div>
-                  <Link to="/login" className="hover:underline underline-offset-2">
-                    <h6 className="!leading-none mt-4">You’re one of us? Login</h6>
+                  <Link
+                    to="/login"
+                    className="hover:underline underline-offset-2"
+                  >
+                    <h6 className="!leading-none mt-4">
+                      You’re one of us? Login
+                    </h6>
                   </Link>
                 </div>
               </div>
