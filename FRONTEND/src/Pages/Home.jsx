@@ -5,6 +5,9 @@ export default function Home() {
     <div>
       <h1>Welcome to Himadri Boys Hostel</h1>
       <p>Your comfort is our priority.</p>
+      <div>
+        added by sanket.
+      </div>
     </div>
   )
 }
