@@ -1,22 +1,19 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import axiosInstance from "../../Utils/axiosInstance";
-import { API_PATHS } from "../../Utils/apiPaths";
+import { useAuthStore } from "../store/authStore";
 
 export default function OTPv() {
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
+  const { verifyOtp, isLoading, error } = useAuthStore();
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log({ otp });
     try {
-      const response = await axiosInstance.post(API_PATHS.VERIFY_EMAIL, {
-        otp,
-      });
-      if (response.status === 200) {
-        navigate("/dashboard");
-      }
+      await verifyOtp(otp);
+      navigate("/dashboard");
     } catch (error) {
       console.error("Error during OTP verification:", error);
     }
@@ -53,6 +50,7 @@ export default function OTPv() {
                 value={otp}
               />
               <div className="flex flex-col items-center mt-4">
+                {error && <p className="text-red-500">{error}</p>}
                 <div className="w-full flex justify-center">
                   <button
                     type="submit"
