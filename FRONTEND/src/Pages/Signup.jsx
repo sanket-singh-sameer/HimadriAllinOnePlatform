@@ -27,25 +27,35 @@ export default function Signup() {
   };
   return (
     <>
-      <div className="min-h-screen bg-[#272643] px-[clamp(32px,5vw,96px)] flex items-center justify-center text-[#E3F6F5]">
-        <div className="absolute top-6 right-8 text-sm transition hidden sm:block hover:underline cursor-pointer">
-          <Link to="/login" className="underline-offset-2">
-            <h6 className="!leading-none">Already a member? Login</h6>
-          </Link>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-[#f8f8f8] to-[#eaeaea] px-[clamp(32px,5vw,96px)] flex items-center justify-center text-[#2c2c2c] font-serif">
+        <Link
+          to="/login"
+          className="absolute top-6 right-8 text-gray-700 px-5 py-2 rounded transition hover:underline underline-offset-2 hidden md:block z-10"
+          data-aos="fade-left"
+        >
+          <h6 className="!leading-none text-sm">Already a member? Login</h6>
+        </Link>
+
         <div className="center-container flex items-center justify-center flex-col sm:flex-row">
           <div className="left-box mb-6" data-aos="zoom-in">
-            <h4 className="sm:!text-right font-semibold [text-shadow:12px_12px_8px_rgba(0,0,0,0.8)]">
+            <h4 className="sm:!text-right font-semibold text-4xl text-gray-800 [text-shadow:2px_2px_0px_rgba(0,0,0,0.05)]">
               Himadri <br /> Boys <br /> Hostel
             </h4>
           </div>
-          <div className="mx-8 h-1 sm:h-108 w-108 sm:w-1 bg-white bg-opacity-50 rounded-full"></div>
+
+          <div className="mx-8 h-1 sm:h-108 w-108 sm:w-1 bg-gray-400 bg-opacity-30 rounded-full"></div>
+
           <div
-            className="right-box flex flex-col items-center mt-6 sm:mt-0 sm:ml-16 text-[#E3F6F5]"
+            className="right-box flex flex-col items-center mt-6 sm:mt-0 sm:ml-16 text-gray-800"
             data-aos="fade-left"
           >
-            <h2 className="!leading-none ">Welcome</h2>
-            <h6>Please Sign-up to The Platform</h6>
+            <h2 className="!leading-none text-3xl font-bold tracking-wide">
+              Welcome
+            </h2>
+            <h6 className="text-gray-600 italic">
+              Please Sign-up to The Platform
+            </h6>
+
             <form
               className="flex flex-col justify-center gap-4 w-[clamp(12rem,50vw,24rem)] mt-6"
               onSubmit={handleSubmit}
@@ -54,7 +64,7 @@ export default function Signup() {
                 value={name}
                 type="text"
                 placeholder="Name"
-                className="px-4 py-2 rounded bg-[#E3F6F5] text-[#272643] focus:outline-none"
+                className="px-4 py-2 rounded-lg bg-white text-gray-700 border border-gray-300 shadow-sm focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-400"
                 required
                 onChange={({ target }) => setName(target.value)}
               />
@@ -62,7 +72,7 @@ export default function Signup() {
                 value={email}
                 type="email"
                 placeholder="Email"
-                className="px-4 py-2 rounded bg-[#E3F6F5] text-[#272643] focus:outline-none"
+                className="px-4 py-2 rounded-lg bg-white text-gray-700 border border-gray-300 shadow-sm focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-400"
                 required
                 onChange={({ target }) => setEmail(target.value)}
               />
@@ -70,17 +80,19 @@ export default function Signup() {
                 value={password}
                 type="password"
                 placeholder="Password"
-                className="px-4 py-2 rounded bg-[#E3F6F5] text-[#272643] focus:outline-none"
+                className="px-4 py-2 rounded-lg bg-white text-gray-700 border border-gray-300 shadow-sm focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-400"
                 required
                 onChange={({ target }) => setPassword(target.value)}
               />
+
+              {/* Button + Login Link */}
               <div className="flex flex-col items-center mt-16">
                 <div className="w-full flex justify-center">
                   <button
                     type="submit"
-                    className="mt-2 w-1/2 bg-[#BAE8E8] py-2 rounded hover:bg-[#2C698D] transition !text-[#272643] cursor-pointer"
+                    className="mt-2 w-1/2 bg-gray-900 text-white py-2 rounded-lg hover:bg-gray-700 transition shadow-md"
                   >
-                    <p className="!leading-none !text-[#272643] !m-0 !italic !font-semibold !opacity-100">
+                    <p className="!leading-none !m-0 !italic !font-semibold">
                       Sign Up
                     </p>
                   </button>
@@ -88,7 +100,7 @@ export default function Signup() {
                 <div>
                   <Link
                     to="/login"
-                    className="hover:underline underline-offset-2"
+                    className="hover:underline underline-offset-2 text-gray-600"
                   >
                     <h6 className="!leading-none mt-4">
                       You’re one of us? Login

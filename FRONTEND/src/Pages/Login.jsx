@@ -24,72 +24,99 @@ export default function Login() {
   };
   return (
     <>
-      <div className="min-h-screen bg-[#272643] flex flex-col md:flex-row">
+      <div className="min-h-screen bg-gradient-to-br from-[#f8f8f8] to-[#eaeaea] flex flex-col md:flex-row font-serif">
         <Link
-            to="/signup"
-            className="absolute top-6 right-8  text-[#E3F6F5] px-5 py-2 rounded transition hover:underline underline-offset-2 hidden md:block"
+          to="/signup"
+          className="absolute top-6 right-8 text-gray-700 px-5 py-2 rounded transition hover:underline underline-offset-2 hidden md:block z-10"
+          data-aos="fade-left"
         >
-            <h6 className="!leading-none text-sm">New member? Signup</h6>
+          <h6 className="!leading-none text-sm">New member? Signup</h6>
         </Link>
-        <div className="left-box w-full md:w-2/5 md:min-h-screen bg-[#BAE8E8] px-[clamp(32px,5vw,96px)] pt-[clamp(2rem,5vw,12rem)] pb-6">
-          <h4 className="!text-left [text-shadow:12px_12px_6px_rgba(255,255,255,0.8)]">
+
+        <div className="left-box w-full md:w-2/5 md:min-h-screen bg-white px-[clamp(32px,5vw,96px)] pt-[clamp(2rem,5vw,12rem)] pb-6 border-r border-gray-200 shadow-sm">
+          <h4
+            className="!text-left text-4xl font-semibold text-gray-800 [text-shadow:2px_2px_0px_rgba(0,0,0,0.05)]"
+            data-aos="zoom-in"
+          >
             Himadri <br />
             Boys <br />
             Hostel
           </h4>
-          <h6 className="!leading-tight mt-6">
+          <h6
+            className="!leading-tight mt-6 text-gray-600  hidden md:block"
+            data-aos="zoom-in"
+          >
             “This is an all-in-one platform created by students, managed by
             students, and built for every hosteler’s life. It brings everything
             you need into one place—making hostel life simpler, smarter, and
             more connected.”
           </h6>
-          <h6 className="!leading-tight mt-12 md:mt-24 italic !font-bold">
+          <h6
+            className="!leading-tight mt-12 md:mt-24 italic !font-bold text-gray-800 hidden md:block"
+            data-aos="zoom-in"
+          >
             Because who knows hostel struggles better than us? Made by students,
             managed by students!
           </h6>
         </div>
-        <div className="right-box flex flex-col items-center justify-center w-full md:w-3/5 text-[#E3F6F5] py-12 px-8">
-          <h2 className="!leading-tight">Step Right In</h2>
-          <h6>Log in and take charge</h6>
-          <form className="flex flex-col gap-4 w-full max-w-sm mt-8" onSubmit={handleSubmit}>
+
+        <div
+          className="right-box flex flex-col items-center justify-center w-full md:w-3/5 text-gray-800 py-12 px-8"
+          data-aos="fade-left"
+        >
+          <h2 className="!leading-tight text-3xl font-bold tracking-wide">
+            Get Started
+          </h2>
+          <h6 className="text-gray-600 italic">Log in and take charge</h6>
+
+          <form
+            className="flex flex-col gap-4 w-full max-w-sm mt-8"
+            onSubmit={handleSubmit}
+          >
             <label className="flex flex-col text-left">
-              <span className="mb-1">Email</span>
+              <span className="mb-1 text-gray-700">Email</span>
               <input
                 value={email}
                 onChange={({ target }) => setEmail(target.value)}
                 type="email"
                 name="email"
-                className="px-3 py-2 rounded bg-[#22223b] text-[#E3F6F5] border border-[#BAE8E8] focus:outline-none"
+                className="px-3 py-2 rounded-lg bg-white text-gray-700 border border-gray-300 shadow-sm focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-400"
                 placeholder="Enter your email"
                 required
               />
             </label>
             <label className="flex flex-col text-left">
-              <span className="mb-1">Password</span>
+              <span className="mb-1 text-gray-700">Password</span>
               <input
                 value={password}
                 onChange={({ target }) => setPassword(target.value)}
                 type="password"
                 name="password"
-                className="px-3 py-2 rounded bg-[#22223b] text-[#E3F6F5] border border-[#BAE8E8] focus:outline-none"
+                className="px-3 py-2 rounded-lg bg-white text-gray-700 border border-gray-300 shadow-sm focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-400"
                 placeholder="Enter your password"
                 required
               />
             </label>
             <button
               type="submit"
-              className="mt-4 bg-[#BAE8E8] text-[#272643] font-bold py-2 rounded hover:bg-[#2C698D] transition cursor-pointer"
+              className="mt-4 bg-gray-900 text-white font-bold py-2 rounded-lg hover:bg-gray-700 transition shadow-md"
             >
-              <p className="!leading-none !text-[#272643] !m-0 !italic !font-semibold !opacity-100">
+              <p className="!leading-none !m-0 !italic !font-semibold">
                 Log In
               </p>
             </button>
-            <div className="flex">
+            <div className="flex flex-col gap-3">
               <Link
                 to="/reset-password"
-                className="text-sm text-[#BAE8E8] hover:underline ml-auto"
+                className="text-sm text-gray-600 hover:underline ml-auto"
               >
                 <h6 className="!leading-none">Lost your password? Reset Now</h6>
+              </Link>
+              <Link
+                to="/signup"
+                className="text-sm text-gray-600 hover:underline ml-auto block md:hidden"
+              >
+                <h6 className="!leading-none">New member? Signup</h6>
               </Link>
             </div>
           </form>
