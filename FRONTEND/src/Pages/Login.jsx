@@ -1,25 +1,24 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import axiosInstance from "../../Utils/axiosInstance";
-import { API_PATHS } from "../../Utils/apiPaths";
+import { useAuthStore } from "../store/authStore";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { Login, error, isLoading } = useAuthStore();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axiosInstance.post(API_PATHS.LOGIN, {
-        email,
-        password,
-      });
-      if (response.status === 200) {
-        navigate("/dashboard");
-      }
+      await Login(email, password);
+      navigate("/dashboard");
     } catch (error) {
       console.error("Error during login:", error);
+      navigate("/login", {
+        state: { error: "Login failed. Please try again." },
+      });
     }
   };
   return (
@@ -97,12 +96,13 @@ export default function Login() {
                 required
               />
             </label>
+            {error && <p className="text-red-500">{error}</p>}
             <button
               type="submit"
               className="mt-4 bg-gray-900 text-white font-bold py-2 rounded-lg hover:bg-gray-700 transition shadow-md"
             >
               <p className="!leading-none !m-0 !italic !font-semibold">
-                Log In
+                {isLoading ? "Logging in..." : "Log In"}
               </p>
             </button>
             <div className="flex flex-col gap-3">

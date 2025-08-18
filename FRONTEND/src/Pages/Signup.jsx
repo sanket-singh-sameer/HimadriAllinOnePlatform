@@ -1,26 +1,21 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import axiosInstance from "../../Utils/axiosInstance";
-import { API_PATHS } from "../../Utils/apiPaths";
+import { useAuthStore } from "../store/authStore";
 
 export default function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { signup, isLoading, error } = useAuthStore();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log({ name, email, password });
     try {
-      const response = await axiosInstance.post(API_PATHS.SIGNUP, {
-        name,
-        email,
-        password,
-      });
-      if (response.status === 201) {
-        navigate("/otp-verify");
-      }
+      await signup(name, email, password);
+      navigate("/otp-verify"); 
     } catch (error) {
       console.error("Error during signup:", error);
     }
@@ -87,13 +82,16 @@ export default function Signup() {
 
               {/* Button + Login Link */}
               <div className="flex flex-col items-center mt-16">
+              {error && <p className="text-red-500">{error}</p>}
                 <div className="w-full flex justify-center">
                   <button
                     type="submit"
                     className="mt-2 w-1/2 bg-gray-900 text-white py-2 rounded-lg hover:bg-gray-700 transition shadow-md"
+                    disabled={isLoading}
                   >
                     <p className="!leading-none !m-0 !italic !font-semibold">
-                      Sign Up
+                      {isLoading ? "Signing Up..." : "Sign Up"}
+
                     </p>
                   </button>
                 </div>

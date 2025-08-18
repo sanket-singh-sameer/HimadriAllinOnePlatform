@@ -1,22 +1,19 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import axiosInstance from "../../Utils/axiosInstance";
-import { API_PATHS } from "../../Utils/apiPaths";
+import { useAuthStore } from "../store/authStore";
 
 export default function OTPv() {
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
+  const { verifyOtp, isLoading, error } = useAuthStore();
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log({ otp });
     try {
-      const response = await axiosInstance.post(API_PATHS.VERIFY_EMAIL, {
-        otp,
-      });
-      if (response.status === 200) {
-        navigate("/dashboard");
-      }
+      await verifyOtp(otp);
+      navigate("/dashboard");
     } catch (error) {
       console.error("Error during OTP verification:", error);
     }
@@ -57,23 +54,28 @@ export default function OTPv() {
           value={otp}
         />
 
-        <div className="flex flex-col items-center mt-4">
-          <div className="w-full flex justify-center">
-            <button
-              type="submit"
-              className="mt-2 w-1/2 bg-gray-900 py-2 rounded-lg hover:bg-gray-700 transition text-white font-semibold shadow-md cursor-pointer"
-            >
-              <p className="!leading-none !m-0 !italic !font-semibold">Verify</p>
-            </button>
-          </div>
-          <div>
-            <Link
-              to="/login"
-              className="hover:underline underline-offset-2 text-gray-600"
-            >
-              <h6 className="!leading-none mt-4">Still waiting? Resend OTP</h6>
-            </Link>
-          </div>
+        {error && <p className="text-red-500">{error}</p>}
+
+        <div className="w-full flex justify-center">
+          <button
+            type="submit"
+            className="mt-2 w-1/2 bg-[#BAE8E8] py-2 rounded hover:bg-[#2C698D] transition !text-[#272643] cursor-pointer"
+            disabled={isLoading}
+          >
+            <p className="!leading-none !text-[#272643] !m-0 !italic !font-semibold !opacity-100">
+              {isLoading ? "Verifying..." : "Verify"}
+            </p>
+          </button>
+        </div>
+        <div>
+          <Link
+            to="/login"
+            className="hover:underline underline-offset-2"
+          >
+            <h6 className="!leading-none mt-4">
+              Still waiting? Resend OTP
+            </h6>
+          </Link>
         </div>
       </form>
     </div>
