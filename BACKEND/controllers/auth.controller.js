@@ -42,6 +42,7 @@ export const signupController = async (req, res) => {
         isUserExists.verificationTokenExpiresAt = Date.now() + 15 * 60 * 1000; // 15 minutes
         await isUserExists.save();
         await otpVerificationMail(email, otp);
+        
         return res.status(201).json({
           message: "User registered successfully",
           user: { ...isUserExists._doc, password: undefined },
@@ -204,7 +205,12 @@ export const checkAuthController = async (req, res) => {
   }
   try {
     const user = await User.findById(req.userId).select("-password");
-    res.status(200).json({ message: "User is authenticated", user: user });
+    res
+      .status(200)
+      .json({
+        message: "User is authenticated",
+        user: { ...user._doc, password: undefined },
+      });
   } catch (error) {
     res.status(500).json({ message: "Error fetching user", error });
   }

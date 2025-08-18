@@ -7,12 +7,12 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const { Login, error, isLoading } = useAuthStore();
+  const { login, error, isLoading } = useAuthStore();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await Login(email, password);
+      await login(email, password);
       navigate("/dashboard");
     } catch (error) {
       console.error("Error during login:", error);
