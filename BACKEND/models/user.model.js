@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
         "hostel-committee",
         "student",
         "admin",
-        "super-admin"
+        "super-admin",
       ],
       default: "student",
     },
@@ -55,6 +55,10 @@ const userSchema = new mongoose.Schema(
     },
     resetPasswordTokenExpiresAt: {
       type: Date,
+    },
+    profilePicture: {
+      type: String,
+      default: "default-avatar.png",
     },
   },
   { timestamps: true }
