@@ -9,6 +9,7 @@ export const useAuthStore = create((set) => ({
   error: null,
   isLoading: false,
   isCheckingAuth: true,
+  error: null,
   signup: async (name, email, password) => {
     set({ isLoading: true, error: null });
     try {
@@ -101,6 +102,28 @@ export const useAuthStore = create((set) => ({
         isAuthenticated: false,
       });
       console.error("Authentication check failed:", error);
+    }
+  },
+
+  logout: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axiosInstance.get(API_PATHS.LOGOUT);
+      if (response.status === 200) {
+        set({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error: null,
+        });
+      }
+    } catch (error) {
+      set({
+        error: error.response.data.message || "Logout failed",
+        isLoading: false,
+      });
+      console.error("Logout failed:", error);
+      throw error;
     }
   },
 }));

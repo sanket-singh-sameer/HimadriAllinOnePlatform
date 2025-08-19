@@ -1,10 +1,13 @@
-import { createComplaint, viewComplaint, viewComplaintDetails } from "../controllers/complaint.controller.js";
+import { createComplaint, updateComplaintStatus, viewComplaint, viewComplaintDetails } from "../controllers/complaint.controller.js";
 import express from "express";
+import { verifyTokenFromCookies } from "../middlewares/verifyToken.middleware.js";
+import { checkIfAdmin } from "../middlewares/checkIfAdmin.middleware.js";
 const router = express.Router();
 
 router.post("/new", createComplaint);
 router.get("/", viewComplaint);
 router.get("/:id", viewComplaintDetails);
+router.put("/:id", verifyTokenFromCookies, checkIfAdmin, updateComplaintStatus);
 
 
 export default router;

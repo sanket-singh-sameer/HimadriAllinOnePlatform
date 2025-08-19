@@ -7,6 +7,8 @@ import connectDB from "./config/connectDB.js";
 import authRoutes from "./routes/auth.route.js";
 import complaintRoutes from "./routes/complaint.route.js";
 import adminRoutes from "./routes/admin.route.js";
+import messMenuRoutes from "./routes/messmenu.route.js";
+import noticeRoutes from "./routes/notice.router.js";
 
 dotenv.config();
 
@@ -24,6 +26,10 @@ app.use(express.json());
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/complaints", complaintRoutes);
+app.use("/api/v1/messmenu", messMenuRoutes);
+app.use("/api/v1/notice", noticeRoutes);
+
+
 const PORT = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
