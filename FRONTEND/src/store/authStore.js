@@ -2,7 +2,6 @@ import { create } from "zustand";
 import axios from "axios";
 import axiosInstance from "../../Utils/axiosInstance";
 import { API_PATHS } from "../../Utils/apiPaths";
-import Login from "../Pages/Login";
 
 export const useAuthStore = create((set) => ({
   user: null,
@@ -11,6 +10,7 @@ export const useAuthStore = create((set) => ({
   isLoading: false,
   isCheckingAuth: true,
   signup: async (name, email, password) => {
+    set({ isLoading: true, error: null });
     try {
       const response = await axiosInstance.post(API_PATHS.SIGNUP, {
         name,
@@ -22,6 +22,7 @@ export const useAuthStore = create((set) => ({
           user: response.data.user,
           isAuthenticated: true,
           isLoading: false,
+          error: null,
         });
       }
     } catch (error) {
@@ -35,13 +36,17 @@ export const useAuthStore = create((set) => ({
   },
 
   verifyOtp: async (otp) => {
+    set({ isLoading: true, error: null });
     try {
-      const response = await axiosInstance.post(API_PATHS.VERIFY_EMAIL, { otp });
+      const response = await axiosInstance.post(API_PATHS.VERIFY_EMAIL, {
+        otp,
+      });
       if (response.status === 200) {
         set({
           user: response.data.user,
           isAuthenticated: true,
           isLoading: false,
+          error: null,
         });
       }
     } catch (error) {
@@ -53,7 +58,8 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
-  Login: async (email, password) => {
+  login: async (email, password) => {
+    set({ isLoading: true, error: null });
     try {
       const response = await axiosInstance.post(API_PATHS.LOGIN, {
         email,
@@ -64,6 +70,7 @@ export const useAuthStore = create((set) => ({
           user: response.data.user,
           isAuthenticated: true,
           isLoading: false,
+          error: null,
         });
       }
     } catch (error) {
@@ -73,6 +80,27 @@ export const useAuthStore = create((set) => ({
       });
       console.error("Login failed:", error);
       throw error;
+    }
+  },
+
+  checkAuth: async () => {
+    set({ isCheckingAuth: true, error: null });
+    try {
+      const response = await axiosInstance.get(API_PATHS.CHECK_AUTH);
+      if (response.status === 200) {
+        set({
+          user: response.data.user,
+          isAuthenticated: true,
+          isCheckingAuth: false,
+        });
+      }
+    } catch (error) {
+      set({
+        error: null,
+        isCheckingAuth: false,
+        isAuthenticated: false,
+      });
+      console.error("Authentication check failed:", error);
     }
   },
 }));
