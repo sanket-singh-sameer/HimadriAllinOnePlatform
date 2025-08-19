@@ -23,7 +23,7 @@ export default function Login() {
   };
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-[#f8f8f8] to-[#eaeaea] flex flex-col md:flex-row font-serif">
+      <div className="min-h-screen bg-gradient-to-br from-[#f8f8f8] to-[#eaeaea] flex flex-col md:flex-row">
         <Link
           to="/signup"
           className="absolute top-6 right-8 text-gray-700 px-5 py-2 rounded transition hover:underline underline-offset-2 hidden md:block z-10"
@@ -99,7 +99,7 @@ export default function Login() {
             {error && <p className="text-red-900 text-sm !italic">{error}</p>}
             <button
               type="submit"
-              className="mt-4 bg-gray-900 text-white font-bold py-2 rounded-lg hover:bg-gray-700 transition shadow-md"
+              className="mt-4 bg-gray-900 text-white font-bold py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer"
             >
               <p className="!leading-none !m-0 !italic !font-semibold">
                 {isLoading ? "Logging in..." : "Log In"}

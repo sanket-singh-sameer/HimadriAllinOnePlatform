@@ -86,7 +86,7 @@ export default function Signup() {
                 <div className="w-full flex justify-center">
                   <button
                     type="submit"
-                    className="mt-2 w-1/2 bg-gray-900 text-white py-2 rounded-lg hover:bg-gray-700 transition shadow-md"
+                    className="mt-2 w-1/2 bg-gray-900 text-white py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer"
                     disabled={isLoading}
                   >
                     <p className="!leading-none !m-0 !italic !font-semibold">
