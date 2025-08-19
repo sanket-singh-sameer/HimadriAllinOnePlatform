@@ -96,7 +96,7 @@ export default function Login() {
                 required
               />
             </label>
-            {error && <p className="text-red-500">{error}</p>}
+            {error && <p className="text-red-900 text-sm !italic">{error}</p>}
             <button
               type="submit"
               className="mt-4 bg-gray-900 text-white font-bold py-2 rounded-lg hover:bg-gray-700 transition shadow-md"
