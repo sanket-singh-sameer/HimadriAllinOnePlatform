@@ -5,8 +5,19 @@ import axiosInstance from "../../Utils/axiosInstance";
 
 const Dashboard = () => {
   const { logout, isLoading, error, user } = useAuthStore();
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState(null);
   const [todaysMenu, setTodaysMenu] = useState(null);
+  const [myComplaints, setMyComplaints] = useState(null);
   const [activeFeature, setActiveFeature] = useState("complaints");
+  const [complaintForm, setComplaintForm] = useState({
+    name: user.name || "",
+    room: user.room || "",
+    title: "",
+    category: "",
+    photo: null,
+    description: "",
+  });
 
   const fetchTodaysMenu = async () => {
     try {
@@ -16,10 +27,6 @@ const Dashboard = () => {
       console.error("Error fetching today's menu:", error);
     }
   };
-  console.log("Today's Menu:", todaysMenu);
-  useEffect(() => {
-    fetchTodaysMenu();
-  }, []);
 
   const handleLogout = () => {
     try {
@@ -28,6 +35,70 @@ const Dashboard = () => {
       console.error("Logout failed:", error);
     }
   };
+
+  const handleFormDataChange = (e) => {
+    const { name, value } = e.target;
+    setComplaintForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddComplaint = async (e) => {
+    e.preventDefault();
+    setFormLoading(true);
+    setFormError(null);
+    try {
+      const complaintData = {
+        user: user._id,
+        name: complaintForm.name,
+        room: complaintForm.room,
+        title: complaintForm.title,
+        category: complaintForm.category,
+        photo: complaintForm.photo,
+        description: complaintForm.description,
+      };
+      console.log("Complaint Data:", complaintData);
+      const response = await axiosInstance.post(
+        API_PATHS.ADD_COMPLAINT,
+        complaintData
+      );
+      console.log("Complaint Response:", response);
+      if (response.status === 201) {
+        setComplaintForm({
+          name: user.name || "",
+          room: user.room || "",
+          title: "",
+          date: "",
+          category: "",
+          photo: null,
+          description: "",
+        });
+      }
+      setFormLoading(false);
+      setFormError(null);
+      fetchMyComplaint();
+    } catch (error) {
+      console.error("Error registering complaint:", error);
+      setFormLoading(false);
+      setFormError(
+        error.response.data.message ||
+          "An error occurred while registering the complaint."
+      );
+    }
+  };
+
+  const fetchMyComplaint = async () => {
+    try {
+      const response = await axiosInstance.get(API_PATHS.FETCH_MY_COMPLAINTS);
+      setMyComplaints(response.data.complaints);
+      console.log("My Complaints:", response.data.complaints);
+    } catch (error) {
+      console.error("Error fetching my complaints:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTodaysMenu();
+    fetchMyComplaint();
+  }, []);
 
   return (
     <>
@@ -156,14 +227,17 @@ const Dashboard = () => {
                         Complaint Register
                       </h3>
 
-                      <form className="space-y-5">
+                      <form className="space-y-5" onSubmit={handleAddComplaint}>
                         <div>
                           <label className="block text-gray-700 font-medium mb-1">
                             Name
                           </label>
                           <input
+                            name="name"
+                            value={complaintForm.name}
+                            readOnly
                             type="text"
-                            className="w-full rounded-xl border border-gray-300 px-4 py-2 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:outline-none text-sm sm:text-base"
+                            className="w-full rounded-xl border border-gray-300 px-4 py-2"
                             placeholder="Enter your name"
                           />
                         </div>
@@ -173,8 +247,11 @@ const Dashboard = () => {
                             Room No.
                           </label>
                           <input
+                            name="room"
+                            value={complaintForm.room}
+                            onChange={handleFormDataChange}
                             type="text"
-                            className="w-full rounded-xl border border-gray-300 px-4 py-2 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:outline-none text-sm sm:text-base"
+                            className="w-full rounded-xl border border-gray-300 px-4 py-2"
                             placeholder="Enter your room number"
                           />
                         </div>
@@ -183,18 +260,50 @@ const Dashboard = () => {
                           <label className="block text-gray-700 font-medium mb-1">
                             Type
                           </label>
-                          <select className="w-full rounded-xl border border-gray-300 px-4 py-2 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:outline-none text-sm sm:text-base">
-                            <option>Mess</option>
-                            <option>Water</option>
-                            <option>Bathroom</option>
-                            <option>Electricity</option>
-                            <option>Internet</option>
-                            <option>Floor-related</option>
-                            <option>Elevator-related</option>
-                            <option>Furniture-related</option>
-                            <option>Security-related</option>
-                            <option>Others</option>
+                          <select
+                            name="category"
+                            value={complaintForm.category}
+                            onChange={handleFormDataChange}
+                            className="w-full rounded-xl border border-gray-300 px-4 py-2"
+                          >
+                            <option value="">Select category</option>
+                            <option value="Mess-Related">Mess-Related</option>
+                            <option value="Water-Related">Water-Related</option>
+                            <option value="Bathroom-Related">
+                              Bathroom-Related
+                            </option>
+                            <option value="Electricity-Related">
+                              Electricity-Related
+                            </option>
+                            <option value="Internet-Related">
+                              Internet-Related
+                            </option>
+                            <option value="Floor-Related">Floor-Related</option>
+                            <option value="Elevator-Related">
+                              Elevator-Related
+                            </option>
+                            <option value="Furniture-Related">
+                              Furniture-Related
+                            </option>
+                            <option value="Security-Related">
+                              Security-Related
+                            </option>
+                            <option value="Others">Others</option>
                           </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-gray-700 font-medium mb-1">
+                            Short Description
+                          </label>
+                          <input
+                            name="title"
+                            value={complaintForm.title}
+                            onChange={handleFormDataChange}
+                            type="text"
+                            className="w-full rounded-xl border border-gray-300 px-4 py-2"
+                            placeholder="Describe the issue in one line..."
+                          />
                         </div>
 
                         <div>
@@ -202,17 +311,23 @@ const Dashboard = () => {
                             Description
                           </label>
                           <textarea
+                            name="description"
+                            value={complaintForm.description}
+                            onChange={handleFormDataChange}
                             rows="3"
-                            className="w-full rounded-xl border border-gray-300 px-4 py-2 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:outline-none text-sm sm:text-base"
-                            placeholder="Describe the issue..."
+                            className="w-full rounded-xl border border-gray-300 px-4 py-2"
+                            placeholder="Describe the issue in detail..."
                           ></textarea>
                         </div>
+                        <p className="text-red-500">{formError}</p>
 
                         <button
                           type="submit"
-                          className="w-full cursor-pointer bg-gray-900 text-white font-semibold py-2.5 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition-all text-sm sm:text-base"
+                          className="w-full cursor-pointer bg-gray-900 text-white font-semibold py-2.5 rounded-xl"
                         >
-                          Add Complaint
+                          {formLoading
+                            ? "Adding Complaint..."
+                            : "Add Complaint"}
                         </button>
                       </form>
 
@@ -222,7 +337,7 @@ const Dashboard = () => {
                         </div>
                         <div className="relative flex justify-center">
                           <span className="px-3 sm:px-4 bg-white text-gray-400 text-xs sm:text-sm font-medium">
-                            Complaints List
+                            Your Complaints
                           </span>
                         </div>
                       </div>
@@ -231,25 +346,42 @@ const Dashboard = () => {
                         <table className="w-full min-w-[600px] border-collapse text-left text-gray-700 text-sm sm:text-base">
                           <thead>
                             <tr className="bg-gray-100 text-gray-900 font-semibold">
-                              <th className="p-3 sm:p-4">Name</th>
+                              <th className="p-3 sm:p-4">Serial No</th>
                               <th className="p-3 sm:p-4">Room</th>
-                              <th className="p-3 sm:p-4">Type</th>
+                              <th className="p-3 sm:p-4">Category</th>
                               <th className="p-3 sm:p-4">Dated On</th>
-                              <th className="p-3 sm:p-4">Description</th>
+                              <th className="p-3 sm:p-4">Short Description</th>
+                              <th className="p-3 sm:p-4">Status</th>
                             </tr>
                           </thead>
                           <tbody>
-                            <tr className="border-b hover:bg-gray-50 transition-colors">
-                              <td className="p-3 sm:p-4 font-medium text-gray-900">
-                                Divyam Singh
-                              </td>
-                              <td className="p-3 sm:p-4">509</td>
-                              <td className="p-3 sm:p-4">Other</td>
-                              <td className="p-3 sm:p-4">2023-10-01</td>
-                              <td className="p-3 sm:p-4">
-                                Dustbin not cleaned for days
-                              </td>
-                            </tr>
+                            {myComplaints?.map((complaint, index) => {
+                              return (
+                                <tr
+                                  key={index}
+                                  className="border-b hover:bg-gray-50 transition-colors"
+                                >
+                                  <td className="p-3 sm:p-4 font-medium text-gray-900">
+                                    {index + 1}
+                                  </td>
+                                  <td className="p-3 sm:p-4">
+                                    {complaint?.room || "N/A"}
+                                  </td>
+                                  <td className="p-3 sm:p-4">
+                                    {complaint?.category || "N/A"}
+                                  </td>
+                                  <td className="p-3 sm:p-4">
+                                    {complaint?.date || "N/A"}
+                                  </td>
+                                  <td className="p-3 sm:p-4">
+                                    {complaint?.title || "N/A"}
+                                  </td>
+                                  <td className="p-3 sm:p-4">
+                                    {complaint?.status || "N/A"}
+                                  </td>
+                                </tr>
+                              );
+                            })}
                           </tbody>
                         </table>
                       </div>

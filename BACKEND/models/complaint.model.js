@@ -7,8 +7,14 @@ const complaintSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    date:{
+      type: String
+    },
+    name: {
+      type: String,
+    },
     room: {
-      type: "String",
+      type: String,
       required: true,
     },
     title: {
@@ -24,18 +30,6 @@ const complaintSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: [
-        "mess-related",
-        "water-supply",
-        "bathroom",
-        "electricity",
-        "internet",
-        "floor-related",
-        "elevator-related",
-        "furniture-related",
-        "security-related",
-        "other",
-      ],
       required: true,
     },
     status: {

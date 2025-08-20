@@ -15,8 +15,8 @@ export const API_PATHS = {
     ADMIN_LOGOUT: "/admin/logout",
     ADMIN_DASHBOARD: "/admin",
 
-    ADD_COMPLAINT: "/complaints",
-
+    ADD_COMPLAINT: "/complaints/new",
+    FETCH_MY_COMPLAINTS: "/complaints/my",
 
     FETCH_TODAYS_MENU: "/messmenu/today",
     FETCH_ALL_NOTICES: "/notice/all",
