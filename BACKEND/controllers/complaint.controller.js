@@ -63,3 +63,21 @@ export const viewComplaintDetails = async (req, res) => {
     res.status(500).json({ message: "Error retrieving complaint", error });
   }
 };
+
+
+export const updateComplaintStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const complaint = await Complaint.findOne({ _id: id });
+    if (!complaint) {
+      return res.status(404).json({ message: "Complaint not found or you are not authorized to update it." });
+    }
+    complaint.status = status || complaint.status;
+    await complaint.save();
+    res.status(200).json({ message: "Complaint updated successfully", complaint });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating complaint", error });
+  }
+};

@@ -14,9 +14,15 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    phone: {
+      type: String,
+    },
     password: {
       type: String,
       required: true,
+    },
+    room: {
+      type: String,
     },
     role: {
       type: String,
@@ -58,7 +64,7 @@ const userSchema = new mongoose.Schema(
     },
     profilePicture: {
       type: String,
-      default: "default-avatar.png",
+      default: "https://static.vecteezy.com/system/resources/thumbnails/020/911/740/small_2x/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png",
     },
   },
   { timestamps: true }

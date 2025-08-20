@@ -104,8 +104,12 @@ export const loginController = async (req, res) => {
 };
 
 export const logoutController = (req, res) => {
-  clearCookies(res);
-  res.status(200).json({ message: "Logout successful" });
+  try {
+    clearCookies(res);
+    res.status(200).json({ message: "Logout successful", success: true });
+  } catch (error) {
+    res.status(500).json({ message: "Error logging out", error, success: false });
+  }
 };
 
 export const otpVerificationController = async (req, res) => {
@@ -213,5 +217,23 @@ export const checkAuthController = async (req, res) => {
       });
   } catch (error) {
     res.status(500).json({ message: "Error fetching user", error });
+  }
+};
+
+export const updateProfileController = async (req, res) => {
+  const { name, phone, room, profilePicture } = req.body;
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.name = name || user.name;
+    user.phone = phone || user.phone;
+    user.room = room || user.room;
+    user.profilePicture = profilePicture || user.profilePicture;
+    await user.save();
+    res.status(200).json({ message: "Profile updated successfully", user:{...user._doc, password: undefined} });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating profile", error });
   }
 };

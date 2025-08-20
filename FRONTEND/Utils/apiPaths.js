@@ -16,4 +16,8 @@ export const API_PATHS = {
     ADMIN_DASHBOARD: "/admin",
 
     ADD_COMPLAINT: "/complaints",
+
+
+    FETCH_TODAYS_MENU: "/messmenu/today",
+    FETCH_ALL_NOTICES: "/notice/all",
 };

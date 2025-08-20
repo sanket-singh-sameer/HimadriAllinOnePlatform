@@ -1,6 +1,33 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useAuthStore } from "../store/authStore";
+import { API_PATHS } from "../../Utils/apiPaths";
+import axiosInstance from "../../Utils/axiosInstance";
 
 const Dashboard = () => {
+  const { logout, isLoading, error, user } = useAuthStore();
+  const [todaysMenu, setTodaysMenu] = useState(null);
+
+  const fetchTodaysMenu = async () => {
+    try {
+      const todaysMenu = await axiosInstance.get(API_PATHS.FETCH_TODAYS_MENU);
+      setTodaysMenu(todaysMenu.data);
+    } catch (error) {
+      console.error("Error fetching today's menu:", error);
+    }
+  };
+  console.log("Today's Menu:", todaysMenu);
+  useEffect(() => {
+    fetchTodaysMenu();
+  }, []);
+
+  const handleLogout = () => {
+    try {
+      logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
   return (
     <>
       <div className="min-h-screen flex bg-gradient-to-br from-[#f8f8f8] to-[#eaeaea]">
@@ -13,9 +40,12 @@ const Dashboard = () => {
                 </h4>
               </div>
               <div className="w-1/2 md:w-1/6 flex justify-center mt-3 md:mt-0">
-                <button className="mt-2 w-full bg-gray-900 text-white py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer">
+                <button
+                  onClick={handleLogout}
+                  className="mt-2 w-full bg-gray-900 text-white py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer"
+                >
                   <p className="!leading-none !m-0 !italic !font-semibold">
-                    Logout
+                    {isLoading ? "Logging out..." : "Logout"}
                   </p>
                 </button>
               </div>
@@ -34,36 +64,36 @@ const Dashboard = () => {
                            bg-gray-50 !text-gray-700 rounded-full border border-gray-200 
                           shadow-sm hover:shadow-md transition-all duration-300 uppercase !opacity-100"
                 >
-                  Boarder
+                  {user.role || "Boarder"}
                 </p>
               </div>
 
               <div className="flex flex-col items-center mb-6">
                 <img
-                  src="https://static.vecteezy.com/system/resources/thumbnails/020/911/740/small_2x/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
+                  src={user.profilePicture ? user.profilePicture : "https://static.vecteezy.com/system/resources/thumbnails/020/911/740/small_2x/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"}
                   alt="Profile Picture"
                   className="w-28 h-28 rounded-full border-4 border-gray-200 shadow-md object-cover"
                 />
                 <p className="!mt-6 !text-lg !font-semibold !opacity-100 !text-gray-900 !leading-none">
-                  Divyam Singh Duhoon
+                  {user.name}
                 </p>
                 <p className="!text-sm !text-gray-500 !opacity-100 !leading-none">
-                  24BCS041
+                  {user.roll}
                 </p>
               </div>
 
               <div className="space-y-5 text-gray-700 text-base flex-1">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold">Phone:</span>
-                  <span className="text-gray-600">+91 7698630094</span>
+                  <span className="text-gray-600">{user.phone || "N/A"}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-semibold">Email:</span>
-                  <span className="text-gray-600">24bcs041@nith.ac.in</span>
+                  <span className="text-gray-600">{user.email}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-semibold">Room No:</span>
-                  <span className="text-gray-600">509</span>
+                  <span className="text-gray-600">{user.room || "N/A"}</span>
                 </div>
               </div>
 
@@ -108,11 +138,17 @@ const Dashboard = () => {
                   ></div>
                   <div className="relative">
                     <h3 className="!text-left !font-semibold !text-gray-800 !text-3xl mb-2 group-hover:!text-gray-900 transition">
-                      Mess Menu
+                      Mess Menu ({todaysMenu ? todaysMenu?.day : "Not Available"})
                     </h3>
-                    <p className="!text-left !text-gray-600 !text-sm !leading-relaxed !opacity-100">
+                    {/* <p className="!text-left !text-gray-600 !text-sm !leading-relaxed !opacity-100">
                       Check today’s food menu.
-                    </p>
+                    </p> */}
+                      <ul className="!text-left !text-gray-600 !text-sm !leading-relaxed !opacity-100">
+                        <li><b>Breakfast</b> : {todaysMenu?.breakfast || "N/A"}</li>
+                        <li><b>Lunch</b> : {todaysMenu?.lunch || "N/A"}</li>
+                        <li><b>Snacks</b> : {todaysMenu?.snacks || "N/A"}</li>
+                        <li><b>Dinner</b> : {todaysMenu?.dinner || "N/A"}</li>
+                      </ul>
                   </div>
                 </div>
               </div>
