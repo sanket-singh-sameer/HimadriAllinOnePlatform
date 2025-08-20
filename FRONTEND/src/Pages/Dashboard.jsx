@@ -6,6 +6,7 @@ import axiosInstance from "../../Utils/axiosInstance";
 const Dashboard = () => {
   const { logout, isLoading, error, user } = useAuthStore();
   const [todaysMenu, setTodaysMenu] = useState(null);
+  const [activeFeature, setActiveFeature] = useState("complaints");
 
   const fetchTodaysMenu = async () => {
     try {
@@ -42,9 +43,9 @@ const Dashboard = () => {
               <div className="w-1/2 md:w-1/6 flex justify-center mt-3 md:mt-0">
                 <button
                   onClick={handleLogout}
-                  className="mt-2 w-full bg-gray-900 text-white py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer"
+                  className="mt-2 w-full bg-gray-900  py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer"
                 >
-                  <p className="!leading-none !m-0 !italic !font-semibold">
+                  <p className="!leading-none !text-white !m-0 !italic !font-semibold !opacity-100">
                     {isLoading ? "Logging out..." : "Logout"}
                   </p>
                 </button>
@@ -60,9 +61,9 @@ const Dashboard = () => {
                 </h3>
                 <p
                   className="inline-block px-6 py-2 sm:px-5 sm:py-1.5 xs:px-4 xs:py-1 
-                              !text-sm xs:!text-xs !font-semibold !tracking-wide 
-                           bg-gray-50 !text-gray-700 rounded-full border border-gray-200 
-                          shadow-sm hover:shadow-md transition-all duration-300 uppercase !opacity-100"
+                    !text-sm xs:!text-xs !font-semibold !tracking-wide 
+                 bg-gray-50 !text-gray-700 rounded-full border border-gray-200 
+                shadow-sm hover:shadow-md transition-all duration-300 uppercase !opacity-100"
                 >
                   {user.role || "Boarder"}
                 </p>
@@ -70,7 +71,11 @@ const Dashboard = () => {
 
               <div className="flex flex-col items-center mb-6">
                 <img
-                  src={user.profilePicture ? user.profilePicture : "https://static.vecteezy.com/system/resources/thumbnails/020/911/740/small_2x/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"}
+                  src={
+                    user.profilePicture
+                      ? user.profilePicture
+                      : "https://static.vecteezy.com/system/resources/thumbnails/020/911/740/small_2x/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
+                  }
                   alt="Profile Picture"
                   className="w-28 h-28 rounded-full border-4 border-gray-200 shadow-md object-cover"
                 />
@@ -105,61 +110,202 @@ const Dashboard = () => {
               </button>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 lg:col-span-2 ">
-              <h3 className="text-2xl !font-black text-gray-900 mb-10 tracking-tight !italic underline">
-                Features
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-                <div
-                  className="group relative p-6 bg-gray-50 rounded-2xl border border-gray-100 shadow-sm 
-                    hover:shadow-lg hover:border-gray-200 transition-all duration-300 cursor-pointer h-fit"
-                >
-                  <div
-                    className="absolute inset-0 rounded-2xl bg-gradient-to-br from-gray-100 to-white 
-                      opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  ></div>
-                  <div className="relative">
-                    <h3 className="!text-left !font-semibold !text-gray-800 !text-3xl mb-2 group-hover:!text-gray-900 transition">
-                      Complaints
-                    </h3>
-                    <p className="!text-left !text-gray-600 !text-sm !leading-relaxed !opacity-100">
-                      Raise and track hostel-related complaints.
-                    </p>
-                  </div>
-                </div>
-
-                <div
-                  className="group relative p-6 bg-gray-50 rounded-2xl border border-gray-100 shadow-sm 
-                    hover:shadow-lg hover:border-gray-200 transition-all duration-300 cursor-pointer h-fit"
-                >
-                  <div
-                    className="absolute inset-0 rounded-2xl bg-gradient-to-br from-gray-100 to-white 
-                      opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  ></div>
-                  <div className="relative">
-                    <h3 className="!text-left !font-semibold !text-gray-800 !text-3xl mb-2 group-hover:!text-gray-900 transition">
-                      Mess Menu ({todaysMenu ? todaysMenu?.day : "Not Available"})
-                    </h3>
-                    {/* <p className="!text-left !text-gray-600 !text-sm !leading-relaxed !opacity-100">
-                      Check today’s food menu.
-                    </p> */}
-                      <ul className="!text-left !text-gray-600 !text-sm !leading-relaxed !opacity-100">
-                        <li><b>Breakfast</b> : {todaysMenu?.breakfast || "N/A"}</li>
-                        <li><b>Lunch</b> : {todaysMenu?.lunch || "N/A"}</li>
-                        <li><b>Snacks</b> : {todaysMenu?.snacks || "N/A"}</li>
-                        <li><b>Dinner</b> : {todaysMenu?.dinner || "N/A"}</li>
-                      </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-3xl shadow-lg p-10 border border-gray-100 lg:col-span-3">
+            <div className="bg-white rounded-3xl shadow-lg p-10 border border-gray-100 lg:col-span-2">
               <h3 className="text-2xl font-extrabold text-gray-900 mb-8 tracking-tight !italic underline ">
                 Notice Board
               </h3>
-
               <ul className="space-y-6 text-gray-700 text-base"></ul>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 lg:col-span-3">
+              <h3 className="text-2xl !font-black text-gray-900 mb-10 tracking-tight !italic underline">
+                Features
+              </h3>
+
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="flex flex-col space-y-4 mt-6">
+                  <button
+                    onClick={() => setActiveFeature("complaints")}
+                    className={`w-full cursor-pointer px-5 py-3.5 rounded-xl font-semibold text-left border transition-all duration-300
+                    ${
+                      activeFeature === "complaints"
+                        ? "bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-lg scale-[1.02]"
+                        : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-gray-200"
+                    } hover:shadow-md hover:scale-[1.01]`}
+                  >
+                    Register a Complaint
+                  </button>
+
+                  <button
+                    onClick={() => setActiveFeature("mess")}
+                    className={`w-full cursor-pointer mt-3 px-5 py-3.5 rounded-xl font-semibold text-left border transition-all duration-300
+                    ${
+                      activeFeature === "mess"
+                        ? "bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-lg scale-[1.02]"
+                        : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-gray-200"
+                    } hover:shadow-md hover:scale-[1.01]`}
+                  >
+                    Today’s Mess Menu
+                  </button>
+                </div>
+
+                <div className="lg:col-span-3 bg-gray-50 rounded-2xl border border-gray-100 p-6 shadow-inner">
+                  {activeFeature === "complaints" && (
+                    <div className="w-full bg-white rounded-3xl shadow-md border border-gray-100 p-6 sm:p-10 max-w-4xl mx-auto">
+                      <h3 className="!text-3xl sm:!text-4xl !font-semibold text-gray-900 text-center mb-8">
+                        Complaint Register
+                      </h3>
+
+                      <form className="space-y-5">
+                        <div>
+                          <label className="block text-gray-700 font-medium mb-1">
+                            Name
+                          </label>
+                          <input
+                            type="text"
+                            className="w-full rounded-xl border border-gray-300 px-4 py-2 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:outline-none text-sm sm:text-base"
+                            placeholder="Enter your name"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-gray-700 font-medium mb-1">
+                            Room No.
+                          </label>
+                          <input
+                            type="text"
+                            className="w-full rounded-xl border border-gray-300 px-4 py-2 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:outline-none text-sm sm:text-base"
+                            placeholder="Enter your room number"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-gray-700 font-medium mb-1">
+                            Type
+                          </label>
+                          <select className="w-full rounded-xl border border-gray-300 px-4 py-2 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:outline-none text-sm sm:text-base">
+                            <option>Mess</option>
+                            <option>Water</option>
+                            <option>Bathroom</option>
+                            <option>Electricity</option>
+                            <option>Internet</option>
+                            <option>Floor-related</option>
+                            <option>Elevator-related</option>
+                            <option>Furniture-related</option>
+                            <option>Security-related</option>
+                            <option>Others</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-gray-700 font-medium mb-1">
+                            Description
+                          </label>
+                          <textarea
+                            rows="3"
+                            className="w-full rounded-xl border border-gray-300 px-4 py-2 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:outline-none text-sm sm:text-base"
+                            placeholder="Describe the issue..."
+                          ></textarea>
+                        </div>
+
+                        <button
+                          type="submit"
+                          className="w-full cursor-pointer bg-gray-900 text-white font-semibold py-2.5 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition-all text-sm sm:text-base"
+                        >
+                          Add Complaint
+                        </button>
+                      </form>
+
+                      <div className="relative my-8 sm:my-10">
+                        <div className="absolute inset-0 flex items-center">
+                          <div className="w-full border-t border-gray-200"></div>
+                        </div>
+                        <div className="relative flex justify-center">
+                          <span className="px-3 sm:px-4 bg-white text-gray-400 text-xs sm:text-sm font-medium">
+                            Complaints List
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
+                        <table className="w-full min-w-[600px] border-collapse text-left text-gray-700 text-sm sm:text-base">
+                          <thead>
+                            <tr className="bg-gray-100 text-gray-900 font-semibold">
+                              <th className="p-3 sm:p-4">Name</th>
+                              <th className="p-3 sm:p-4">Room</th>
+                              <th className="p-3 sm:p-4">Type</th>
+                              <th className="p-3 sm:p-4">Dated On</th>
+                              <th className="p-3 sm:p-4">Description</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr className="border-b hover:bg-gray-50 transition-colors">
+                              <td className="p-3 sm:p-4 font-medium text-gray-900">
+                                Divyam Singh
+                              </td>
+                              <td className="p-3 sm:p-4">509</td>
+                              <td className="p-3 sm:p-4">Other</td>
+                              <td className="p-3 sm:p-4">2023-10-01</td>
+                              <td className="p-3 sm:p-4">
+                                Dustbin not cleaned for days
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeFeature === "mess" && (
+                    <div className="w-full bg-white rounded-3xl shadow-md border border-gray-100 p-10 max-w-2xl mx-auto">
+                      <h3 className="!text-4xl !font-semibold text-gray-900 text-center">
+                        Mess Menu
+                      </h3>
+                      <p className="!text-center !text-gray-900 mt-2 !text-xl !opacity-100 uppercase !italic">
+                        [{todaysMenu ? todaysMenu?.day : "Not Available"}]
+                      </p>
+
+                      <div className="mt-10 divide-y divide-gray-200">
+                        <div className="py-5 flex flex-col md:flex-row justify-between items-center">
+                          <p className="!text-lg !font-semibold !text-gray-900 ">
+                            Breakfast
+                          </p>
+                          <span className="text-gray-600 text-base max-w-xs text-right leading-relaxed !text-center md:!text-right">
+                            {todaysMenu?.breakfast || "N/A"}
+                          </span>
+                        </div>
+
+                        <div className="py-5 flex flex-col md:flex-row justify-between items-center">
+                          <p className="!text-lg !font-semibold !text-gray-900">
+                            Lunch
+                          </p>
+                          <span className="text-gray-600 text-base max-w-xs text-right leading-relaxed">
+                            {todaysMenu?.lunch || "N/A"}
+                          </span>
+                        </div>
+
+                        <div className="py-5 flex flex-col md:flex-row justify-between items-center">
+                          <p className="!text-lg !font-semibold !text-gray-900">
+                            Snacks
+                          </p>
+                          <span className="text-gray-600 text-base max-w-xs text-right leading-relaxed">
+                            {todaysMenu?.snacks || "N/A"}
+                          </span>
+                        </div>
+
+                        <div className="py-5 flex flex-col md:flex-row justify-between items-center">
+                          <p className="!text-lg !font-semibold !text-gray-900">
+                            Dinner
+                          </p>
+                          <span className="text-gray-600 text-base max-w-xs text-right leading-relaxed">
+                            {todaysMenu?.dinner || "N/A"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </main>
