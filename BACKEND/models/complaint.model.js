@@ -34,8 +34,8 @@ const complaintSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "under-progress", "resolved", "rejected"],
-      default: "pending",
+      enum: ["Pending", "Under-Progress", "Resolved", "Rejected"],
+      default: "Pending",
     },
   },
   { timestamps: true }
