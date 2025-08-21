@@ -9,6 +9,7 @@ export const API_PATHS = {
     FORGOT_PASSWORD: "/auth/forgot-password",
     RESET_PASSWORD: (token) => `/auth/reset-password/${token}`,
     CHECK_AUTH: "/auth/check-auth",
+    EDIT_PROFILE: "/auth/update-profile",
 
 
     ADMIN_LOGIN: "/admin/login",
