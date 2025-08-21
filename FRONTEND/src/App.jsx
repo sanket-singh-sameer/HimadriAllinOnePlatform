@@ -7,6 +7,7 @@ import Signup from "./Pages/SignUp";
 import Home from "./Pages/Home";
 import OTPv from "./Pages/OTP-v";
 import Dashboard from "./Pages/Dashboard";
+import Admin from "./Pages/Admin";
 import { useAuthStore } from "./store/authStore";
 import { FullPageLoader } from "./Components/LoadingSpinner";
 
@@ -73,6 +74,7 @@ function App() {
             </ProtectedRoute>
           }
         ></Route>
+        <Route path="/admin" element={<Admin />}></Route>
       </Routes>
     </main>
   );
