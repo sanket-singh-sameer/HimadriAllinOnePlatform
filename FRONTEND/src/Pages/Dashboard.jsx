@@ -7,6 +7,7 @@ const Dashboard = () => {
   const { logout, isLoading, error, user } = useAuthStore();
   const [formLoading, setFormLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [allNotices, setAllNotices] = useState([]);
 
   const [formError, setFormError] = useState(null);
   const [todaysMenu, setTodaysMenu] = useState(null);
@@ -20,6 +21,11 @@ const Dashboard = () => {
     photo: null,
     description: "",
   });
+  const [editProfileForm, setEditProfileForm] = useState({
+    name: user.name || "",
+    room: user.room || "",
+    phone: user.phone || "",
+  });
 
   const fetchTodaysMenu = async () => {
     try {
@@ -30,9 +36,17 @@ const Dashboard = () => {
     }
   };
 
-  const handleLogout = () => {
+  const fetchAllNotices = async () => {
     try {
-      logout();
+      const response = await axiosInstance.get(API_PATHS.FETCH_ALL_NOTICES);
+      setAllNotices(response.data.notices);
+    } catch (error) {
+      console.error("Error fetching all notices:", error);
+    }
+  };
+  const handleLogout = async () => {
+    try {
+      await logout();
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -41,6 +55,10 @@ const Dashboard = () => {
   const handleFormDataChange = (e) => {
     const { name, value } = e.target;
     setComplaintForm((prev) => ({ ...prev, [name]: value }));
+  };
+  const handleEditFormChange = (e) => {
+    const { name, value } = e.target;
+    setEditProfileForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAddComplaint = async (e) => {
@@ -97,9 +115,39 @@ const Dashboard = () => {
     }
   };
 
+  const fetchUserData = async () => {
+    try {
+      const response = await axiosInstance.get(API_PATHS.CHECK_AUTH);
+      if (response.status === 200) {
+        useAuthStore.setState({ user: response.data.user });
+      }
+      console.log("User Data:", response.data.user);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
+  const handleEditProfile = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axiosInstance.put(
+        API_PATHS.EDIT_PROFILE,
+        editProfileForm
+      );
+      if (response.status === 200) {
+        console.log("Profile updated:", response.data);
+      }
+      setIsOpen(false);
+      fetchUserData();
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    }
+  };
+
   useEffect(() => {
     fetchTodaysMenu();
     fetchMyComplaint();
+    fetchAllNotices();
   }, []);
 
   return (
@@ -199,15 +247,18 @@ const Dashboard = () => {
                         Edit Profile
                       </h3>
 
-                      <form className="space-y-6">
+                      <form onSubmit={handleEditProfile} className="space-y-6">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
                             Full Name
                           </label>
                           <input
+                            value={editProfileForm.name}
                             type="text"
+                            name="name"
                             className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm"
                             placeholder="Enter Your Name"
+                            onChange={handleEditFormChange}
                           />
                         </div>
 
@@ -216,9 +267,12 @@ const Dashboard = () => {
                             Phone Number
                           </label>
                           <input
+                            value={editProfileForm.phone}
                             type="tel"
+                            name="phone"
                             className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm"
-                            placeholder="Enter Your Phone Number"
+                            placeholder="Enter Your Phone Number (+91 9876543210)"
+                            onChange={handleEditFormChange}
                           />
                         </div>
 
@@ -227,9 +281,12 @@ const Dashboard = () => {
                             Room No
                           </label>
                           <input
-                            type="text"
+                            value={editProfileForm.room}
+                            type="number"
+                            name="room"
                             className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm"
                             placeholder="Enter Your Room Number"
+                            onChange={handleEditFormChange}
                           />
                         </div>
 
@@ -254,38 +311,29 @@ const Dashboard = () => {
               </h3>
               <ul className="space-y-6 text-gray-700 text-base max-h-[380px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                 <ul className="space-y-4">
-                  <li className="bg-gray-50 rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all">
-                    <p className="!text-3xl !font-light !text-gray-900 !text-left">
-                      Notice 1
-                    </p>
-                    <p className="!text-gray-600 !text-sm !leading-relaxed !text-left ml-6 !opacity-100">
-                      Dated on: <span>01/01/2023</span>
-                    </p>
-                    <p className="!text-gray-600 !text-sm !leading-relaxed !text-left ml-6 !opacity-100">
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Ad dignissimos nisi nam minima, asperiores reiciendis,
-                      voluptate amet perferendis eligendi...
-                    </p>
-                    <p className="!text-gray-900 !text-lg !leading-relaxed !text-right !font-semibold">
-                      -Author
-                    </p>
-                  </li>
-                  <li className="bg-gray-50 rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all">
-                    <p className="!text-3xl !font-light !text-gray-900 !text-left">
-                      Notice 2
-                    </p>
-                    <p className="!text-gray-600 !text-sm !leading-relaxed !text-left ml-6 !opacity-100">
-                      Dated on: <span>01/01/2023</span>
-                    </p>
-                    <p className="!text-gray-600 !text-sm !leading-relaxed !text-left ml-6 !opacity-100">
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Ad dignissimos nisi nam minima, asperiores reiciendis,
-                      voluptate amet perferendis eligendi...
-                    </p>
-                    <p className="!text-gray-900 !text-lg !leading-relaxed !text-right !font-semibold">
-                      -Author
-                    </p>
-                  </li>
+                  {allNotices.map((notice, idx) => (
+                    idx < 10 && (
+                    <li
+                      key={notice._id}
+                      className="bg-gray-50 rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all"
+                    >
+                      <p className="!text-3xl !font-light !text-gray-900 !text-left">
+                        {notice.title}
+                      </p>
+                      <p className="!text-gray-600 !text-sm !leading-relaxed !text-left ml-6 !opacity-100">
+                        Dated on:{" "}
+                        <span>
+                          {(new Date(notice.date)).toLocaleDateString()}
+                        </span>
+                      </p>
+                      <p className="!text-gray-600 !text-sm !leading-relaxed !text-left ml-6 !opacity-100">
+                        {notice.description}
+                      </p>
+                      <p className="!text-gray-900 !text-lg !leading-relaxed !text-right !font-semibold">
+                        - {notice.author}
+                      </p>
+                    </li>
+                  )))}
                 </ul>
               </ul>
             </div>
