@@ -6,6 +6,8 @@ import axiosInstance from "../../Utils/axiosInstance";
 const Dashboard = () => {
   const { logout, isLoading, error, user } = useAuthStore();
   const [formLoading, setFormLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
   const [formError, setFormError] = useState(null);
   const [todaysMenu, setTodaysMenu] = useState(null);
   const [myComplaints, setMyComplaints] = useState(null);
@@ -173,19 +175,119 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <button
-                disabled
-                className="mt-8 w-full bg-gray-300 text-gray-500 py-2.5 rounded-lg cursor-not-allowed shadow-inner"
-              >
-                Edit Profile
-              </button>
+              <div className="w-full">
+                <button
+                  onClick={() => setIsOpen(true)}
+                  className="mt-8 w-full bg-gray-900 !text-white  py-3 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer "
+                >
+                  <p className="!m-0 !leading-none !text-lg !text-white !font-semibold !italic !opacity-100">
+                    Edit Profile
+                  </p>
+                </button>
+
+                {isOpen && (
+                  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-10 relative transition-all">
+                      <button
+                        onClick={() => setIsOpen(false)}
+                        className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl"
+                      >
+                        ✕
+                      </button>
+
+                      <h3 className="text-2xl font-extrabold text-gray-900 mb-8 tracking-tight">
+                        Edit Profile
+                      </h3>
+
+                      <form className="space-y-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Full Name
+                          </label>
+                          <input
+                            type="text"
+                            className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm"
+                            placeholder="Enter Your Name"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Phone Number
+                          </label>
+                          <input
+                            type="tel"
+                            className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm"
+                            placeholder="Enter Your Phone Number"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Room No
+                          </label>
+                          <input
+                            type="text"
+                            className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm"
+                            placeholder="Enter Your Room Number"
+                          />
+                        </div>
+
+                        <button
+                          type="submit"
+                          className="w-full bg-gray-900 py-3.5 rounded-xl hover:bg-gray-700 shadow-lg cursor-pointer transition"
+                        >
+                          <p className="!m-0 !leading-none !text-lg !text-white !font-semibold !italic !opacity-100 ">
+                            Save Changes
+                          </p>
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="bg-white rounded-3xl shadow-lg p-10 border border-gray-100 lg:col-span-2">
               <h3 className="text-2xl font-extrabold text-gray-900 mb-8 tracking-tight !italic underline ">
                 Notice Board
               </h3>
-              <ul className="space-y-6 text-gray-700 text-base"></ul>
+              <ul className="space-y-6 text-gray-700 text-base max-h-[380px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                <ul className="space-y-4">
+                  <li className="bg-gray-50 rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all">
+                    <p className="!text-3xl !font-light !text-gray-900 !text-left">
+                      Notice 1
+                    </p>
+                    <p className="!text-gray-600 !text-sm !leading-relaxed !text-left ml-6 !opacity-100">
+                      Dated on: <span>01/01/2023</span>
+                    </p>
+                    <p className="!text-gray-600 !text-sm !leading-relaxed !text-left ml-6 !opacity-100">
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      Ad dignissimos nisi nam minima, asperiores reiciendis,
+                      voluptate amet perferendis eligendi...
+                    </p>
+                    <p className="!text-gray-900 !text-lg !leading-relaxed !text-right !font-semibold">
+                      -Author
+                    </p>
+                  </li>
+                  <li className="bg-gray-50 rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all">
+                    <p className="!text-3xl !font-light !text-gray-900 !text-left">
+                      Notice 2
+                    </p>
+                    <p className="!text-gray-600 !text-sm !leading-relaxed !text-left ml-6 !opacity-100">
+                      Dated on: <span>01/01/2023</span>
+                    </p>
+                    <p className="!text-gray-600 !text-sm !leading-relaxed !text-left ml-6 !opacity-100">
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      Ad dignissimos nisi nam minima, asperiores reiciendis,
+                      voluptate amet perferendis eligendi...
+                    </p>
+                    <p className="!text-gray-900 !text-lg !leading-relaxed !text-right !font-semibold">
+                      -Author
+                    </p>
+                  </li>
+                </ul>
+              </ul>
             </div>
 
             <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 lg:col-span-3">
@@ -252,7 +354,7 @@ const Dashboard = () => {
                             onChange={handleFormDataChange}
                             type="text"
                             className="w-full rounded-xl border border-gray-300 px-4 py-2"
-                            placeholder="Enter your room number"
+                            placeholder="Enter Your Room Number"
                           />
                         </div>
 
@@ -302,7 +404,7 @@ const Dashboard = () => {
                             onChange={handleFormDataChange}
                             type="text"
                             className="w-full rounded-xl border border-gray-300 px-4 py-2"
-                            placeholder="Describe the issue in one line..."
+                            placeholder="Describe The Issue In One Line..."
                           />
                         </div>
 
@@ -316,10 +418,10 @@ const Dashboard = () => {
                             onChange={handleFormDataChange}
                             rows="3"
                             className="w-full rounded-xl border border-gray-300 px-4 py-2"
-                            placeholder="Describe the issue in detail..."
+                            placeholder="Describe The Issue In Detail..."
                           ></textarea>
                         </div>
-                        <p className="text-red-500">{formError}</p>
+                        <p className="text-red-700 !italic">{formError}</p>
 
                         <button
                           type="submit"
@@ -343,20 +445,23 @@ const Dashboard = () => {
                       </div>
 
                       <div className="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
-                        <table className="w-full min-w-[600px] border-collapse text-left text-gray-700 text-sm sm:text-base">
-                          <thead>
-                            <tr className="bg-gray-100 text-gray-900 font-semibold">
-                              <th className="p-3 sm:p-4">Serial No</th>
-                              <th className="p-3 sm:p-4">Room</th>
-                              <th className="p-3 sm:p-4">Category</th>
-                              <th className="p-3 sm:p-4">Dated On</th>
-                              <th className="p-3 sm:p-4">Short Description</th>
-                              <th className="p-3 sm:p-4">Status</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {myComplaints?.map((complaint, index) => {
-                              return (
+                        {/* Desktop Table */}
+                        <div className="hidden sm:block overflow-x-auto">
+                          <table className="w-full border-collapse text-left text-gray-700 text-sm sm:text-base">
+                            <thead>
+                              <tr className="bg-gray-100 text-gray-900 font-semibold">
+                                <th className="p-3 sm:p-4">Serial No</th>
+                                <th className="p-3 sm:p-4">Room</th>
+                                <th className="p-3 sm:p-4">Category</th>
+                                <th className="p-3 sm:p-4">Dated On</th>
+                                <th className="p-3 sm:p-4">
+                                  Short Description
+                                </th>
+                                <th className="p-3 sm:p-4">Status</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {myComplaints?.map((complaint, index) => (
                                 <tr
                                   key={index}
                                   className="border-b hover:bg-gray-50 transition-colors"
@@ -380,10 +485,48 @@ const Dashboard = () => {
                                     {complaint?.status || "N/A"}
                                   </td>
                                 </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        {/* Mobile Cards */}
+                        <div className="sm:hidden space-y-4">
+                          {myComplaints?.map((complaint, index) => (
+                            <div
+                              key={index}
+                              className="bg-white rounded-lg shadow border border-gray-200 p-4"
+                            >
+                              <p className="text-sm font-semibold text-gray-900 mb-2">
+                                Complaint #{index + 1}
+                              </p>
+                              <div className="space-y-1 text-sm text-gray-700">
+                                <p>
+                                  <span className="font-medium">Room:</span>{" "}
+                                  {complaint?.room || "N/A"}
+                                </p>
+                                <p>
+                                  <span className="font-medium">Category:</span>{" "}
+                                  {complaint?.category || "N/A"}
+                                </p>
+                                <p>
+                                  <span className="font-medium">Dated On:</span>{" "}
+                                  {complaint?.date || "N/A"}
+                                </p>
+                                <p>
+                                  <span className="font-medium">
+                                    Description:
+                                  </span>{" "}
+                                  {complaint?.title || "N/A"}
+                                </p>
+                                <p>
+                                  <span className="font-medium">Status:</span>{" "}
+                                  {complaint?.status || "N/A"}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -402,7 +545,7 @@ const Dashboard = () => {
                           <p className="!text-lg !font-semibold !text-gray-900 ">
                             Breakfast
                           </p>
-                          <span className="text-gray-600 text-base max-w-xs text-right leading-relaxed !text-center md:!text-right">
+                          <span className="text-gray-600 text-base max-w-xs leading-relaxed !text-center md:!text-right">
                             {todaysMenu?.breakfast || "N/A"}
                           </span>
                         </div>
@@ -411,7 +554,7 @@ const Dashboard = () => {
                           <p className="!text-lg !font-semibold !text-gray-900">
                             Lunch
                           </p>
-                          <span className="text-gray-600 text-base max-w-xs text-right leading-relaxed">
+                          <span className="text-gray-600 text-base max-w-xs leading-relaxed !text-center md:!text-right">
                             {todaysMenu?.lunch || "N/A"}
                           </span>
                         </div>
@@ -420,7 +563,7 @@ const Dashboard = () => {
                           <p className="!text-lg !font-semibold !text-gray-900">
                             Snacks
                           </p>
-                          <span className="text-gray-600 text-base max-w-xs text-right leading-relaxed">
+                          <span className="text-gray-600 text-base max-w-xs !text-center md:!text-right leading-relaxed">
                             {todaysMenu?.snacks || "N/A"}
                           </span>
                         </div>
@@ -429,7 +572,7 @@ const Dashboard = () => {
                           <p className="!text-lg !font-semibold !text-gray-900">
                             Dinner
                           </p>
-                          <span className="text-gray-600 text-base max-w-xs text-right leading-relaxed">
+                          <span className="text-gray-600 text-base max-w-xs !text-center md:!text-right leading-relaxed">
                             {todaysMenu?.dinner || "N/A"}
                           </span>
                         </div>
