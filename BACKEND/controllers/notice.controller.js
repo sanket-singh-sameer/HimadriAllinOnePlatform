@@ -1,4 +1,5 @@
 import Notice from "../models/notice.model.js";
+import User from "../models/user.model.js";
 
 export const createNotice = async (req, res) => {
   const { title, description } = req.body;
@@ -16,11 +17,24 @@ export const createNotice = async (req, res) => {
   }
 };
 
-
 export const viewAllNotices = async (req, res) => {
   try {
+    const getAuthorNameById = async (authorId) => {
+      const user = await User.findById(authorId);
+      return user ? user.name : "Unknown";
+    };
     const notices = await Notice.find();
-    res.status(200).json({ message: "Notices retrieved successfully", notices });
+    res
+      .status(200)
+      .json({
+        message: "Notices retrieved successfully",
+        notices: await Promise.all(
+          notices.map(async (notice) => ({
+            ...notice._doc,
+            author: await getAuthorNameById(notice.author),
+          }))
+        ),
+      });
   } catch (error) {
     console.error("Error retrieving notices:", error);
     res.status(500).json({ message: "Error retrieving notices" });
