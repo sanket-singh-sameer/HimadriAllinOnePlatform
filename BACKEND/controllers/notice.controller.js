@@ -29,7 +29,7 @@ export const viewAllNotices = async (req, res) => {
       .json({
         message: "Notices retrieved successfully",
         notices: await Promise.all(
-          notices.map(async (notice) => ({
+          notices.reverse().map(async (notice) => ({
             ...notice._doc,
             author: await getAuthorNameById(notice.author),
           }))
