@@ -21,4 +21,5 @@ export const API_PATHS = {
 
     FETCH_TODAYS_MENU: "/messmenu/today",
     FETCH_ALL_NOTICES: "/notice/all",
+    DELETE_NOTICE: (noticeId) => `/notice/${noticeId}`,
 };

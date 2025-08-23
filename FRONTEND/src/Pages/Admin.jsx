@@ -4,13 +4,26 @@ import axiosInstance from "../../Utils/axiosInstance";
 import { useAuthStore } from "../store/authStore";
 
 export default function Admin() {
+  const { logout, isLoading, error, user } = useAuthStore();
+
   const [formError, setFormError] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
+  const [selectedNotice, setSelectedNotice] = useState(null);
   const [openIndex, setOpenIndex] = useState(null);
+  const [allNotices, setAllNotices] = useState([]);
 
   const [activeFeature, setActiveFeature] = useState("statistics");
   const [todaysMenu, setTodaysMenu] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+
+  const fetchAllNotices = async () => {
+    try {
+      const response = await axiosInstance.get(API_PATHS.FETCH_ALL_NOTICES);
+      setAllNotices(response.data.notices);
+    } catch (error) {
+      console.error("Error fetching all notices:", error);
+    }
+  };
 
   const complaints = [
     {
@@ -51,9 +64,21 @@ export default function Admin() {
     setOpenIndex(openIndex === index ? null : index);
   };
 
-  const handleDeleteNotice = async () => {
-    console.log("Set karle isse lawde");
+  const handleDeleteNotice = async (noticeId) => {
+    try {
+      const response = await axiosInstance.delete(
+        API_PATHS.DELETE_NOTICE(noticeId)
+      );
+      console.log("Notice deleted successfully:", response.data);
+      setAllNotices((prevNotices) =>
+        prevNotices.filter((notice) => notice._id !== noticeId)
+      );
+    } catch (error) {
+      console.error("Error deleting notice:", error);
+    }
+    console.log("Deleting notice with ID:", noticeId);
     setShowConfirm(false);
+    setSelectedNotice(null);
   };
 
   const fetchTodaysMenu = async () => {
@@ -65,9 +90,19 @@ export default function Admin() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      console.log("Logout successful");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
   useEffect(() => {
     fetchTodaysMenu();
-  }, []);
+    fetchAllNotices();
+  }, [allNotices]);
 
   const COLORS = ["#4ade80", "#f87171"];
 
@@ -83,9 +118,12 @@ export default function Admin() {
                 </h4>
               </div>
               <div className="w-1/2 md:w-1/6 flex justify-center mt-3 md:mt-0">
-                <button className="mt-2 w-full bg-gray-900  py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer">
+                <button
+                  onClick={handleLogout}
+                  className="mt-2 w-full bg-gray-900  py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer"
+                >
                   <p className="!leading-none !text-white !m-0 !italic !font-semibold !opacity-100">
-                    Logout
+                    {isLoading ? "Logging out..." : "Logout"}
                   </p>
                 </button>
               </div>
@@ -104,7 +142,7 @@ export default function Admin() {
                  bg-gray-50 !text-gray-700 rounded-full border border-gray-200 
                 shadow-sm hover:shadow-md transition-all duration-300 uppercase !opacity-100"
                 >
-                  Admin
+                  {user?.role}
                 </p>
               </div>
 
@@ -115,25 +153,25 @@ export default function Admin() {
                   className="w-28 h-28 rounded-full border-4 border-gray-200 shadow-md object-cover"
                 />
                 <p className="!mt-6 !text-lg !font-semibold !opacity-100 !text-gray-900 !leading-none">
-                  Name
+                  {user?.name}
                 </p>
                 <p className="!text-sm !text-gray-500 !opacity-100 !leading-none">
-                  Roll
+                  {user?.roll || <span className="text-gray-400">N/A</span>}
                 </p>
               </div>
 
               <div className="space-y-5 text-gray-700 text-base flex-1">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold">Phone:</span>
-                  <span className="text-gray-600">1234567890</span>
+                  <span className="text-gray-600">{user?.phone}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-semibold">Email:</span>
-                  <span className="text-gray-600">john.doe@example.com</span>
+                  <span className="text-gray-600">{user?.email}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-semibold">Room No:</span>
-                  <span className="text-gray-600">101</span>
+                  <span className="text-gray-600">{user?.room}</span>
                 </div>
               </div>
 
@@ -223,74 +261,90 @@ export default function Admin() {
 
               <ul className="space-y-6 text-gray-700 text-base max-h-[380px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                 <ul className="space-y-4">
-                  <li className="bg-gray-50 rounded-2xl border border-gray-200 p-6 shadow-md hover:shadow-lg transition-all duration-300 relative">
-                    <button
-                      onClick={() => setShowConfirm(true)}
-                      className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition cursor-pointer"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M6 18 18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
+                  {allNotices.map(
+                    (notice, index) =>
+                      index < 10 && (
+                        <li
+                          key={notice._id || index}
+                          className="bg-gray-50 rounded-2xl border border-gray-200 p-6 shadow-md hover:shadow-lg transition-all duration-300 relative"
+                        >
+                          {(user.role === "admin" ||
+                            user.role === "super-admin") && (
+                            <button
+                              onClick={() => {
+                                setSelectedNotice(notice);
+                                setShowConfirm(true);
+                              }}
+                              className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition cursor-pointer"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth="1.5"
+                                stroke="currentColor"
+                                className="w-6 h-6"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M6 18 18 6M6 6l12 12"
+                                />
+                              </svg>
+                            </button>
+                          )}
 
-                    {showConfirm && (
-                      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center">
-                          <h3 className="!text-xl font-semibold text-gray-900 mb-4">
-                            Confirm Deletion
-                          </h3>
-                          <p className="text-gray-600 mb-6 !text-lg">
-                            Are you sure you want to delete this notice?
+                          <p className="!text-3xl !font-semibold !text-gray-900 !mb-3 !text-left">
+                            {notice.title}
                           </p>
-                          <div className="flex justify-center gap-4">
-                            <button
-                              onClick={() => setShowConfirm(false)}
-                              className="px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 bg-gray-50 hover:bg-gray-100 font-medium shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
-                            >
-                              Cancel
-                            </button>
+                          <p className="!text-gray-500 !text-sm !leading-relaxed !mb-3 !text-left ml-6">
+                            Dated on:{" "}
+                            <span className="!font-medium">{notice.date}</span>
+                          </p>
 
-                            <button
-                              className="px-5 py-2.5 rounded-lg text-white bg-gray-700 hover:bg-gray-800 font-medium shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
-                              onClick={() => handleDeleteNotice()}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                          <p className="!text-gray-700 !text-base !leading-relaxed !text-left ml-6 !mb-4">
+                            {notice.description}
+                          </p>
 
-                    <p className="!text-3xl !font-semibold !text-gray-900 !mb-3 !text-left">
-                      Notice 1
-                    </p>
-
-                    <p className="!text-gray-500 !text-sm !leading-relaxed !mb-3 !text-left ml-6">
-                      Dated on: <span className="!font-medium">01/01/2023</span>
-                    </p>
-
-                    <p className="!text-gray-700 !text-base !leading-relaxed !text-left ml-6 !mb-4">
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Ad dignissimos nisi nam minima, asperiores reiciendis,
-                      voluptate amet perferendis eligendi...
-                    </p>
-
-                    <p className="!text-gray-900 !text-lg !leading-relaxed !text-right !font-semibold">
-                      - Author
-                    </p>
-                  </li>
+                          <p className="!text-gray-900 !text-lg !leading-relaxed !text-right !font-semibold">
+                            - {notice.author}
+                          </p>
+                        </li>
+                      )
+                  )}
                 </ul>
+                {showConfirm && selectedNotice && (
+                  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center">
+                      <h3 className="!text-xl font-semibold text-gray-900 mb-4">
+                        Confirm Deletion
+                      </h3>
+                      <p className="text-gray-600 mb-6 !text-lg">
+                        Are you sure you want to delete this notice?
+                      </p>
+                      <div className="flex justify-center gap-4">
+                        <button
+                          onClick={() => {
+                            setShowConfirm(false);
+                            setSelectedNotice(null);
+                          }}
+                          className="px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 bg-gray-50 hover:bg-gray-100 font-medium shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          className="px-5 py-2.5 rounded-lg text-white bg-gray-700 hover:bg-gray-800 font-medium shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
+                          onClick={() =>
+                            handleDeleteNotice(selectedNotice?._id)
+                          }
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </ul>
             </div>
 

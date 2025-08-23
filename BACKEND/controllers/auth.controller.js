@@ -76,9 +76,6 @@ export const loginController = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    if (!email.startsWith("24") && !email.endsWith("@nith.ac.in")) {
-      return res.status(400).json({ message: "Use your college email" });
-    }
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });

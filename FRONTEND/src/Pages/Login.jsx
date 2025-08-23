@@ -13,12 +13,8 @@ export default function Login() {
     e.preventDefault();
     try {
       await login(email, password);
-      navigate("/dashboard");
     } catch (error) {
       console.error("Error during login:", error);
-      navigate("/login", {
-        state: { error: "Login failed. Please try again." },
-      });
     }
   };
   return (
