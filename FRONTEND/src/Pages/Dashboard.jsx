@@ -311,29 +311,31 @@ const Dashboard = () => {
               </h3>
               <ul className="space-y-6 text-gray-700 text-base max-h-[380px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                 <ul className="space-y-4">
-                  {allNotices.map((notice, idx) => (
-                    idx < 10 && (
-                    <li
-                      key={notice._id}
-                      className="bg-gray-50 rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all"
-                    >
-                      <p className="!text-3xl !font-light !text-gray-900 !text-left">
-                        {notice.title}
-                      </p>
-                      <p className="!text-gray-600 !text-sm !leading-relaxed !text-left ml-6 !opacity-100">
-                        Dated on:{" "}
-                        <span>
-                          {(new Date(notice.date)).toLocaleDateString()}
-                        </span>
-                      </p>
-                      <p className="!text-gray-600 !text-sm !leading-relaxed !text-left ml-6 !opacity-100">
-                        {notice.description}
-                      </p>
-                      <p className="!text-gray-900 !text-lg !leading-relaxed !text-right !font-semibold">
-                        - {notice.author}
-                      </p>
-                    </li>
-                  )))}
+                  {allNotices.map(
+                    (notice, idx) =>
+                      idx < 10 && (
+                        <li
+                          key={notice._id}
+                          className="bg-gray-50 rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all"
+                        >
+                          <p className="!text-3xl !font-light !text-gray-900 !text-left">
+                            {notice.title}
+                          </p>
+                          <p className="!text-gray-600 !text-sm !leading-relaxed !text-left ml-6 !opacity-100">
+                            Dated on:{" "}
+                            <span>
+                              {new Date(notice.date).toLocaleDateString()}
+                            </span>
+                          </p>
+                          <p className="!text-gray-600 !text-sm !leading-relaxed !text-left ml-6 !opacity-100">
+                            {notice.description}
+                          </p>
+                          <p className="!text-gray-900 !text-lg !leading-relaxed !text-right !font-semibold">
+                            - {notice.author}
+                          </p>
+                        </li>
+                      )
+                  )}
                 </ul>
               </ul>
             </div>
