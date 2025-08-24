@@ -161,10 +161,17 @@ const Dashboard = () => {
                   HBH Dashboard
                 </h4>
               </div>
-              <div className="w-1/2 md:w-1/6 flex justify-center mt-3 md:mt-0">
+              <div className="w-full md:w-1/3 gap-3 flex justify-end mt-3 md:mt-0">
+                {user.role !== "student" && (
+                  <button className="mt-2 w-full bg-gray-900  py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer">
+                    <p className="!leading-none !text-white !m-0 !italic !font-semibold !opacity-100">
+                      Go to Admin Dashboard
+                    </p>
+                  </button>)
+                }
                 <button
                   onClick={handleLogout}
-                  className="mt-2 w-full bg-gray-900  py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer"
+                  className="mt-2 w-1/2 bg-gray-900  py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer"
                 >
                   <p className="!leading-none !text-white !m-0 !italic !font-semibold !opacity-100">
                     {isLoading ? "Logging out..." : "Logout"}
