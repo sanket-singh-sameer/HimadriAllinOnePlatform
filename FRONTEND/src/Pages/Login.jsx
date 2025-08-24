@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuthStore } from "../store/authStore";
 
 export default function Login() {
@@ -8,6 +8,16 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { login, error, isLoading } = useAuthStore();
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,7 +29,7 @@ export default function Login() {
   };
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-[#f8f8f8] to-[#eaeaea] flex flex-col md:flex-row">
+      <div className="min-h-screen bg-gradient-to-br from-[#f8f8f8] to-[#eaeaea] flex flex-col md:flex-row overflow-hidden">
         <Link
           to="/signup"
           className="absolute top-6 right-8 text-gray-700 px-5 py-2 rounded transition hover:underline underline-offset-2 hidden md:block z-10"
@@ -29,14 +39,17 @@ export default function Login() {
         </Link>
 
         <div className="left-box w-full md:w-2/5 md:min-h-screen bg-white px-[clamp(32px,5vw,96px)] pt-[clamp(2rem,5vw,12rem)] pb-6 border-r border-gray-200 shadow-sm">
-          <h4
-            className="!text-left text-4xl font-semibold text-gray-800 [text-shadow:2px_2px_0px_rgba(0,0,0,0.05)]"
-            data-aos="zoom-in"
-          >
-            Himadri <br />
-            Boys <br />
-            Hostel
-          </h4>
+          <Link to={"/"}>
+            <h4
+              className="!text-left text-4xl font-semibold text-gray-800 [text-shadow:2px_2px_0px_rgba(0,0,0,0.05)]"
+              data-aos="zoom-in"
+            >
+              Himadri <br />
+              Boys <br />
+              Hostel
+            </h4>
+          </Link>
+
           <h6
             className="!leading-tight mt-6 text-gray-600  hidden md:block"
             data-aos="zoom-in"
@@ -92,10 +105,10 @@ export default function Login() {
                 required
               />
             </label>
-            {error && <p className="text-red-900 text-sm !italic">{error}</p>}
+            {error && <p className="text-red-700 !italic">{error}</p>}
             <button
               type="submit"
-              className="mt-4 bg-gray-900 text-white font-bold py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer"
+              className="mt-4 bg-gray-900 text-white font-bold py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer "
             >
               <p className="!leading-none !m-0 !italic !font-semibold">
                 {isLoading ? "Logging in..." : "Log In"}
