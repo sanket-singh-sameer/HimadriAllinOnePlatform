@@ -19,6 +19,7 @@ export const API_PATHS = {
   FETCH_ALL_COMPLAINTS: "/complaints/all",
   UPDATE_COMPLAINT_STATUS: (id) => `/complaints/${id}`,
 
+  ADD_NOTICE: "/notice/create",
   FETCH_TODAYS_MENU: "/messmenu/today",
   FETCH_ALL_NOTICES: "/notice/all",
   DELETE_NOTICE: (noticeId) => `/notice/${noticeId}`,

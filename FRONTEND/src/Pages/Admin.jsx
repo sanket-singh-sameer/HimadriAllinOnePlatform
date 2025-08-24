@@ -3,9 +3,11 @@ import { API_PATHS } from "../../Utils/apiPaths";
 import axiosInstance from "../../Utils/axiosInstance";
 import { useAuthStore } from "../store/authStore";
 import { set } from "mongoose";
+import { useNavigate } from "react-router-dom";
 
 export default function Admin() {
   const { logout, isLoading, error, user } = useAuthStore();
+  const navigate = useNavigate();
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedNotice, setSelectedNotice] = useState(null);
@@ -26,7 +28,6 @@ export default function Admin() {
   const [noticeForm, setNoticeForm] = useState({
     title: "",
     description: "",
-    author: "",
   });
   const [editProfileForm, setEditProfileForm] = useState({
     name: user.name || "",
@@ -45,20 +46,20 @@ export default function Admin() {
     setNoticeForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddNotice = async (e) => {
+  const handleAddNewNoticeForm = async (e) => {
     e.preventDefault();
     try {
       const noticeData = {
         ...noticeForm,
-        date: new Date().toISOString(),
       };
-      
-      const response = await axiosInstance.post(API_PATHS.ADD_NOTICE, noticeData);
+
+      const response = await axiosInstance.post(
+        API_PATHS.ADD_NOTICE,
+        noticeData
+      );
       if (response.status === 200 || response.status === 201) {
-        // Refresh notices list
         fetchAllNotices();
-        // Reset form and close popup
-        setNoticeForm({ title: "", description: "", author: "" });
+        setNoticeForm({ title: "", description: "" });
         setShowAddNoticeForm(false);
       }
     } catch (error) {
@@ -366,10 +367,20 @@ export default function Admin() {
             <header className="bg-white/80 w-[100%] backdrop-blur-md border-b border-gray-200 shadow-sm px-8 py-6 flex flex-col md:flex-row md:items-center md:justify-between rounded-b-2xl mx-auto">
               <div className="flex items-center gap-6">
                 <h4 className="text-5xl !font-light text-gray-900 leading-tight">
-                  HBH Dashboard
+                  Admin Panel
                 </h4>
               </div>
-              <div className="w-1/2 md:w-1/6 flex justify-center mt-3 md:mt-0">
+              <div className="w-full md:w-1/3 gap-3 flex justify-end mt-3 md:mt-0">
+                {user.role !== "student" && (
+                  <button
+                    onClick={() => navigate("/dashboard")}
+                    className="mt-2 w-full bg-gray-900  py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer"
+                  >
+                    <p className="!leading-none !text-white !m-0 !italic !font-semibold !opacity-100">
+                      Go to Admin Dashboard
+                    </p>
+                  </button>
+                )}
                 <button
                   onClick={handleLogout}
                   className="mt-2 w-full bg-gray-900  py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer"
@@ -518,7 +529,7 @@ export default function Admin() {
               </h3>
 
               <div className="mb-4 flex justify-end">
-                <button 
+                <button
                   onClick={() => setShowAddNoticeForm(true)}
                   className="px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-2xl border border-gray-200 shadow-md hover:shadow-lg hover:bg-gray-200 transition-all duration-300 cursor-pointer text-lg"
                 >
@@ -1154,21 +1165,33 @@ export default function Admin() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-xl mx-4">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="!text-2xl font-bold text-gray-900">Add New Notice</h3>
+              <h3 className="!text-2xl font-bold text-gray-900">
+                Add New Notice
+              </h3>
               <button
                 onClick={() => {
                   setShowAddNoticeForm(false);
-                  setNoticeForm({ title: "", description: "", author: "" });
+                  setNoticeForm({ title: "", description: "" });
                 }}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
 
-            <form onSubmit={handleAddNotice} className="space-y-6">
+            <form onSubmit={handleAddNewNoticeForm} className="space-y-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Title
@@ -1206,8 +1229,8 @@ export default function Admin() {
                 <input
                   type="text"
                   name="author"
-                  value={noticeForm.author}
-                  onChange={handleNoticeFormChange}
+                  value={user.name}
+                  readOnly
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                   placeholder="Enter author name"
                   required
@@ -1215,7 +1238,8 @@ export default function Admin() {
               </div>
 
               <div className="text-sm text-gray-500">
-                <span className="font-medium">Date:</span> {new Date().toLocaleDateString()}
+                <span className="font-medium">Date:</span>{" "}
+                {new Date().toLocaleDateString()}
               </div>
 
               <div className="flex gap-4 pt-4">
@@ -1223,7 +1247,7 @@ export default function Admin() {
                   type="button"
                   onClick={() => {
                     setShowAddNoticeForm(false);
-                    setNoticeForm({ title: "", description: "", author: "" });
+                    setNoticeForm({ title: "", description: "" });
                   }}
                   className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
                 >

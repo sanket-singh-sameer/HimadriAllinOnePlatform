@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useAuthStore } from "../store/authStore";
 import { API_PATHS } from "../../Utils/apiPaths";
 import axiosInstance from "../../Utils/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const { logout, isLoading, error, user } = useAuthStore();
   const [formLoading, setFormLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -163,7 +165,9 @@ const Dashboard = () => {
               </div>
               <div className="w-full md:w-1/3 gap-3 flex justify-end mt-3 md:mt-0">
                 {user.role !== "student" && (
-                  <button className="mt-2 w-full bg-gray-900  py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer">
+                  <button
+                    onClick={() => navigate("/admin")}
+                    className="mt-2 w-full bg-gray-900  py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer">
                     <p className="!leading-none !text-white !m-0 !italic !font-semibold !opacity-100">
                       Go to Admin Dashboard
                     </p>
