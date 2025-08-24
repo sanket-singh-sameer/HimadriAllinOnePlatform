@@ -4,18 +4,20 @@ import { Link } from "react-router-dom";
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f8f8f8] to-[#eaeaea]">
-      <nav className="flex justify-between items-center px-16 py-8 backdrop-blur-sm bg-white/80 border-b border-gray-200/50 relative z-20">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-gray-800 to-gray-600 rounded-lg flex items-center justify-center shadow-lg">
-            <h4 className="!text-white !font-bold !text-lg tracking-wider">
-              H
-            </h4>
+      <nav className="flex justify-between items-center px-16 py-8 backdrop-blur-sm bg-white/80 border-b border-gray-200/50 absolute w-full z-20">
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <div className="w-12 h-12 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 rounded-xl flex items-center justify-center shadow-xl border border-gray-600/20">
+              <h4 className="!text-white !font-black !text-xl tracking-wider transform hover:scale-110 transition-transform duration-300">
+                H
+              </h4>
+            </div>
           </div>
           <div className="flex flex-col">
-            <h4 className="!text-2xl !text-left !font-extrabold !text-gray-800 tracking-tight leading-none">
+            <h4 className="!text-2xl !text-left !font-black !text-gray-900 tracking-tight leading-none hover:!text-gray-700 transition-colors duration-300">
               HBH
             </h4>
-            <span className="!text-xs !text-gray-600 !font-medium tracking-wide leading-none">
+            <span className="!text-xs !text-gray-600 !font-semibold tracking-wider leading-none uppercase">
               Himadri Boys Hostel
             </span>
           </div>
@@ -38,82 +40,53 @@ export default function Home() {
 
       <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
 
-      <section className="h-screen flex items-center justify-center px-16 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <div className="grid grid-rows-3 h-screen py-20">
-            <div className="flex items-end justify-center pb-12">
-              <h1 className="!text-6xl xl:!text-8xl !font-black !leading-[0.8] tracking-[-0.02em] relative">
+      <section className="h-fit flex items-center px-16 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto w-full relative z-10">
+          <div className="flex flex-col justify-center h-screen py-20 mt-20 space-y-16">
+            <div className="space-y-8">
+              <h1 className="!text-6xl xl:!text-8xl !font-black !leading-[0.8] tracking-[-0.02em] relative !text-left">
                 <span className="block !text-gray-900 hover:!text-gray-700 transition-colors duration-500">
                   HIMADRI
                 </span>
                 <span className="block !text-gray-800 !font-light tracking-[0.3em] !text-4xl xl:!text-5xl mt-2">
                   BOYS HOSTEL
                 </span>
-                <div className="absolute -inset-4 bg-gradient-to-r from-transparent via-gray-200/20 to-transparent blur-3xl -z-10"></div>
-                <div className="absolute top-0 left-0 w-16 h-1 bg-gray-900 rounded-full"></div>
-                <div className="absolute bottom-0 right-0 w-24 h-0.5 bg-gray-600 rounded-full"></div>
               </h1>
-            </div>
 
-            <div className="flex items-center justify-center px-8">
-              <div className="max-w-5xl space-y-6">
-                <blockquote className="!text-2xl xl:!text-3xl !font-light !text-gray-800 !italic !leading-[1.4] !opacity-100 tracking-wide">
-                  "An all-in-one platform created by students, managed by
-                  students, making hostel life simpler, smarter, and more
-                  connected."
+              <div className="max-w-4xl space-y-6">
+                <blockquote className="!text-2xl xl:!text-3xl !font-light !text-gray-800 !italic !leading-[1.4] !opacity-100 tracking-wide !text-left">
+                  "This is an all-in-one platform created by students, managed
+                  by students, and built for every hosteler's life. It brings
+                  everything you need into one place—making hostel life simpler,
+                  smarter, and more connected."
                 </blockquote>
-                <p className="!text-xl xl:!text-2xl !text-gray-600 !font-medium !opacity-100 !leading-relaxed tracking-wide">
+                <p className="!text-xl xl:!text-2xl !text-gray-600 !font-medium !opacity-100 !leading-relaxed tracking-wide !text-left">
                   Because who knows hostel struggles better than us?
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start justify-center pt-12">
-              <div className="flex gap-8">
-                <a
-                  href="#features-section"
-                  className="!bg-gray-900 !text-white px-12 py-5 rounded-xl 
-             hover:!bg-gray-700 transition-all duration-300 
-             shadow-xl hover:shadow-2xl text-center !font-semibold 
-             !text-xl tracking-wide transform hover:scale-[1.02] 
-             active:scale-[0.98]"
-                >
-                  Know More
-                </a>
+            <div className="flex items-center gap-6">
+              <a
+                href="#features-section"
+                className="!bg-gray-900 !text-white px-10 py-4 rounded-xl 
+               hover:!bg-gray-700 transition-all duration-300 
+               shadow-xl hover:shadow-2xl !font-semibold 
+               !text-lg tracking-wide transform hover:scale-[1.02] 
+               active:scale-[0.98]"
+              >
+                Know More
+              </a>
 
-                <Link
-                  to="/signup"
-                  className="border-2 border-gray-300 !text-gray-700 px-12 py-5 rounded-xl hover:border-gray-500 hover:bg-white hover:shadow-xl transition-all duration-300 text-center !font-semibold !text-xl tracking-wide transform hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  Join Now
-                </Link>
-              </div>
+              <Link
+                to="/signup"
+                className="border-2 border-gray-300 !text-gray-700 px-10 py-4 rounded-xl hover:border-gray-500 hover:bg-white hover:shadow-xl transition-all duration-300 !font-semibold !text-lg tracking-wide transform hover:scale-[1.02] active:scale-[0.98]"
+              >
+                Join Now
+              </Link>
             </div>
           </div>
         </div>
-
-        <div className="absolute top-24 left-24 w-40 h-40 bg-gray-200/30 rounded-full blur-sm"></div>
-        <div className="absolute bottom-24 right-24 w-32 h-32 bg-gray-300/40 rounded-full blur-sm"></div>
-        <div className="absolute top-1/2 left-12 w-20 h-20 bg-gray-400/20 rounded-full blur-sm"></div>
-        <div className="absolute top-1/3 right-16 w-16 h-16 bg-gray-500/25 rounded-full blur-sm"></div>
-
-        <div className="absolute top-32 right-32 w-24 h-1 bg-gradient-to-r from-gray-400/30 to-transparent rounded-full blur-[1px]"></div>
-        <div className="absolute bottom-32 left-32 w-28 h-1 bg-gradient-to-l from-gray-500/25 to-transparent rounded-full blur-[1px]"></div>
-        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-gray-600/40 rounded-full"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-3 h-3 bg-gray-500/30 rounded-full"></div>
-        <div className="absolute top-3/4 left-1/3 w-1 h-1 bg-gray-700/50 rounded-full"></div>
-
-        <div className="absolute top-16 right-1/4 w-12 h-12 border border-gray-300/20 rounded-lg rotate-45 blur-[0.5px]"></div>
-        <div className="absolute bottom-16 left-1/4 w-8 h-8 border border-gray-400/25 rounded rotate-12 blur-[0.5px]"></div>
-        <div className="absolute top-2/3 right-12 w-6 h-16 bg-gradient-to-b from-gray-300/15 to-transparent rounded-full blur-[1px]"></div>
-        <div className="absolute top-1/6 left-1/2 w-16 h-6 bg-gradient-to-r from-transparent via-gray-400/20 to-transparent rounded-full blur-[1px]"></div>
-
-        <div className="absolute top-40 left-1/3 w-1.5 h-1.5 bg-gray-600/35 rounded-full"></div>
-        <div className="absolute top-48 left-1/3 w-1 h-1 bg-gray-500/30 rounded-full ml-4"></div>
-        <div className="absolute top-56 left-1/3 w-0.5 h-0.5 bg-gray-700/40 rounded-full ml-8"></div>
-        <div className="absolute bottom-40 right-1/3 w-1.5 h-1.5 bg-gray-600/35 rounded-full"></div>
-        <div className="absolute bottom-48 right-1/3 w-1 h-1 bg-gray-500/30 rounded-full mr-4"></div>
-        <div className="absolute bottom-56 right-1/3 w-0.5 h-0.5 bg-gray-700/40 rounded-full mr-8"></div>
       </section>
 
       <section
@@ -452,7 +425,7 @@ export default function Home() {
               </a>
               <span className="!text-gray-700">•</span>
               <span className="!text-gray-400 text-sm font-medium">
-                Made in India 🇮🇳
+                Made in 509 🇮🇳
               </span>
             </div>
           </div>

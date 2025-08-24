@@ -22,6 +22,12 @@ export default function Admin() {
   const [activeFeature, setActiveFeature] = useState("statistics");
   const [todaysMenu, setTodaysMenu] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [showAddNoticeForm, setShowAddNoticeForm] = useState(false);
+  const [noticeForm, setNoticeForm] = useState({
+    title: "",
+    description: "",
+    author: "",
+  });
   const [editProfileForm, setEditProfileForm] = useState({
     name: user.name || "",
     email: user.email || "",
@@ -32,6 +38,32 @@ export default function Admin() {
   const handleEditFormChange = (e) => {
     const { name, value } = e.target;
     setEditProfileForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleNoticeFormChange = (e) => {
+    const { name, value } = e.target;
+    setNoticeForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddNotice = async (e) => {
+    e.preventDefault();
+    try {
+      const noticeData = {
+        ...noticeForm,
+        date: new Date().toISOString(),
+      };
+      
+      const response = await axiosInstance.post(API_PATHS.ADD_NOTICE, noticeData);
+      if (response.status === 200 || response.status === 201) {
+        // Refresh notices list
+        fetchAllNotices();
+        // Reset form and close popup
+        setNoticeForm({ title: "", description: "", author: "" });
+        setShowAddNoticeForm(false);
+      }
+    } catch (error) {
+      console.error("Error adding notice:", error);
+    }
   };
   const fetchUserData = async () => {
     try {
@@ -486,7 +518,10 @@ export default function Admin() {
               </h3>
 
               <div className="mb-4 flex justify-end">
-                <button className="px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-2xl border border-gray-200 shadow-md hover:shadow-lg hover:bg-gray-200 transition-all duration-300 cursor-pointer text-lg">
+                <button 
+                  onClick={() => setShowAddNoticeForm(true)}
+                  className="px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-2xl border border-gray-200 shadow-md hover:shadow-lg hover:bg-gray-200 transition-all duration-300 cursor-pointer text-lg"
+                >
                   + Add Notice
                 </button>
               </div>
@@ -1113,6 +1148,98 @@ export default function Admin() {
           </div>
         </main>
       </div>
+
+      {/* Add Notice Popup Form */}
+      {showAddNoticeForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-xl mx-4">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="!text-2xl font-bold text-gray-900">Add New Notice</h3>
+              <button
+                onClick={() => {
+                  setShowAddNoticeForm(false);
+                  setNoticeForm({ title: "", description: "", author: "" });
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={handleAddNotice} className="space-y-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={noticeForm.title}
+                  onChange={handleNoticeFormChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                  placeholder="Enter notice title"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  value={noticeForm.description}
+                  onChange={handleNoticeFormChange}
+                  rows="4"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent resize-none"
+                  placeholder="Enter notice description"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Author
+                </label>
+                <input
+                  type="text"
+                  name="author"
+                  value={noticeForm.author}
+                  onChange={handleNoticeFormChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                  placeholder="Enter author name"
+                  required
+                />
+              </div>
+
+              <div className="text-sm text-gray-500">
+                <span className="font-medium">Date:</span> {new Date().toLocaleDateString()}
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddNoticeForm(false);
+                    setNoticeForm({ title: "", description: "", author: "" });
+                  }}
+                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-6 py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-700 transition-colors"
+                >
+                  Add Notice
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
