@@ -7,8 +7,9 @@
   "type": "module",
   "main": "./BACKEND/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./BACKEND/server.js"
+    "dev": "cross-env NODE_ENV=development nodemon ./BACKEND/server.js",
+    "start": "cross-env NODE_ENV=production node ./BACKEND/server.js",
+    "build": "npm install && npm install --prefix ./FRONTEND && npm run build --prefix ./FRONTEND"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
@@ -16,11 +17,14 @@
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^17.2.1",
-    "express": "^5.1.0",
+    "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "mailersend": "^2.6.0",
     "mongoose": "^8.17.1",
     "rechart": "^0.0.1",
     "resend": "^6.0.1"
+  },
+  "devDependencies": {
+    "cross-env": "^10.0.0"
   }
 }

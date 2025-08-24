@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import AOS from "aos";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./Pages/Login";
-import Signup from "./Pages/SignUp";
+import Signup from "./Pages/Signup";
 import Home from "./Pages/Home";
 import OTPv from "./Pages/OTP-v";
 import Dashboard from "./Pages/Dashboard";
@@ -13,7 +13,7 @@ import { FullPageLoader } from "./Components/LoadingSpinner";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
-  
+
   if (!isAuthenticated || !user?.isVerified) {
     return <Navigate to="/login" replace />;
   }
@@ -35,7 +35,7 @@ const ProtectedRoute = ({ children }) => {
 
 const AdminRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
-  
+
   if (!isAuthenticated || !user?.isVerified) {
     return <Navigate to="/login" replace />;
   }
@@ -48,14 +48,14 @@ const AdminRoute = ({ children }) => {
 
 const RedirectAuthenticatedUser = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
-  
+
   if (isAuthenticated && user?.isVerified) {
     if (user?.role === "admin" || user?.role === "super-admin") {
       return <Navigate to="/admin" replace />;
     }
     return <Navigate to="/dashboard" replace />;
   }
-  
+
   return children;
 };
 
@@ -67,7 +67,7 @@ function App() {
 
   useEffect(() => {
     AOS.init({
-      duration: 1000, 
+      duration: 1000,
       once: true,
     });
   }, []);
@@ -79,8 +79,8 @@ function App() {
   return (
     <main className="main-container">
       <Routes>
-        <Route 
-          path="/" 
+        <Route
+          path="/"
           element={
             <RedirectAuthenticatedUser>
               <Home />
@@ -120,6 +120,7 @@ function App() {
             </AdminRoute>
           }
         />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </main>
   );
