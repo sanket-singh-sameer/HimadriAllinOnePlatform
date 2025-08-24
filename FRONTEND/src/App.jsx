@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import AOS from "aos";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./Pages/Login";
-import Signup from "./Pages/SignUp";
+import Signup from "./Pages/Signup";
 import Home from "./Pages/Home";
 import OTPv from "./Pages/OTP-v";
 import Dashboard from "./Pages/Dashboard";
