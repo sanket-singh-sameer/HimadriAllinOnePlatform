@@ -13,8 +13,34 @@ import { FullPageLoader } from "./Components/LoadingSpinner";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
-  if (!isAuthenticated || !user.isVerified) {
+  
+  if (!isAuthenticated || !user?.isVerified) {
     return <Navigate to="/login" replace />;
+  }
+  if (
+    (user?.role === "admin" || user?.role === "super-admin") &&
+    window.location.pathname === "/dashboard"
+  ) {
+    return <Navigate to="/admin" replace />;
+  }
+  if (
+    (user?.role === "user" || user?.role === "student") &&
+    window.location.pathname === "/admin"
+  ) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+};
+
+const AdminRoute = ({ children }) => {
+  const { isAuthenticated, user } = useAuthStore();
+  
+  if (!isAuthenticated || !user?.isVerified) {
+    return <Navigate to="/login" replace />;
+  }
+  if (user?.role === "student") {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
@@ -22,9 +48,14 @@ const ProtectedRoute = ({ children }) => {
 
 const RedirectAuthenticatedUser = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
-  if (isAuthenticated && user.isVerified) {
+  
+  if (isAuthenticated && user?.isVerified) {
+    if (user?.role === "admin" || user?.role === "super-admin") {
+      return <Navigate to="/admin" replace />;
+    }
     return <Navigate to="/dashboard" replace />;
   }
+  
   return children;
 };
 
@@ -48,7 +79,14 @@ function App() {
   return (
     <main className="main-container">
       <Routes>
-        <Route path="/" element={<Home />}></Route>
+        <Route 
+          path="/" 
+          element={
+            <RedirectAuthenticatedUser>
+              <Home />
+            </RedirectAuthenticatedUser>
+          }
+        />
         <Route
           path="/login"
           element={
@@ -56,7 +94,7 @@ function App() {
               <Login />
             </RedirectAuthenticatedUser>
           }
-        ></Route>
+        />
         <Route
           path="/signup"
           element={
@@ -64,8 +102,8 @@ function App() {
               <Signup />
             </RedirectAuthenticatedUser>
           }
-        ></Route>
-        <Route path="/otp-verify" element={<OTPv />}></Route>
+        />
+        <Route path="/otp-verify" element={<OTPv />} />
         <Route
           path="/dashboard"
           element={
@@ -73,8 +111,15 @@ function App() {
               <Dashboard />
             </ProtectedRoute>
           }
-        ></Route>
-        <Route path="/admin" element={<Admin />}></Route>
+        />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <Admin />
+            </AdminRoute>
+          }
+        />
       </Routes>
     </main>
   );

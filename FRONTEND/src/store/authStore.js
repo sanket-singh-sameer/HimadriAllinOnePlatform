@@ -59,6 +59,7 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
+  
   login: async (email, password) => {
     set({ isLoading: true, error: null });
     try {

@@ -42,7 +42,7 @@ export const signupController = async (req, res) => {
         isUserExists.verificationTokenExpiresAt = Date.now() + 15 * 60 * 1000; // 15 minutes
         await isUserExists.save();
         await otpVerificationMail(email, otp);
-        
+
         return res.status(201).json({
           message: "User registered successfully",
           user: { ...isUserExists._doc, password: undefined },
@@ -76,9 +76,6 @@ export const loginController = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    if (!email.startsWith("24") && !email.endsWith("@nith.ac.in")) {
-      return res.status(400).json({ message: "Use your college email" });
-    }
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -108,7 +105,9 @@ export const logoutController = (req, res) => {
     clearCookies(res);
     res.status(200).json({ message: "Logout successful", success: true });
   } catch (error) {
-    res.status(500).json({ message: "Error logging out", error, success: false });
+    res
+      .status(500)
+      .json({ message: "Error logging out", error, success: false });
   }
 };
 
@@ -209,12 +208,10 @@ export const checkAuthController = async (req, res) => {
   }
   try {
     const user = await User.findById(req.userId).select("-password");
-    res
-      .status(200)
-      .json({
-        message: "User is authenticated",
-        user: { ...user._doc, password: undefined },
-      });
+    res.status(200).json({
+      message: "User is authenticated",
+      user: { ...user._doc, password: undefined },
+    });
   } catch (error) {
     res.status(500).json({ message: "Error fetching user", error });
   }
@@ -232,8 +229,27 @@ export const updateProfileController = async (req, res) => {
     user.room = room || user.room;
     user.profilePicture = profilePicture || user.profilePicture;
     await user.save();
-    res.status(200).json({ message: "Profile updated successfully", user:{...user._doc, password: undefined} });
+    res
+      .status(200)
+      .json({
+        message: "Profile updated successfully",
+        user: { ...user._doc, password: undefined },
+      });
   } catch (error) {
     res.status(500).json({ message: "Error updating profile", error });
+  }
+};
+
+export const totalUserLoggedInController = async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments({ role: "student" });
+    const totalAdmins = await User.countDocuments({ role: "admin" });
+    const totalSuperAdmins = await User.countDocuments({ role: "super-admin" });
+    res.status(200).json({
+      message: "Total users fetched successfully",
+      data: { totalUsers, totalAdmins, totalSuperAdmins },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching total users", error });
   }
 };
