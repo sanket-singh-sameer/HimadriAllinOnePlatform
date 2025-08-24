@@ -5,16 +5,57 @@ import { useAuthStore } from "../store/authStore";
 
 export default function Admin() {
   const { logout, isLoading, error, user } = useAuthStore();
-
-  const [formError, setFormError] = useState("");
+  
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedNotice, setSelectedNotice] = useState(null);
   const [openIndex, setOpenIndex] = useState(null);
   const [allNotices, setAllNotices] = useState([]);
+  const [complaintsList, setComplaintsList] = useState([]);
+  const [complaintsListTemp, setComplaintsListTemp] = useState([]);
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState("");
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("");
 
   const [activeFeature, setActiveFeature] = useState("statistics");
   const [todaysMenu, setTodaysMenu] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [editProfileForm, setEditProfileForm] = useState({
+    name: user.name || "",
+    email: user.email || "",
+    phone: user.phone || "",
+    room: user.room || "",
+  });
+
+  const handleEditFormChange = (e) => {
+    const { name, value } = e.target;
+    setEditProfileForm((prev) => ({ ...prev, [name]: value }));
+  };
+  const fetchUserData = async () => {
+    try {
+      const response = await axiosInstance.get(API_PATHS.CHECK_AUTH);
+      if (response.status === 200) {
+        useAuthStore.setState({ user: response.data.user });
+      }
+      console.log("User Data:", response.data.user);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+  const handleEditFormSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axiosInstance.put(
+        API_PATHS.EDIT_PROFILE,
+        editProfileForm
+      );
+      if (response.status === 200) {
+        console.log("Profile updated:", response.data);
+      }
+      setIsOpen(false);
+      fetchUserData();
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    }
+  };
 
   const fetchAllNotices = async () => {
     try {
@@ -24,41 +65,6 @@ export default function Admin() {
       console.error("Error fetching all notices:", error);
     }
   };
-
-  const complaints = [
-    {
-      id: 1,
-      serial: "01",
-      room: "509",
-      category: "Mess",
-      date: "2025-08-23",
-      title: "Broken furniture. Request to change furniture.",
-      description: "The chair in my room is broken and needs to be replaced.",
-      status: "Pending",
-    },
-    {
-      id: 2,
-      serial: "02",
-      room: "312",
-      category: "Electrical",
-      date: "2025-08-22",
-      title: "Fan not working. Need electrician",
-      description:
-        "The ceiling fan in my room is not working and needs to be repaired.",
-      status: "Resolved",
-    },
-    {
-      id: 3,
-      serial: "03",
-      room: "215",
-      category: "Floor",
-      date: "2025-08-22",
-      title: "Floor tiles broken. Need replacement.",
-      description:
-        "The floor tiles in my room are broken and need to be replaced.",
-      status: "Rejected",
-    },
-  ];
 
   const toggleAccordion = (index) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -99,10 +105,119 @@ export default function Admin() {
     }
   };
 
+  const fetchAllComplaints = async () => {
+    try {
+      const response = await axiosInstance.get(API_PATHS.FETCH_ALL_COMPLAINTS);
+      setComplaintsList(response.data.complaints);
+      categorizeComplaints(response.data.complaints);
+      console.log(
+        "All complaints fetched successfully:",
+        response.data.complaints
+      );
+    } catch (error) {
+      console.error("Error fetching all complaints:", error);
+    }
+  };
+
+  const updateComplaintStatus = async (id, status) => {
+    try {
+      console.log("Updating complaint ID:", id, "to status:", status);
+      const response = await axiosInstance.put(
+        API_PATHS.UPDATE_COMPLAINT_STATUS(id),
+        { status }
+      );
+      if (response.status === 200) {
+        console.log("Complaint status updated successfully:", response.data);
+        fetchAllComplaints();
+      }
+    } catch (error) {
+      console.error("Error updating complaint status:", error);
+    }
+  };
+
+  const categorizeComplaints = (complaints) => {
+    if (!complaints || !Array.isArray(complaints)) {
+      console.warn("Invalid field:", complaints);
+      return;
+    }
+
+    const statusCategories = {
+      Pending: [],
+      Rejected: [],
+      Resolved: [],
+      "Under-Progress": [],
+    };
+    const categoryCategories = {
+      "Bathroom-Related": [],
+      "Electricity-Related": [],
+      "Elevator-Related": [],
+      "Floor-Related": [],
+      "Furniture-Related": [],
+      "Internet-Related": [],
+      "Mess-Related": [],
+      Other: [],
+      "Security-Related": [],
+      "Water-Related": [],
+    };
+
+    complaints.forEach((complaint) => {
+      if (statusCategories[complaint.status]) {
+        statusCategories[complaint.status].push(complaint);
+      }
+      if (categoryCategories[complaint.category]) {
+        categoryCategories[complaint.category].push(complaint);
+      } else {
+        categoryCategories.Other.push(complaint);
+      }
+    });
+  };
+
+  const clearAllFilters = () => {
+    setSelectedStatusFilter("");
+    setSelectedCategoryFilter("");
+    setComplaintsListTemp(complaintsList);
+  };
+
+  const applyFilters = (
+    statusFilter = selectedStatusFilter,
+    categoryFilter = selectedCategoryFilter
+  ) => {
+    let filteredComplaints = complaintsList;
+
+    if (statusFilter && statusFilter !== "") {
+      filteredComplaints = filteredComplaints.filter(
+        (complaint) => complaint.status === statusFilter
+      );
+    }
+
+    if (categoryFilter && categoryFilter !== "") {
+      filteredComplaints = filteredComplaints.filter(
+        (complaint) => complaint.category === categoryFilter
+      );
+    }
+
+    setComplaintsListTemp(filteredComplaints);
+  };
+
+  const handleFilterChangeByStatus = (status) => {
+    setSelectedStatusFilter(status);
+    applyFilters(status, selectedCategoryFilter);
+  };
+
+  const handleFilterChangeByCategory = (category) => {
+    setSelectedCategoryFilter(category);
+    applyFilters(selectedStatusFilter, category);
+  };
+
   useEffect(() => {
     fetchTodaysMenu();
     fetchAllNotices();
-  }, [allNotices]);
+    fetchAllComplaints();
+  }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [complaintsList]);
 
   const COLORS = ["#4ade80", "#f87171"];
 
@@ -199,13 +314,19 @@ export default function Admin() {
                         Edit Profile
                       </h3>
 
-                      <form className="space-y-6">
+                      <form
+                        onSubmit={handleEditFormSubmit}
+                        className="space-y-6"
+                      >
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
                             Full Name
                           </label>
                           <input
+                            value={editProfileForm.name}
                             type="text"
+                            name="name"
+                            onChange={handleEditFormChange}
                             className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm"
                             placeholder="Enter Your Name"
                           />
@@ -216,7 +337,10 @@ export default function Admin() {
                             Phone Number
                           </label>
                           <input
-                            type="tel"
+                            value={editProfileForm.phone}
+                            type="text"
+                            name="phone"
+                            onChange={handleEditFormChange}
                             className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm"
                             placeholder="Enter Your Phone Number"
                           />
@@ -227,7 +351,10 @@ export default function Admin() {
                             Room No
                           </label>
                           <input
+                            value={editProfileForm.room}
                             type="text"
+                            name="room"
+                            onChange={handleEditFormChange}
                             className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm"
                             placeholder="Enter Your Room Number"
                           />
@@ -469,56 +596,120 @@ export default function Admin() {
                       <h3 className="!text-3xl sm:!text-4xl !font-semibold text-gray-900 text-center mb-8">
                         Complaint Register
                       </h3>
-                      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4">
-                        <label
-                          className="text-gray-700 font-medium mr-2"
-                          htmlFor="complaint-filter-01"
-                        >
-                          Filter by Status:
-                        </label>
-                        <select
-                          id="complaint-filter-01"
-                          className="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm cursor-pointer"
-                        >
-                          <option value="">All</option>
-                          <option value="Pending">Pending</option>
-                          <option value="Resolved">Resolved</option>
-                          <option value="Rejected">Rejected</option>
-                        </select>
-                        <label
-                          className="text-gray-700 font-medium mr-2"
-                          htmlFor="complaint-filter-02"
-                        >
-                          Filter by Category:
-                        </label>
-                        <select
-                          id="complaint-filter-02"
-                          className="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm cursor-pointer"
-                        >
-                          <option value="">All</option>
-                          <option value="Mess-Related">Mess-Related</option>
-                          <option value="Water-Related">Water-Related</option>
-                          <option value="Bathroom-Related">
-                            Bathroom-Related
-                          </option>
-                          <option value="Electricity-Related">
-                            Electricity-Related
-                          </option>
-                          <option value="Internet-Related">
-                            Internet-Related
-                          </option>
-                          <option value="Floor-Related">Floor-Related</option>
-                          <option value="Elevator-Related">
-                            Elevator-Related
-                          </option>
-                          <option value="Furniture-Related">
-                            Furniture-Related
-                          </option>
-                          <option value="Security-Related">
-                            Security-Related
-                          </option>
-                          <option value="Others">Others</option>
-                        </select>
+                      <div className="mb-6 flex flex-col gap-4 sm:gap-6">
+                        {/* Filters Container */}
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-end gap-4">
+                          {/* Status Filter */}
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <label
+                              className="text-gray-700 font-medium text-sm whitespace-nowrap"
+                              htmlFor="complaint-filter-01"
+                            >
+                              Filter by Status:
+                            </label>
+                            <select
+                              id="complaint-filter-01"
+                              value={selectedStatusFilter}
+                              onChange={(e) =>
+                                handleFilterChangeByStatus(e.target.value)
+                              }
+                              className="w-full sm:w-auto min-w-[140px] border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm cursor-pointer"
+                            >
+                              <option value="">All Status</option>
+                              <option value="Pending">Pending</option>
+                              <option value="Resolved">Resolved</option>
+                              <option value="Rejected">Rejected</option>
+                            </select>
+                          </div>
+
+                          {/* Category Filter */}
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <label
+                              className="text-gray-700 font-medium text-sm whitespace-nowrap"
+                              htmlFor="complaint-filter-02"
+                            >
+                              Filter by Category:
+                            </label>
+                            <select
+                              id="complaint-filter-02"
+                              value={selectedCategoryFilter}
+                              onChange={(e) =>
+                                handleFilterChangeByCategory(e.target.value)
+                              }
+                              className="w-full sm:w-auto min-w-[180px] border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm cursor-pointer"
+                            >
+                              <option value="">All Categories</option>
+                              <option value="Bathroom-Related">
+                                Bathroom-Related
+                              </option>
+                              <option value="Water-Related">
+                                Water-Related
+                              </option>
+                              <option value="Electricity-Related">
+                                Electricity-Related
+                              </option>
+                              <option value="Mess-Related">Mess-Related</option>
+                              <option value="Internet-Related">
+                                Internet-Related
+                              </option>
+                              <option value="Floor-Related">
+                                Floor-Related
+                              </option>
+                              <option value="Elevator-Related">
+                                Elevator-Related
+                              </option>
+                              <option value="Furniture-Related">
+                                Furniture-Related
+                              </option>
+                              <option value="Security-Related">
+                                Security-Related
+                              </option>
+                              <option value="Others">Others</option>
+                            </select>
+                          </div>
+
+                          {/* Clear Filters Button */}
+                          {(selectedStatusFilter || selectedCategoryFilter) && (
+                            <div className="flex justify-center sm:justify-end lg:justify-start">
+                              <button
+                                onClick={clearAllFilters}
+                                className="w-full sm:w-auto px-4 py-2 bg-gray-100 text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-200 transition cursor-pointer text-sm font-medium min-w-[120px]"
+                              >
+                                Clear Filters
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Active Filters Display (Mobile) */}
+                        {(selectedStatusFilter || selectedCategoryFilter) && (
+                          <div className="flex flex-wrap gap-2 lg:hidden">
+                            {selectedStatusFilter && (
+                              <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                                Status: {selectedStatusFilter}
+                                <button
+                                  onClick={() => handleFilterChangeByStatus("")}
+                                  className="ml-1 text-blue-600 hover:text-blue-800"
+                                >
+                                  ×
+                                </button>
+                              </span>
+                            )}
+                            {selectedCategoryFilter && (
+                              <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                                Category: {selectedCategoryFilter}
+                                <button
+                                  onClick={() =>
+                                    handleFilterChangeByCategory("")
+                                  }
+                                  className="ml-1 text-green-600 hover:text-green-800"
+                                >
+                                  ×
+                                </button>
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                       <div className="relative my-8 sm:my-10">
                         <div className="absolute inset-0 flex items-center">
@@ -526,89 +717,137 @@ export default function Admin() {
                         </div>
                         <div className="relative flex justify-center">
                           <span className="px-3 sm:px-4 bg-white text-gray-400 text-xs sm:text-sm font-medium">
-                            All Complaints
+                            {selectedStatusFilter || selectedCategoryFilter
+                              ? `Filtered Complaints (${complaintsListTemp.length})`
+                              : `All Complaints (${complaintsListTemp.length})`}
                           </span>
                         </div>
                       </div>
 
                       <div className="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
-                        <div className="space-y-8 py-8 px-4 sm:px-6">
-                          {complaints.map((complaint, index) => (
-                            <div
-                              key={complaint.id}
-                              className="border rounded-3xl shadow-md bg-white transition-all duration-500 hover:shadow-lg"
-                            >
-                              <button
-                                onClick={() => toggleAccordion(index)}
-                                className="w-full flex justify-between items-center p-6 sm:p-8 text-left cursor-pointer"
+                        <div className="space-y-4 sm:space-y-6 lg:space-y-8 py-4 sm:py-6 lg:py-8 px-2 sm:px-4 lg:px-6">
+                          {complaintsListTemp.length === 0 ? (
+                            <div className="text-center py-12">
+                              <div className="text-gray-400 text-4xl mb-4">
+                                📋
+                              </div>
+                              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                No complaints found
+                              </h3>
+                              <p className="text-gray-500 text-sm">
+                                {selectedStatusFilter || selectedCategoryFilter
+                                  ? "Try adjusting your filters to see more results."
+                                  : "No complaints have been submitted yet."}
+                              </p>
+                            </div>
+                          ) : (
+                            complaintsListTemp.map((complaint, index) => (
+                              <div
+                                key={complaint.serial}
+                                className="border rounded-2xl lg:rounded-3xl shadow-md bg-white transition-all duration-500 hover:shadow-lg"
                               >
-                                <div className="flex flex-col items-start justify-center space-y-1">
-                                  <h3 className="!text-2xl !font-bold !text-gray-900 !tracking-tight !leading-snug">
-                                    Complaint #{complaint.serial}
-                                  </h3>
-                                  <p className="!text-base !font-medium !text-gray-600 !leading-snug !opacity-100">
-                                    {complaint.title}
-                                  </p>
-                                  <p className="!text-base !font-medium !text-gray-600 !leading-snug !opacity-100">
-                                    Room No: &nbsp;{complaint.room}
-                                  </p>
-                                </div>
+                                <button
+                                  onClick={() => toggleAccordion(index)}
+                                  className="w-full flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 sm:p-6 lg:p-8 text-left cursor-pointer gap-3 sm:gap-0"
+                                >
+                                  <div className="flex flex-col items-start justify-center space-y-1 sm:space-y-1">
+                                    <h3 className="text-lg sm:text-xl lg:!text-2xl !font-bold !text-gray-900 !tracking-tight !leading-snug">
+                                      Complaint #{complaint.serial}
+                                    </h3>
+                                    <p className="text-sm sm:!text-base !font-medium !text-gray-600 !leading-snug !opacity-100 line-clamp-2">
+                                      {complaint.title}
+                                    </p>
+                                    <p className="text-xs sm:!text-base !font-medium !text-gray-600 !leading-snug !opacity-100">
+                                      Room No: &nbsp;{complaint.room}
+                                    </p>
+                                  </div>
 
-                                <span
-                                  className={`text-sm font-medium px-4 py-1.5 rounded-full shadow-sm ${
-                                    complaint.status === "Resolved"
-                                      ? "bg-green-100 text-green-700"
-                                      : complaint.status === "Pending"
-                                      ? "bg-yellow-100 text-yellow-700"
-                                      : complaint.status === "Rejected"
-                                      ? "bg-red-100 text-red-700"
-                                      : "bg-gray-100 text-gray-700"
+                                  <span
+                                    className={`self-start sm:self-center text-xs sm:text-sm font-medium px-3 sm:px-4 py-1 sm:py-1.5 rounded-full shadow-sm min-w-fit ${
+                                      complaint.status === "Resolved"
+                                        ? "bg-green-100 text-green-700"
+                                        : complaint.status === "Pending"
+                                        ? "bg-yellow-100 text-yellow-700"
+                                        : complaint.status === "Rejected"
+                                        ? "bg-red-100 text-red-700"
+                                        : complaint.status === "Under-Progress"
+                                        ? "bg-blue-100 text-blue-700"
+                                        : "bg-gray-100 text-gray-700"
+                                    }`}
+                                  >
+                                    {complaint.status}
+                                  </span>
+                                </button>
+
+                                <div
+                                  className={`transition-all duration-700 overflow-hidden ${
+                                    openIndex === index
+                                      ? "max-h-[500px] opacity-100"
+                                      : "max-h-0 opacity-0"
                                   }`}
                                 >
-                                  {complaint.status}
-                                </span>
-                              </button>
+                                  <div className="border-t px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-3 text-gray-700 text-sm sm:text-base">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+                                      <p className="!font-medium !text-gray-900 !opacity-100">
+                                        <span className="text-gray-600">
+                                          Category:
+                                        </span>{" "}
+                                        {complaint.category}
+                                      </p>
+                                      <p className="!font-medium !text-gray-900 !opacity-100">
+                                        <span className="text-gray-600">
+                                          Date:
+                                        </span>{" "}
+                                        {complaint.date}
+                                      </p>
+                                    </div>
 
-                              <div
-                                className={`transition-all duration-700 overflow-hidden ${
-                                  openIndex === index
-                                    ? "max-h-[500px] opacity-100"
-                                    : "max-h-0 opacity-0"
-                                }`}
-                              >
-                                <div className="border-t px-6 sm:px-8 py-6 space-y-3 text-gray-700 text-base">
-                                  <p className="!font-medium !text-gray-900 !opacity-100">
-                                    <span>
-                                      Category: &nbsp;{complaint.category}
-                                    </span>
-                                  </p>
-                                  <p className="!font-medium !text-gray-900 !opacity-100">
-                                    <span>
-                                      Dated On: &nbsp;{complaint.date}
-                                    </span>
-                                  </p>
-                                  <br />
-                                  <p className="!font-light !text-gray-900 !opacity-100">
-                                    <span>Description: </span> <br />
-                                    {complaint.description}
-                                  </p>
-                                  <br />
+                                    <div className="pt-2">
+                                      <p className="!font-medium !text-gray-900 !opacity-100 mb-2">
+                                        <span className="text-gray-600">
+                                          Description:
+                                        </span>
+                                      </p>
+                                      <p className="!font-light !text-gray-900 !opacity-100 pl-4 border-l-2 border-gray-200">
+                                        {complaint.description}
+                                      </p>
+                                    </div>
 
-                                  <div className="flex items-center justify-center flex-wrap gap-3 mt-4">
-                                    <button className="px-4 py-2 rounded-xl bg-green-100 text-green-700 font-medium shadow-sm hover:bg-green-200 transition cursor-pointer">
-                                      Resolved
-                                    </button>
-                                    <button className="px-4 py-2 rounded-xl bg-red-100 text-red-700 font-medium shadow-sm hover:bg-red-200 transition cursor-pointer">
-                                      Rejected
-                                    </button>
-                                    <button className="px-4 py-2 rounded-xl bg-yellow-100 text-yellow-700 font-medium shadow-sm hover:bg-yellow-200 transition cursor-pointer">
-                                      Under Process
-                                    </button>
+                                    <div className="flex flex-col sm:flex-row items-center justify-center flex-wrap gap-2 sm:gap-3 mt-4 pt-4 border-t border-gray-100">
+                                      <button
+                                        onClick={() =>
+                                          updateComplaintStatus(
+                                            complaint._id,
+                                            "Resolved"
+                                          )
+                                        }
+                                        disabled={
+                                          complaint.status === "Resolved"
+                                        }
+                                        className="w-full sm:w-auto px-3 sm:px-4 py-2 rounded-xl bg-green-100 text-green-700 font-medium shadow-sm hover:bg-green-200 transition cursor-pointer text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                      >
+                                        ✓ Resolved
+                                      </button>
+                                      <button
+                                        onClick={() =>
+                                          updateComplaintStatus(
+                                            complaint._id,
+                                            "Rejected"
+                                          )
+                                        }
+                                        disabled={
+                                          complaint.status === "Rejected"
+                                        }
+                                        className="w-full sm:w-auto px-3 sm:px-4 py-2 rounded-xl bg-red-100 text-red-700 font-medium shadow-sm hover:bg-red-200 transition cursor-pointer text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                      >
+                                        ✗ Rejected
+                                      </button>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            ))
+                          )}
                         </div>
                       </div>
                     </div>

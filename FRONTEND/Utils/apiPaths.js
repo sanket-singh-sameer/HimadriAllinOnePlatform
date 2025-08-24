@@ -18,8 +18,12 @@ export const API_PATHS = {
 
     ADD_COMPLAINT: "/complaints/new",
     FETCH_MY_COMPLAINTS: "/complaints/my",
+    FETCH_ALL_COMPLAINTS: "/complaints/all",
+    UPDATE_COMPLAINT_STATUS: (id) => `/complaints/${id}`,
 
     FETCH_TODAYS_MENU: "/messmenu/today",
     FETCH_ALL_NOTICES: "/notice/all",
     DELETE_NOTICE: (noticeId) => `/notice/${noticeId}`,
+
+    FETCH_CGPI_BY_ROLL: (roll) => `/cgpi/${roll}`
 };
