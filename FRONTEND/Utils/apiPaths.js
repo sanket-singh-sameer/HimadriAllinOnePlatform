@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 export const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8080/api/v1";
 
 export const API_PATHS = {
