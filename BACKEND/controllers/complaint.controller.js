@@ -58,18 +58,15 @@ export const viewAllComplaint = async (req, res) => {
   }
 };
 
-
 export const viewComplaintDetails = async (req, res) => {
   try {
     const user = getUserId(req);
     const { id } = req.params;
     const complaint = await Complaint.findOne({ _id: id, user });
     if (!complaint) {
-      return res
-        .status(404)
-        .json({
-          message: "Complaint not found or you are not authorized to view it.",
-        });
+      return res.status(404).json({
+        message: "Complaint not found or you are not authorized to view it.",
+      });
     }
     res
       .status(200)
@@ -86,12 +83,9 @@ export const updateComplaintStatus = async (req, res) => {
   try {
     const complaint = await Complaint.findOne({ _id: id });
     if (!complaint) {
-      return res
-        .status(404)
-        .json({
-          message:
-            "Complaint not found or you are not authorized to update it.",
-        });
+      return res.status(404).json({
+        message: "Complaint not found or you are not authorized to update it.",
+      });
     }
     complaint.status = status || complaint.status;
     await complaint.save();
@@ -100,5 +94,39 @@ export const updateComplaintStatus = async (req, res) => {
       .json({ message: "Complaint updated successfully", complaint });
   } catch (error) {
     res.status(500).json({ message: "Error updating complaint", error });
+  }
+};
+
+export const totalComplaintsController = async (req, res) => {
+  try {
+    const totalComplaints = await Complaint.countDocuments();
+    const pendingComplaints = await Complaint.countDocuments({
+      status: "Pending",
+    });
+    const underProgressComplaints = await Complaint.countDocuments({
+      status: "Under-Progress",
+    });
+    const resolvedComplaints = await Complaint.countDocuments({
+      status: "Resolved",
+    });
+    const rejectedComplaints = await Complaint.countDocuments({
+      status: "Rejected",
+    });
+    res
+      .status(200)
+      .json({
+        message: "Total complaints retrieved successfully",
+        data: {
+          totalComplaints,
+          pendingComplaints,
+          underProgressComplaints,
+          resolvedComplaints,
+          rejectedComplaints,
+        },
+      });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error retrieving total complaints", error });
   }
 };

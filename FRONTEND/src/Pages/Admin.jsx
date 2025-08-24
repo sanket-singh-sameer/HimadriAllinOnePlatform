@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { API_PATHS } from "../../Utils/apiPaths";
 import axiosInstance from "../../Utils/axiosInstance";
 import { useAuthStore } from "../store/authStore";
+import { set } from "mongoose";
 
 export default function Admin() {
   const { logout, isLoading, error, user } = useAuthStore();
@@ -16,6 +17,7 @@ export default function Admin() {
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("");
   const [searchRollNumber, setSearchRollNumber] = useState("");
   const [studentDetails, setStudentDetails] = useState(null);
+  const [websiteStats, setWebsiteStats] = useState(null);
 
   const [activeFeature, setActiveFeature] = useState("statistics");
   const [todaysMenu, setTodaysMenu] = useState(null);
@@ -137,6 +139,38 @@ export default function Admin() {
     }
   };
 
+  const getWebsiteStats = async () => {
+    try {
+      const responseComplaints = await axiosInstance.get(
+        API_PATHS.FETCH_TOTAL_COMPLAINTS
+      );
+      const responseUsers = await axiosInstance.get(
+        API_PATHS.FETCH_TOTAL_USERS
+      );
+      console.log("Website stats responses:", {
+        responseComplaints,
+        responseUsers,
+      });
+      setWebsiteStats({
+        totalComplaints: responseComplaints.data.data.totalComplaints,
+        pendingComplaints: responseComplaints.data.data.pendingComplaints,
+        underProgressComplaints:
+          responseComplaints.data.data.underProgressComplaints,
+        resolvedComplaints: responseComplaints.data.data.resolvedComplaints,
+        rejectedComplaints: responseComplaints.data.data.rejectedComplaints,
+        totalUsers: responseUsers.data.data.totalUsers,
+        totalAdmins: responseUsers.data.data.totalAdmins,
+        totalSuperAdmins: responseUsers.data.data.totalSuperAdmins,
+        totalStudents:
+          responseUsers.data.data.totalUsers -
+          responseUsers.data.data.totalAdmins -
+          responseUsers.data.data.totalSuperAdmins,
+      });
+    } catch (error) {
+      console.error("Error fetching website stats:", error);
+      setWebsiteStats(null);
+    }
+  };
   const categorizeComplaints = (complaints) => {
     if (!complaints || !Array.isArray(complaints)) {
       console.warn("Invalid field:", complaints);
@@ -283,6 +317,7 @@ export default function Admin() {
     fetchTodaysMenu();
     fetchAllNotices();
     fetchAllComplaints();
+    getWebsiteStats();
   }, []);
 
   useEffect(() => {
@@ -333,7 +368,7 @@ export default function Admin() {
 
               <div className="flex flex-col items-center mb-6">
                 <img
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYRYThvhDcy28VrH3k-SC0Cn2K5FHYV_D3JQ&s"
+                  src={user?.profilePicture}
                   alt="Profile Picture"
                   className="w-28 h-28 rounded-full border-4 border-gray-200 shadow-md object-cover"
                 />
@@ -611,7 +646,7 @@ export default function Admin() {
                           Total Students
                         </h3>
                         <p className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
-                          1200
+                          {websiteStats?.totalStudents}
                         </p>
                       </div>
 
@@ -626,7 +661,7 @@ export default function Admin() {
                               Total
                             </p>
                             <p className="text-2xl sm:text-3xl font-bold text-gray-900">
-                              350
+                              {websiteStats?.totalComplaints}
                             </p>
                           </div>
 
@@ -635,7 +670,7 @@ export default function Admin() {
                               Resolved
                             </p>
                             <p className="text-2xl sm:text-3xl font-bold text-gray-900">
-                              220
+                              {websiteStats?.resolvedComplaints}
                             </p>
                           </div>
 
@@ -644,7 +679,7 @@ export default function Admin() {
                               Pending
                             </p>
                             <p className="text-2xl sm:text-3xl font-bold text-gray-900">
-                              90
+                              {websiteStats?.pendingComplaints}
                             </p>
                           </div>
 
@@ -653,7 +688,7 @@ export default function Admin() {
                               Rejected
                             </p>
                             <p className="text-2xl sm:text-3xl font-bold text-gray-900">
-                              40
+                              {websiteStats?.rejectedComplaints}
                             </p>
                           </div>
                         </div>

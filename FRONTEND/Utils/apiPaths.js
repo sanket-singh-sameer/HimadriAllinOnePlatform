@@ -25,4 +25,7 @@ export const API_PATHS = {
 
   FETCH_CGPI_BY_ROLL: (roll) => `/cgpi/${roll}`,
   FETCH_USER_DETAILS: (roll) => `/auth/${roll}`,
+
+  FETCH_TOTAL_COMPLAINTS: "/complaints/stats",
+  FETCH_TOTAL_USERS: "/auth/total-user-count"
 };
