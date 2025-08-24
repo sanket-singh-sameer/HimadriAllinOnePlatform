@@ -82,3 +82,28 @@ export const checkAdminController = async (req, res) => {
   }
   res.status(200).json({ message: "Admin is authenticated" });
 };
+
+
+export const getStudentByRoll = async (req, res) => {
+  let { rollNumber } = req.params;
+  try {
+    if (!rollNumber) {
+      return res.status(400).json({ message: "Roll number is required" });
+    }else{
+      rollNumber = rollNumber.toUpperCase();
+    }
+    const student = await User.findOne({ roll:rollNumber });
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+    res.status(200).json({
+      message: "Student found",
+      student: {
+        ...student._doc,
+        password: undefined,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

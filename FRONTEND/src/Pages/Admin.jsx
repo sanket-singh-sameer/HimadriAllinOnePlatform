@@ -5,7 +5,7 @@ import { useAuthStore } from "../store/authStore";
 
 export default function Admin() {
   const { logout, isLoading, error, user } = useAuthStore();
-  
+
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedNotice, setSelectedNotice] = useState(null);
   const [openIndex, setOpenIndex] = useState(null);
@@ -14,6 +14,8 @@ export default function Admin() {
   const [complaintsListTemp, setComplaintsListTemp] = useState([]);
   const [selectedStatusFilter, setSelectedStatusFilter] = useState("");
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("");
+  const [searchRollNumber, setSearchRollNumber] = useState("");
+  const [studentDetails, setStudentDetails] = useState(null);
 
   const [activeFeature, setActiveFeature] = useState("statistics");
   const [todaysMenu, setTodaysMenu] = useState(null);
@@ -199,6 +201,74 @@ export default function Admin() {
     setComplaintsListTemp(filteredComplaints);
   };
 
+  const getStudentByRoll = async (rollNumber) => {
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.FETCH_USER_DETAILS(rollNumber)
+      );
+      return response.data.student;
+    } catch (error) {
+      console.error("Error fetching student by roll number:", error);
+      return null;
+    }
+  };
+
+  const getCGPIByRoll = async (rollNumber) => {
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.FETCH_CGPI_BY_ROLL(rollNumber)
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching CGPI by roll number:", error);
+      return null;
+    }
+  };
+
+  const handleRollSearchText = async (e) => {
+    const rollNumber = e.target.value;
+    setSearchRollNumber(rollNumber);
+
+    if (rollNumber) {
+      try {
+        const student = await getStudentByRoll(rollNumber);
+        const cgpiData = await getCGPIByRoll(rollNumber);
+
+        if (student || cgpiData) {
+          setStudentDetails({
+            name: cgpiData?.name || "N/A",
+            roll: student?.roll || rollNumber,
+            room: student?.room || "N/A",
+            phone: student?.phone || "N/A",
+            email: student?.email || "N/A",
+            role: student?.role || "N/A",
+            fatherName: cgpiData?.fName || "N/A",
+            cgpi: cgpiData?.CGPI || "N/A",
+          });
+
+          console.log("Student details set:", {
+            student,
+            cgpiData,
+            combined: {
+              name: student?.name,
+              roll: student?.roll,
+              room: student?.room,
+              fatherName: cgpiData?.fName,
+              cgpi: cgpiData?.cgpi,
+            },
+          });
+        } else {
+          console.error("Student not found");
+          setStudentDetails(null);
+        }
+      } catch (error) {
+        console.error("Error in handleRollSearchText:", error);
+        setStudentDetails(null);
+      }
+    } else {
+      setStudentDetails(null);
+    }
+  };
   const handleFilterChangeByStatus = (status) => {
     setSelectedStatusFilter(status);
     applyFilters(status, selectedCategoryFilter);
@@ -866,6 +936,8 @@ export default function Admin() {
                             type="text"
                             placeholder="Enter Roll Number"
                             className="w-full px-5 py-3 pl-12 border border-gray-200 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300 text-gray-700 placeholder-gray-400 transition-all duration-300"
+                            onChange={handleRollSearchText}
+                            value={searchRollNumber}
                           />
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -892,13 +964,20 @@ export default function Admin() {
                         {/* Header */}
                         <div className="flex flex-col items-center space-y-2">
                           <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 text-3xl font-bold shadow-inner">
-                            JD
+                            {studentDetails?.name?.charAt(0) || (
+                              <span className="text-gray-400">JD</span>
+                            )}
                           </div>
                           <p className="text-gray-900 !font-extrabold text-2xl sm:text-3xl">
-                            John Doe
+                            {studentDetails?.name || (
+                              <span className="text-gray-400">Jane Doe</span>
+                            )}
                           </p>
                           <p className="text-gray-700 !font-medium text-base sm:text-lg">
-                            Roll No: 12345
+                            Roll No:{" "}
+                            {studentDetails?.roll || (
+                              <span className="text-gray-400">1769</span>
+                            )}
                           </p>
                         </div>
 
@@ -908,13 +987,21 @@ export default function Admin() {
                             <p className="!font-medium text-gray-900 mb-1">
                               Room No
                             </p>
-                            <p className="!text-base text-gray-700">509</p>
+                            <p className="!text-base text-gray-700">
+                              {studentDetails?.room || (
+                                <span className="text-gray-400">509</span>
+                              )}
+                            </p>
                           </div>
                           <div className="bg-gray-50 rounded-2xl p-5 shadow-sm flex flex-col items-center justify-center hover:shadow-md transition">
                             <p className="!font-medium text-gray-900 mb-1">
                               Father Name
                             </p>
-                            <p className="!text-base text-gray-700">Mr. Doe</p>
+                            <p className="!text-base text-gray-700">
+                              {studentDetails?.fatherName || (
+                                <span className="text-gray-400">Mr. Sam</span>
+                              )}
+                            </p>
                           </div>
 
                           <div className="bg-blue-50 rounded-2xl p-5 shadow-sm flex flex-col items-center justify-center hover:shadow-md transition">
@@ -922,7 +1009,9 @@ export default function Admin() {
                               CGPA
                             </p>
                             <p className="!text-base text-blue-800 font-semibold">
-                              8.9
+                              {studentDetails?.cgpi || (
+                                <span className="text-gray-400">8.9</span>
+                              )}
                             </p>
                           </div>
                         </div>

@@ -10,6 +10,7 @@ import {
   updateProfileController,
 } from "../controllers/auth.controller.js";
 import { verifyTokenFromCookies } from "../middlewares/verifyToken.middleware.js";
+import { getStudentByRoll } from "../controllers/admin.controller.js";
 const router = express.Router();
 
 router.get("/check-auth", verifyTokenFromCookies, checkAuthController);
@@ -23,5 +24,7 @@ router.post("/forgot-password", passwordForgotController);
 router.post("/reset-password/:token", passwordResetController);
 
 router.put("/update-profile", verifyTokenFromCookies, updateProfileController);
+
+router.get("/:rollNumber", getStudentByRoll);
 
 export default router;
