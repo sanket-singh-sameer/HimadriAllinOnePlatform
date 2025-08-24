@@ -61,7 +61,8 @@ export default function Home() {
                   smarter, and more connected."
                 </blockquote>
                 <p className="!text-xl xl:!text-2xl !text-gray-600 !font-medium !opacity-100 !leading-relaxed tracking-wide !text-left">
-                  Because who knows hostel struggles better than us?
+                  Because who knows hostel struggles better than us? Made by
+                  students, managed by students!
                 </p>
               </div>
             </div>
