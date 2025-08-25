@@ -1,5 +1,10 @@
 import { Resend } from "resend";
-import { PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE, WELCOME_EMAIL_TEMPLATE } from "./mailTemplate.js";
+import {
+  PASSWORD_RESET_REQUEST_TEMPLATE,
+  PASSWORD_RESET_SUCCESS_TEMPLATE,
+  VERIFICATION_EMAIL_TEMPLATE,
+  WELCOME_EMAIL_TEMPLATE,
+} from "./mailTemplate.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -12,7 +17,10 @@ export const otpVerificationMail = async (email, otp) => {
     from: "HBH NITH <onboarding@test.divyamsingh.me>",
     to: [email],
     subject: "OTP Verification",
-    html: VERIFICATION_EMAIL_TEMPLATE.replaceAll("{verificationCode}", otp),
+    html: VERIFICATION_EMAIL_TEMPLATE.replaceAll("{verificationCode}", otp)
+      .replaceAll("{appName}", "HBH NITH")
+      .replaceAll("{supportEmail}", "sanketsinghsameer@proton.me")
+      .replaceAll("Your App Team", "HBH NITH"),
   });
 
   if (error) {
@@ -22,18 +30,25 @@ export const otpVerificationMail = async (email, otp) => {
   console.log({ data });
 };
 
-export const welcomeEmail = async (email, userName, appName, dashboardURL, supportEmail, helpCenterURL) => {
+export const welcomeEmail = async (
+  email,
+  userName,
+  appName,
+  dashboardURL,
+  supportEmail,
+  helpCenterURL
+) => {
   console.log(email, userName);
   const { data, error } = await resend.emails.send({
     from: "HBH NITH <welcome@test.divyamsingh.me>",
     to: [email],
     subject: "Welcome to " + appName,
-    html: WELCOME_EMAIL_TEMPLATE
-      .replaceAll("{userName}", userName)
+    html: WELCOME_EMAIL_TEMPLATE.replaceAll("{userName}", userName)
       .replaceAll("{appName}", appName)
       .replaceAll("{dashboardURL}", dashboardURL)
       .replaceAll("{supportEmail}", supportEmail)
-      .replaceAll("{helpCenterURL}", helpCenterURL),
+      .replaceAll("{helpCenterURL}", helpCenterURL)
+      .replaceAll("Your App Team", "HBH NITH"),
   });
 
   if (error) {
@@ -49,7 +64,10 @@ export const passwordResetEmail = async (email, resetToken) => {
     from: "HBH NITH <reset@test.divyamsingh.me>",
     to: [email],
     subject: "Password Reset",
-    html: PASSWORD_RESET_REQUEST_TEMPLATE.replaceAll("{resetURL}", `${process.env.CLIENT_URL}/forgot-password/${resetToken}`),
+    html: PASSWORD_RESET_REQUEST_TEMPLATE.replaceAll(
+      "{resetURL}",
+      `${process.env.CLIENT_URL}/forgot-password/${resetToken}`
+    ),
   });
 
   if (error) {

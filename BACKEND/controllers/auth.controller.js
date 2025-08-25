@@ -137,9 +137,9 @@ export const otpVerificationController = async (req, res) => {
       user.email,
       user.name,
       "HBH NITH",
-      "http://yourapp.com/dashboard",
-      "support@yourapp.com",
-      "http://yourapp.com/help"
+      process.env.CLIENT_URL || "http://localhost:5173/dashboard",
+      "sanketsinghsameer@proton.me",
+      process.env.SUPPORT_URL || "https://divyamsingh.me"
     );
     return res.status(200).json({
       message: "Email verified successfully",
