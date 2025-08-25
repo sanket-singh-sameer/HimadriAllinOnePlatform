@@ -229,12 +229,10 @@ export const updateProfileController = async (req, res) => {
     user.room = room || user.room;
     user.profilePicture = profilePicture || user.profilePicture;
     await user.save();
-    res
-      .status(200)
-      .json({
-        message: "Profile updated successfully",
-        user: { ...user._doc, password: undefined },
-      });
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: { ...user._doc, password: undefined },
+    });
   } catch (error) {
     res.status(500).json({ message: "Error updating profile", error });
   }
@@ -242,7 +240,7 @@ export const updateProfileController = async (req, res) => {
 
 export const totalUserLoggedInController = async (req, res) => {
   try {
-    const totalUsers = await User.countDocuments({ role: "student" });
+    const totalUsers = await User.countDocuments({});
     const totalAdmins = await User.countDocuments({ role: "admin" });
     const totalSuperAdmins = await User.countDocuments({ role: "super-admin" });
     res.status(200).json({
