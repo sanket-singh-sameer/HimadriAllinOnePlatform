@@ -158,7 +158,6 @@ const Dashboard = () => {
       <div className="min-h-screen flex bg-gradient-to-br from-[#f8f8f8] to-[#eaeaea]">
         <main className="flex-1 flex flex-col">
           <nav className="sticky top-0 z-20 flex justify-between items-center px-4 sm:px-8 lg:px-16 py-4 sm:py-6 lg:py-8 backdrop-blur-sm bg-white/90 border-b border-gray-200/50 w-full shadow-sm">
-            {/* Logo and Brand */}
             <div className="flex items-center space-x-3 sm:space-x-6">
               <div className="relative group cursor-pointer">
                 <div className="flex items-center space-x-1">
@@ -185,7 +184,6 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Desktop Navigation */}
             <div className="hidden md:flex space-x-4 items-center">
               {user.role !== "student" && (
                 <button
@@ -243,7 +241,6 @@ const Dashboard = () => {
               </button>
             </div>
 
-            {/* Mobile Menu Button */}
             <div className="md:hidden">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -278,7 +275,6 @@ const Dashboard = () => {
               </button>
             </div>
 
-            {/* Mobile Menu Overlay */}
             <div
               className={`md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-xl border-b border-gray-200/50 shadow-xl transform transition-all duration-300 ease-in-out z-30 ${
                 mobileMenuOpen
@@ -352,7 +348,6 @@ const Dashboard = () => {
 
           <div className="p-4 sm:p-6 md:p-8 lg:p-10 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 flex-1">
             <div className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 p-4 sm:p-6 md:p-8 border border-gray-100 hover:border-gray-200 flex flex-col relative overflow-hidden">
-              {/* Decorative background gradient */}
               <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-blue-50 to-transparent rounded-bl-3xl"></div>
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-gray-50 to-transparent rounded-tr-3xl"></div>
 
@@ -593,12 +588,10 @@ const Dashboard = () => {
             </div>
 
             <div className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 p-4 sm:p-6 md:p-8 lg:p-10 border border-gray-100 hover:border-gray-200 lg:col-span-2 flex flex-col relative overflow-hidden">
-              {/* Decorative background gradient */}
               <div className="absolute top-0 right-0 w-32 h-32 sm:w-40 sm:h-40 bg-gradient-to-bl from-green-50 to-transparent rounded-bl-3xl"></div>
               <div className="absolute bottom-0 left-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-tr from-blue-50 to-transparent rounded-tr-3xl"></div>
 
               <div className="relative z-10">
-                {/* Header Section */}
                 <div className="flex items-center justify-between mb-6 sm:mb-8">
                   <div className="flex items-center space-x-2 sm:space-x-3">
                     <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-green-500/25">
@@ -628,7 +621,6 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {/* Notice List Container */}
                 <ul className="space-y-4 sm:space-y-6 text-gray-700 text-sm sm:text-base max-h-[350px] sm:max-h-[380px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                   <ul className="space-y-3 sm:space-y-4">
                     {allNotices.map(
@@ -638,7 +630,6 @@ const Dashboard = () => {
                             key={notice._id}
                             className="group/notice bg-gradient-to-r from-gray-50 to-gray-50/50 hover:from-green-50 hover:to-blue-50/50 rounded-2xl border border-gray-200 hover:border-green-200 p-4 sm:p-5 shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden"
                           >
-                            {/* Notice decorative elements */}
                             <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-green-100/30 to-transparent rounded-bl-2xl opacity-0 group-hover/notice:opacity-100 transition-opacity duration-300"></div>
 
                             <div className="relative z-10">
@@ -878,7 +869,6 @@ const Dashboard = () => {
                       </div>
 
                       <div className="rounded-xl border border-gray-200 shadow-sm bg-white overflow-hidden">
-                        {/* Desktop Table */}
                         <div className="hidden sm:block overflow-x-auto">
                           <table className="w-full border-collapse text-left text-gray-700 text-sm sm:text-base">
                             <thead>
@@ -933,14 +923,12 @@ const Dashboard = () => {
                           </table>
                         </div>
 
-                        {/* Mobile Cards */}
                         <div className="sm:hidden space-y-4 p-3">
                           {myComplaints?.map((complaint, index) => (
                             <div
                               key={index}
                               className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200"
                             >
-                              {/* Header Strip */}
                               <div className="bg-gray-900 text-white px-4 py-3 flex items-center justify-between">
                                 <div className="flex items-center space-x-2">
                                   <span className="text-lg font-bold">
@@ -963,9 +951,7 @@ const Dashboard = () => {
                                 </span>
                               </div>
 
-                              {/* Content */}
                               <div className="p-4 space-y-4">
-                                {/* Quick Info Row */}
                                 <div className="flex justify-between items-center">
                                   <div>
                                     <span className="text-xs text-gray-500 uppercase tracking-wide">
@@ -985,7 +971,6 @@ const Dashboard = () => {
                                   </div>
                                 </div>
 
-                                {/* Category */}
                                 <div>
                                   <span className="text-xs text-gray-500 uppercase tracking-wide">
                                     Category
@@ -995,7 +980,6 @@ const Dashboard = () => {
                                   </p>
                                 </div>
 
-                                {/* Description */}
                                 <div>
                                   <span className="text-xs text-gray-500 uppercase tracking-wide">
                                     Description
