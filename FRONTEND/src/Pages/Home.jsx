@@ -452,7 +452,6 @@ export default function Home() {
           <div className="border-t border-gray-800 pt-8 sm:pt-10 lg:pt-12 mb-8 sm:mb-10">
             <div className="max-w-full px-4 sm:px-0">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 items-center">
-                {/* Left Side - Content */}
                 <div className="text-left">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
