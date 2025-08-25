@@ -17,6 +17,7 @@ export default function Admin() {
   const [complaintsListTemp, setComplaintsListTemp] = useState([]);
   const [selectedStatusFilter, setSelectedStatusFilter] = useState("");
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("");
+  const [roomSearchFilter, setRoomSearchFilter] = useState("");
   const [searchRollNumber, setSearchRollNumber] = useState("");
   const [studentDetails, setStudentDetails] = useState(null);
   const [websiteStats, setWebsiteStats] = useState(null);
@@ -245,12 +246,14 @@ export default function Admin() {
   const clearAllFilters = () => {
     setSelectedStatusFilter("");
     setSelectedCategoryFilter("");
+    setRoomSearchFilter("");
     setComplaintsListTemp(complaintsList);
   };
 
   const applyFilters = (
     statusFilter = selectedStatusFilter,
-    categoryFilter = selectedCategoryFilter
+    categoryFilter = selectedCategoryFilter,
+    roomFilter = roomSearchFilter
   ) => {
     let filteredComplaints = complaintsList;
 
@@ -263,6 +266,13 @@ export default function Admin() {
     if (categoryFilter && categoryFilter !== "") {
       filteredComplaints = filteredComplaints.filter(
         (complaint) => complaint.category === categoryFilter
+      );
+    }
+
+    if (roomFilter && roomFilter !== "") {
+      filteredComplaints = filteredComplaints.filter(
+        (complaint) =>
+          complaint.room && complaint.room.toString().includes(roomFilter)
       );
     }
 
@@ -339,12 +349,18 @@ export default function Admin() {
   };
   const handleFilterChangeByStatus = (status) => {
     setSelectedStatusFilter(status);
-    applyFilters(status, selectedCategoryFilter);
+    applyFilters(status, selectedCategoryFilter, roomSearchFilter);
   };
 
   const handleFilterChangeByCategory = (category) => {
     setSelectedCategoryFilter(category);
-    applyFilters(selectedStatusFilter, category);
+    applyFilters(selectedStatusFilter, category, roomSearchFilter);
+  };
+
+  const handleRoomSearchChange = (e) => {
+    const roomValue = e.target.value;
+    setRoomSearchFilter(roomValue);
+    applyFilters(selectedStatusFilter, selectedCategoryFilter, roomValue);
   };
 
   useEffect(() => {
@@ -394,7 +410,6 @@ export default function Admin() {
               </div>
             </div>
 
-            {/* Desktop Navigation */}
             <div className="hidden md:flex space-x-4 items-center">
               {user.role !== "admin" && (
                 <button
@@ -452,7 +467,6 @@ export default function Admin() {
               </button>
             </div>
 
-            {/* Mobile Menu Button */}
             <div className="md:hidden">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -487,7 +501,6 @@ export default function Admin() {
               </button>
             </div>
 
-            {/* Mobile Menu Overlay */}
             <div
               className={`md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-xl border-b border-gray-200/50 shadow-xl transform transition-all duration-300 ease-in-out z-30 ${
                 mobileMenuOpen
@@ -561,7 +574,6 @@ export default function Admin() {
 
           <div className="p-4 sm:p-6 md:p-8 lg:p-10 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 flex-1">
             <div className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 p-4 sm:p-6 md:p-8 border border-gray-100 hover:border-gray-200 flex flex-col relative overflow-hidden">
-              {/* Decorative background gradient */}
               <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-blue-50 to-transparent rounded-bl-3xl"></div>
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-gray-50 to-transparent rounded-tr-3xl"></div>
 
@@ -802,12 +814,10 @@ export default function Admin() {
             </div>
 
             <div className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 p-4 sm:p-6 md:p-8 lg:p-10 border border-gray-100 hover:border-gray-200 lg:col-span-2 flex flex-col relative overflow-hidden">
-              {/* Decorative background gradient */}
               <div className="absolute top-0 right-0 w-32 h-32 sm:w-40 sm:h-40 bg-gradient-to-bl from-green-50 to-transparent rounded-bl-3xl"></div>
               <div className="absolute bottom-0 left-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-tr from-blue-50 to-transparent rounded-tr-3xl"></div>
 
               <div className="relative z-10">
-                {/* Header Section */}
                 <div className="flex items-center justify-between mb-6 sm:mb-8">
                   <div className="flex items-center space-x-2 sm:space-x-3">
                     <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-green-500/25">
@@ -860,7 +870,6 @@ export default function Admin() {
                   </button>
                 </div>
 
-                {/* Notice List Container */}
                 <ul className="space-y-4 sm:space-y-6 text-gray-700 text-sm sm:text-base max-h-[350px] sm:max-h-[380px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                   <ul className="space-y-3 sm:space-y-4">
                     {allNotices.map(
@@ -870,7 +879,6 @@ export default function Admin() {
                             key={notice._id || index}
                             className="group/notice bg-gradient-to-r from-gray-50 to-gray-50/50 hover:from-green-50 hover:to-blue-50/50 rounded-2xl border border-gray-200 hover:border-green-200 p-4 sm:p-5 shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden"
                           >
-                            {/* Notice decorative elements */}
                             <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-green-100/30 to-transparent rounded-bl-2xl opacity-0 group-hover/notice:opacity-100 transition-opacity duration-300"></div>
 
                             {(user.role === "admin" ||
@@ -1124,9 +1132,39 @@ export default function Admin() {
                         Complaint Register
                       </h3>
                       <div className="mb-6 flex flex-col gap-4 sm:gap-6">
-                        {/* Filters Container */}
-                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-end gap-4">
-                          {/* Status Filter */}
+                        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <label
+                              className="text-gray-700 font-medium text-sm whitespace-nowrap"
+                              htmlFor="room-search-filter"
+                            >
+                              Search by Room:
+                            </label>
+                            <div className="relative">
+                              <input
+                                id="room-search-filter"
+                                type="text"
+                                value={roomSearchFilter}
+                                onChange={handleRoomSearchChange}
+                                placeholder="Enter room number..."
+                                className="w-full sm:w-auto min-w-[160px] border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm"
+                              />
+                              <svg
+                                className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"
+                                />
+                              </svg>
+                            </div>
+                          </div>
+
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                             <label
                               className="text-gray-700 font-medium text-sm whitespace-nowrap"
@@ -1149,7 +1187,6 @@ export default function Admin() {
                             </select>
                           </div>
 
-                          {/* Category Filter */}
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                             <label
                               className="text-gray-700 font-medium text-sm whitespace-nowrap"
@@ -1195,8 +1232,9 @@ export default function Admin() {
                             </select>
                           </div>
 
-                          {/* Clear Filters Button */}
-                          {(selectedStatusFilter || selectedCategoryFilter) && (
+                          {(selectedStatusFilter ||
+                            selectedCategoryFilter ||
+                            roomSearchFilter) && (
                             <div className="flex justify-center sm:justify-end lg:justify-start">
                               <button
                                 onClick={clearAllFilters}
@@ -1208,8 +1246,9 @@ export default function Admin() {
                           )}
                         </div>
 
-                        {/* Active Filters Display (Mobile) */}
-                        {(selectedStatusFilter || selectedCategoryFilter) && (
+                        {(selectedStatusFilter ||
+                          selectedCategoryFilter ||
+                          roomSearchFilter) && (
                           <div className="flex flex-wrap gap-2 lg:hidden">
                             {selectedStatusFilter && (
                               <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
@@ -1235,6 +1274,24 @@ export default function Admin() {
                                 </button>
                               </span>
                             )}
+                            {roomSearchFilter && (
+                              <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
+                                Room: {roomSearchFilter}
+                                <button
+                                  onClick={() => {
+                                    setRoomSearchFilter("");
+                                    applyFilters(
+                                      selectedStatusFilter,
+                                      selectedCategoryFilter,
+                                      ""
+                                    );
+                                  }}
+                                  className="ml-1 text-purple-600 hover:text-purple-800"
+                                >
+                                  ×
+                                </button>
+                              </span>
+                            )}
                           </div>
                         )}
                       </div>
@@ -1244,7 +1301,9 @@ export default function Admin() {
                         </div>
                         <div className="relative flex justify-center">
                           <span className="px-3 sm:px-4 bg-white text-gray-400 text-xs sm:text-sm font-medium">
-                            {selectedStatusFilter || selectedCategoryFilter
+                            {selectedStatusFilter ||
+                            selectedCategoryFilter ||
+                            roomSearchFilter
                               ? `Filtered Complaints (${complaintsListTemp.length})`
                               : `All Complaints (${complaintsListTemp.length})`}
                           </span>
@@ -1262,7 +1321,9 @@ export default function Admin() {
                                 No complaints found
                               </h3>
                               <p className="text-gray-500 text-sm">
-                                {selectedStatusFilter || selectedCategoryFilter
+                                {selectedStatusFilter ||
+                                selectedCategoryFilter ||
+                                roomSearchFilter
                                   ? "Try adjusting your filters to see more results."
                                   : "No complaints have been submitted yet."}
                               </p>
@@ -1386,7 +1447,6 @@ export default function Admin() {
                         Search Student
                       </h3>
 
-                      {/* Search Bar */}
                       <div className="flex justify-center">
                         <div className="relative w-full sm:w-2/3">
                           <input
@@ -1413,12 +1473,9 @@ export default function Admin() {
                         </div>
                       </div>
 
-                      {/* Example Student Details */}
                       <div className="bg-white rounded-3xl shadow-xl border border-gray-100 max-w-lg mx-auto p-8 sm:p-10 space-y-6 relative">
-                        {/* Top Accent */}
                         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-24 h-2 bg-gray-200 rounded-full"></div>
 
-                        {/* Header */}
                         <div className="flex flex-col items-center space-y-2">
                           <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 text-3xl font-bold shadow-inner">
                             {studentDetails?.name?.charAt(0) || (
@@ -1438,7 +1495,6 @@ export default function Admin() {
                           </p>
                         </div>
 
-                        {/* Info Sections */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                           <div className="bg-gray-50 rounded-2xl p-5 shadow-sm flex flex-col items-center justify-center hover:shadow-md transition">
                             <p className="!font-medium text-gray-900 mb-1">
@@ -1473,7 +1529,6 @@ export default function Admin() {
                           </div>
                         </div>
 
-                        {/* Footer */}
                         <div className="text-center text-gray-500 text-sm mt-2 tracking-wide">
                           Academic Details Overview
                         </div>
@@ -1536,7 +1591,6 @@ export default function Admin() {
         </main>
       </div>
 
-      {/* Add Notice Popup Form */}
       {showAddNoticeForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-xl mx-4">
