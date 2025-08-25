@@ -220,7 +220,7 @@ const Dashboard = () => {
               )}
               <button
                 onClick={handleLogout}
-                className="group relative !bg-gray-900 !text-white hover:!text-gray-900 px-4 lg:px-8 py-2 lg:py-3 rounded-xl transition-all duration-300 !font-bold tracking-wide overflow-hidden border-2 border-gray-900 hover:border-white"
+                className="cursor-pointer group relative !bg-gray-900 !text-white hover:!text-gray-900 px-4 lg:px-8 py-2 lg:py-3 rounded-xl transition-all duration-300 !font-bold tracking-wide overflow-hidden border-2 border-gray-900 hover:border-white"
                 disabled={isLoading}
               >
                 <span className="relative z-10 flex items-center gap-2">
@@ -691,35 +691,57 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg sm:rounded-xl lg:rounded-2xl shadow-lg p-3 sm:p-5 md:p-6 lg:p-8 border border-gray-100 lg:col-span-3">
-              <h3 className="text-lg sm:text-xl lg:text-2xl !font-black text-gray-900 mb-4 sm:mb-6 lg:mb-8 tracking-tight !italic underline">
-                Features
-              </h3>
+            <div className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 p-4 sm:p-6 md:p-8 lg:p-10 border border-gray-100 hover:border-gray-200 lg:col-span-3 flex flex-col relative overflow-hidden">
+              <div className="flex items-center justify-between mb-6 sm:mb-8">
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-purple-500/25">
+                    <svg
+                      className="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="!text-xl sm:!text-2xl md:!text-3xl !font-black !text-gray-900 tracking-tight">
+                    Features
+                  </h3>
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-md group-hover:opacity-100 opacity-0 transition-opacity duration-300"></div>
+                  <span className="relative inline-block px-2 py-1 sm:px-3 sm:py-1 !text-xs sm:!text-sm !font-bold !tracking-wide bg-gradient-to-r from-purple-50 to-pink-50 !text-purple-700 rounded-full border border-purple-200 shadow-sm hover:shadow-md transition-all duration-300 uppercase">
+                    Active
+                  </span>
+                </div>
+              </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
                 <div className="flex flex-col space-y-2 sm:space-y-3 lg:space-y-4 mt-2 sm:mt-4 lg:mt-6">
                   <button
                     onClick={() => setActiveFeature("complaints")}
-                    className={`w-full cursor-pointer px-3 sm:px-4 lg:px-5 py-2.5 sm:py-3 lg:py-3.5 rounded-lg sm:rounded-xl font-medium sm:font-semibold text-left border transition-all duration-300 text-sm sm:text-base
-                    ${
+                    className={`w-full cursor-pointer px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl transition-all duration-300 font-bold tracking-wide border-2 hover:shadow-md hover:scale-105 ${
                       activeFeature === "complaints"
-                        ? "bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-lg scale-[1.02]"
-                        : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-gray-200"
-                    } hover:shadow-md hover:scale-[1.01]`}
+                        ? "bg-gray-900 text-white border-gray-900"
+                        : "bg-white text-gray-900 border-gray-200 hover:border-gray-400"
+                    }`}
                   >
                     Register a Complaint
                   </button>
-
                   <button
                     onClick={() => setActiveFeature("mess")}
-                    className={`w-full cursor-pointer px-3 sm:px-4 lg:px-5 py-2.5 sm:py-3 lg:py-3.5 rounded-lg sm:rounded-xl font-medium sm:font-semibold text-left border transition-all duration-300 text-sm sm:text-base
-                    ${
+                    className={`w-full cursor-pointer px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl transition-all duration-300 font-bold tracking-wide border-2 hover:shadow-md hover:scale-105 ${
                       activeFeature === "mess"
-                        ? "bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-lg scale-[1.02]"
-                        : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-gray-200"
-                    } hover:shadow-md hover:scale-[1.01]`}
+                        ? "bg-gray-900 text-white border-gray-900"
+                        : "bg-white text-gray-900 border-gray-200 hover:border-gray-400"
+                    }`}
                   >
-                    Today’s Mess Menu
+                    Today's Mess Menu
                   </button>
                 </div>
 
@@ -892,7 +914,17 @@ const Dashboard = () => {
                                   <td className="p-3 sm:p-4">
                                     {complaint?.title || "N/A"}
                                   </td>
-                                  <td className="p-3 sm:p-4">
+                                  <td className={`p-3 sm:p-4  ${
+                                      complaint.status === "Resolved"
+                                        ? "bg-green-100 text-green-700"
+                                        : complaint.status === "Pending"
+                                        ? "bg-yellow-100 text-yellow-700"
+                                        : complaint.status === "Rejected"
+                                        ? "bg-red-100 text-red-700"
+                                        : complaint.status === "Under-Progress"
+                                        ? "bg-blue-100 text-blue-700"
+                                        : "bg-gray-100 text-gray-700"
+                                    }`}>
                                     {complaint?.status || "N/A"}
                                   </td>
                                 </tr>
@@ -982,7 +1014,7 @@ const Dashboard = () => {
                   )}
 
                   {activeFeature === "mess" && (
-                    <div className="w-full bg-white rounded-lg sm:rounded-xl lg:rounded-2xl xl:rounded-3xl shadow-md border border-gray-100 p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 max-w-4 xl mx-auto">
+                    <div className="w-full bg-white rounded-lg sm:rounded-xl lg:rounded-2xl xl:rounded-3xl shadow-md border border-gray-100 p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 max-w-4xl mx-auto">
                       <h3 className="!text-xl sm:!text-2xl lg:!text-3xl xl:!text-4xl !font-semibold text-gray-900 text-center">
                         Mess Menu
                       </h3>
