@@ -716,11 +716,11 @@ export default function Admin() {
                 <div className="w-full mt-6 sm:mt-8">
                   <button
                     onClick={() => setIsOpen(true)}
-                    className="w-full group relative !bg-gray-900 !text-white hover:!text-gray-900 px-6 py-3 sm:px-8 sm:py-4 rounded-xl transition-all duration-300 !font-bold tracking-wide overflow-hidden border-2 border-gray-900 hover:border-white flex items-center justify-center gap-2"
+                    className="w-full !bg-gray-900 !text-white hover:bg-gradient-to-r hover:from-gray-800 hover:to-gray-900 px-6 py-3 sm:px-8 sm:py-4 rounded-xl !font-bold tracking-wide border-2 border-gray-900 hover:border-gray-700 hover:shadow-xl hover:shadow-gray-900/25 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 transform transition-all duration-300 ease-out cursor-pointer group"
                   >
-                    <span className="relative z-10 flex items-center gap-2">
+                    <span className="flex items-center gap-2 group-hover:translate-x-0.5 transition-transform duration-300">
                       <svg
-                        className="w-4 h-4 transition-transform duration-300 group-hover:rotate-12"
+                        className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -734,7 +734,6 @@ export default function Admin() {
                       </svg>
                       Edit Profile
                     </span>
-                    <div className="absolute inset-0 bg-white transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
                   </button>
 
                   {isOpen && (
@@ -870,7 +869,7 @@ export default function Admin() {
                   </button>
                 </div>
 
-                <ul className="space-y-4 sm:space-y-6 text-gray-700 text-sm sm:text-base max-h-[350px] sm:max-h-[380px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                <ul className="space-y-4 sm:space-y-6 text-gray-700 text-sm sm:text-base max-h-[360px] sm:max-h-[490px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                   <ul className="space-y-3 sm:space-y-4">
                     {allNotices.map(
                       (notice, index) =>
