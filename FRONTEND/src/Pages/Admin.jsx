@@ -366,7 +366,7 @@ export default function Admin() {
             email: student?.email || "N/A",
             role: student?.role || "N/A",
             fatherName: cgpiData?.fName || "N/A",
-            cgpi: cgpiData?.CGPI || "N/A",
+            cgpi: cgpiData?.cgpi || "N/A",
           });
 
           console.log("Student details set:", {
