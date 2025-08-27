@@ -3,14 +3,15 @@ import { useAuthStore } from "../store/authStore";
 import { API_PATHS } from "../../Utils/apiPaths";
 import axiosInstance from "../../Utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { logout, isLoading, error, user } = useAuthStore();
-  const [formLoading, setFormLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [allNotices, setAllNotices] = useState([]);
+  const [localIsLoading, setLocalIsLoading] = useState(false);
 
   const [formError, setFormError] = useState(null);
   const [todaysMenu, setTodaysMenu] = useState(null);
@@ -66,7 +67,7 @@ const Dashboard = () => {
 
   const handleAddComplaint = async (e) => {
     e.preventDefault();
-    setFormLoading(true);
+    setLocalIsLoading(true);
     setFormError(null);
     try {
       const complaintData = {
@@ -95,12 +96,14 @@ const Dashboard = () => {
           description: "",
         });
       }
-      setFormLoading(false);
+      setLocalIsLoading(false);
+      toast.success(response.data.message);
       setFormError(null);
       fetchMyComplaint();
     } catch (error) {
       console.error("Error registering complaint:", error);
-      setFormLoading(false);
+      setLocalIsLoading(false);
+      toast.error("Error registering complaint");
       setFormError(
         error.response.data.message ||
           "An error occurred while registering the complaint."
@@ -132,6 +135,7 @@ const Dashboard = () => {
 
   const handleEditProfile = async (e) => {
     e.preventDefault();
+    setLocalIsLoading(true);
     try {
       const response = await axiosInstance.put(
         API_PATHS.EDIT_PROFILE,
@@ -140,9 +144,14 @@ const Dashboard = () => {
       if (response.status === 200) {
         console.log("Profile updated:", response.data);
       }
+      toast.success(response.data.message);
       setIsOpen(false);
+      setLocalIsLoading(false);
       fetchUserData();
     } catch (error) {
+      toast.error("Error updating profile");
+      setIsOpen(false);
+      setLocalIsLoading(false);
       console.error("Error updating profile:", error);
     }
   };
@@ -575,7 +584,7 @@ const Dashboard = () => {
                             className="w-full bg-gray-900 py-3.5 rounded-xl hover:bg-gray-700 shadow-lg cursor-pointer transition"
                           >
                             <p className="!m-0 !leading-none !text-lg !text-white !font-semibold !italic !opacity-100 ">
-                              Save Changes
+                              {localIsLoading ? "Saving..." : "Save Changes"}
                             </p>
                           </button>
                         </form>
@@ -845,7 +854,7 @@ const Dashboard = () => {
                           type="submit"
                           className="w-full cursor-pointer bg-gray-900 text-white font-medium sm:font-semibold py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base hover:bg-gray-800 transition-colors duration-200"
                         >
-                          {formLoading
+                          {localIsLoading
                             ? "Adding Complaint..."
                             : "Add Complaint"}
                         </button>

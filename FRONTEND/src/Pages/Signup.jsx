@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "../store/authStore";
+import { toast } from "react-toastify";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -16,8 +17,10 @@ export default function Signup() {
     try {
       await signup(name, email, password);
       navigate("/otp-verify");
+      toast.success("Please Verify Your Email");
     } catch (error) {
       console.error("Error during signup:", error);
+      toast.error("Signup failed");
     }
   };
 

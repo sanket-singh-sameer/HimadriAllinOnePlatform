@@ -2,6 +2,8 @@ import React from "react";
 import { useEffect } from "react";
 import AOS from "aos";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { ToastContainer } from 'react-toastify';
+
 import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
 import Home from "./Pages/Home";
@@ -78,6 +80,20 @@ function App() {
 
   return (
     <main className="main-container">
+
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        className="mt-16"
+      />
+
       <Routes>
         <Route
           path="/"

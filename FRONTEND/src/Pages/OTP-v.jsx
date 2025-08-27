@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "../store/authStore";
+import { toast } from "react-toastify";
 
 export default function OTPv() {
   const [otp, setOtp] = useState("");
@@ -24,8 +25,10 @@ export default function OTPv() {
     try {
       await verifyOtp(otp);
       navigate("/dashboard");
+      toast.success("OTP verified successfully");
     } catch (error) {
       console.error("Error during OTP verification:", error);
+      toast.error("OTP verification failed");
     }
   };
   return (

@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "../store/authStore";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -23,8 +24,11 @@ export default function Login() {
     e.preventDefault();
     try {
       await login(email, password);
+      toast.success("Logged In Successfully");
+      navigate("/");
     } catch (error) {
       console.error("Error during login:", error);
+      toast.error("Login failed");
     }
   };
   return (

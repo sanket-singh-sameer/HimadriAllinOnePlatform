@@ -4,6 +4,7 @@ import axiosInstance from "../../Utils/axiosInstance";
 import { useAuthStore } from "../store/authStore";
 import { set } from "mongoose";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function Admin() {
   const { logout, isLoading, error, user } = useAuthStore();
@@ -22,6 +23,9 @@ export default function Admin() {
   const [studentDetails, setStudentDetails] = useState(null);
   const [websiteStats, setWebsiteStats] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [localIsLoading, setLocalIsLoading] = useState(false);
+  const [localIsLoadingResolved, setLocalIsLoadingResolved] = useState(false);
+  const [localIsLoadingRejected, setLocalIsLoadingRejected] = useState(false);
 
   const [activeFeature, setActiveFeature] = useState("statistics");
   const [todaysMenu, setTodaysMenu] = useState(null);
@@ -50,6 +54,7 @@ export default function Admin() {
 
   const handleAddNewNoticeForm = async (e) => {
     e.preventDefault();
+    setLocalIsLoading(true);
     try {
       const noticeData = {
         ...noticeForm,
@@ -62,10 +67,14 @@ export default function Admin() {
       if (response.status === 200 || response.status === 201) {
         fetchAllNotices();
         setNoticeForm({ title: "", description: "" });
-        setShowAddNoticeForm(false);
+        toast.success(response.data.message);
       }
     } catch (error) {
       console.error("Error adding notice:", error);
+      toast.error("Error adding notice");
+    } finally {
+      setLocalIsLoading(false);
+      setShowAddNoticeForm(false);
     }
   };
   const fetchUserData = async () => {
@@ -81,6 +90,7 @@ export default function Admin() {
   };
   const handleEditFormSubmit = async (e) => {
     e.preventDefault();
+    setLocalIsLoading(true);
     try {
       const response = await axiosInstance.put(
         API_PATHS.EDIT_PROFILE,
@@ -90,8 +100,12 @@ export default function Admin() {
         console.log("Profile updated:", response.data);
       }
       setIsOpen(false);
+      toast.success(response.data.message);
+      setLocalIsLoading(false);
       fetchUserData();
     } catch (error) {
+      toast.error("Error updating profile");
+      setLocalIsLoading(false);
       console.error("Error updating profile:", error);
     }
   };
@@ -110,6 +124,7 @@ export default function Admin() {
   };
 
   const handleDeleteNotice = async (noticeId) => {
+    setLocalIsLoading(true);
     try {
       const response = await axiosInstance.delete(
         API_PATHS.DELETE_NOTICE(noticeId)
@@ -118,9 +133,14 @@ export default function Admin() {
       setAllNotices((prevNotices) =>
         prevNotices.filter((notice) => notice._id !== noticeId)
       );
+      toast.success(response.data.message);
     } catch (error) {
       console.error("Error deleting notice:", error);
+      toast.error("Error deleting notice");
+    } finally {
+      setLocalIsLoading(false);
     }
+
     console.log("Deleting notice with ID:", noticeId);
     setShowConfirm(false);
     setSelectedNotice(null);
@@ -159,6 +179,12 @@ export default function Admin() {
   };
 
   const updateComplaintStatus = async (id, status) => {
+    if (status=="Resolved"){
+      setLocalIsLoadingResolved(true);
+    }
+    if (status=="Rejected"){
+      setLocalIsLoadingRejected(true);
+    }
     try {
       console.log("Updating complaint ID:", id, "to status:", status);
       const response = await axiosInstance.put(
@@ -169,9 +195,21 @@ export default function Admin() {
         console.log("Complaint status updated successfully:", response.data);
         fetchAllComplaints();
       }
+      // toast.success(response.data.message);
+      if (status=="Resolved") {
+        toast.success("Marked As Resolved");
+      }
+      if (status=="Rejected") {
+        toast.error("Marked As Rejected");
+      }
     } catch (error) {
+      toast.error("Error updating complaint status");
       console.error("Error updating complaint status:", error);
+    } finally {
+      setLocalIsLoadingRejected(false);
+      setLocalIsLoadingResolved(false);
     }
+
   };
 
   const getWebsiteStats = async () => {
@@ -801,7 +839,7 @@ export default function Admin() {
                             className="w-full bg-gray-900 py-3.5 rounded-xl hover:bg-gray-700 shadow-lg cursor-pointer transition"
                           >
                             <p className="!m-0 !leading-none !text-lg !text-white !font-semibold !italic !opacity-100 ">
-                              Save Changes
+                              {localIsLoading ? "Saving..." : "Save Changes"}
                             </p>
                           </button>
                         </form>
@@ -978,7 +1016,7 @@ export default function Admin() {
                               handleDeleteNotice(selectedNotice?._id)
                             }
                           >
-                            Delete
+                            {localIsLoading ? "Deleting..." : "Delete"}
                           </button>
                         </div>
                       </div>
@@ -1413,7 +1451,7 @@ export default function Admin() {
                                         }
                                         className="w-full sm:w-auto px-3 sm:px-4 py-2 rounded-xl bg-green-100 text-green-700 font-medium shadow-sm hover:bg-green-200 transition cursor-pointer text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                       >
-                                        ✓ Resolved
+                                        {localIsLoadingResolved ? "Loading..." : "✓ Resolved"}
                                       </button>
                                       <button
                                         onClick={() =>
@@ -1427,7 +1465,7 @@ export default function Admin() {
                                         }
                                         className="w-full sm:w-auto px-3 sm:px-4 py-2 rounded-xl bg-red-100 text-red-700 font-medium shadow-sm hover:bg-red-200 transition cursor-pointer text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                       >
-                                        ✗ Rejected
+                                        {localIsLoadingRejected ? "Loading..." : "✗ Rejected"}
                                       </button>
                                     </div>
                                   </div>
@@ -1686,7 +1724,7 @@ export default function Admin() {
                   type="submit"
                   className="flex-1 px-6 py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-700 transition-colors"
                 >
-                  Add Notice
+                  {localIsLoading ? "Adding..." : "Add Notice"}
                 </button>
               </div>
             </form>
