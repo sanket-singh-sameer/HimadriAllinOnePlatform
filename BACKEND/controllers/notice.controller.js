@@ -31,6 +31,7 @@ export const viewAllNotices = async (req, res) => {
         notices: await Promise.all(
           notices.reverse().map(async (notice) => ({
             ...notice._doc,
+            authorId: notice.author,
             author: await getAuthorNameById(notice.author),
           }))
         ),

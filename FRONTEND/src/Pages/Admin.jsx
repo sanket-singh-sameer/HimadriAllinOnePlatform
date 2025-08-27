@@ -919,7 +919,7 @@ export default function Admin() {
                             <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-green-100/30 to-transparent rounded-bl-2xl opacity-0 group-hover/notice:opacity-100 transition-opacity duration-300"></div>
 
                             {(user.role === "admin" ||
-                              user.role === "super-admin") && (
+                              user.role === "super-admin" || user._id === notice.authorId) && (
                               <button
                                 onClick={() => {
                                   setSelectedNotice(notice);
