@@ -26,6 +26,7 @@ export default function Admin() {
   const [localIsLoading, setLocalIsLoading] = useState(false);
   const [localIsLoadingResolved, setLocalIsLoadingResolved] = useState(false);
   const [localIsLoadingRejected, setLocalIsLoadingRejected] = useState(false);
+  const [localIsLoadingPending, setLocalIsLoadingPending] = useState(false);
 
   const [activeFeature, setActiveFeature] = useState("statistics");
   const [todaysMenu, setTodaysMenu] = useState(null);
@@ -179,11 +180,14 @@ export default function Admin() {
   };
 
   const updateComplaintStatus = async (id, status) => {
-    if (status=="Resolved"){
+    if (status == "Resolved") {
       setLocalIsLoadingResolved(true);
     }
-    if (status=="Rejected"){
+    if (status == "Rejected") {
       setLocalIsLoadingRejected(true);
+    }
+    if (status == "Pending") {
+      setLocalIsLoadingPending(true);
     }
     try {
       console.log("Updating complaint ID:", id, "to status:", status);
@@ -196,11 +200,14 @@ export default function Admin() {
         fetchAllComplaints();
       }
       // toast.success(response.data.message);
-      if (status=="Resolved") {
+      if (status == "Resolved") {
         toast.success("Marked As Resolved");
       }
-      if (status=="Rejected") {
+      if (status == "Rejected") {
         toast.error("Marked As Rejected");
+      }
+      if (status == "Pending") {
+        toast.warn("Marked As Pending");
       }
     } catch (error) {
       toast.error("Error updating complaint status");
@@ -208,8 +215,8 @@ export default function Admin() {
     } finally {
       setLocalIsLoadingRejected(false);
       setLocalIsLoadingResolved(false);
+      setLocalIsLoadingPending(false);
     }
-
   };
 
   const getWebsiteStats = async () => {
@@ -919,7 +926,8 @@ export default function Admin() {
                             <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-green-100/30 to-transparent rounded-bl-2xl opacity-0 group-hover/notice:opacity-100 transition-opacity duration-300"></div>
 
                             {(user.role === "admin" ||
-                              user.role === "super-admin" || user._id === notice.authorId) && (
+                              user.role === "super-admin" ||
+                              user._id === notice.authorId) && (
                               <button
                                 onClick={() => {
                                   setSelectedNotice(notice);
@@ -1451,7 +1459,25 @@ export default function Admin() {
                                         }
                                         className="w-full sm:w-auto px-3 sm:px-4 py-2 rounded-xl bg-green-100 text-green-700 font-medium shadow-sm hover:bg-green-200 transition cursor-pointer text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                       >
-                                        {localIsLoadingResolved ? "Loading..." : "✓ Resolved"}
+                                        {localIsLoadingResolved
+                                          ? "Loading..."
+                                          : "✓ Resolved"}
+                                      </button>
+                                      <button
+                                        onClick={() =>
+                                          updateComplaintStatus(
+                                            complaint._id,
+                                            "Pending"
+                                          )
+                                        }
+                                        disabled={
+                                          complaint.status === "Pending"
+                                        }
+                                        className="w-full sm:w-auto px-3 sm:px-4 py-2 rounded-xl bg-yellow-100 text-yellow-700 font-medium shadow-sm hover:bg-yellow-200 transition cursor-pointer text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                      >
+                                        {localIsLoadingPending
+                                          ? "Loading..."
+                                          : "⚠️ Pending"}
                                       </button>
                                       <button
                                         onClick={() =>
@@ -1465,7 +1491,9 @@ export default function Admin() {
                                         }
                                         className="w-full sm:w-auto px-3 sm:px-4 py-2 rounded-xl bg-red-100 text-red-700 font-medium shadow-sm hover:bg-red-200 transition cursor-pointer text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                       >
-                                        {localIsLoadingRejected ? "Loading..." : "✗ Rejected"}
+                                        {localIsLoadingRejected
+                                          ? "Loading..."
+                                          : "✗ Rejected"}
                                       </button>
                                     </div>
                                   </div>

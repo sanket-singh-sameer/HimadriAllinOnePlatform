@@ -12,7 +12,7 @@ const cgpiSchema = new mongoose.Schema({
     type: String,
   },
   cgpi: {
-    type: String,
+    type: Number,
   },
 });
 

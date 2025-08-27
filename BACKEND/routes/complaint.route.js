@@ -16,6 +16,6 @@ router.get("/my", viewMyComplaint);
 router.get("/all", viewAllComplaint);
 router.get("/stats", totalComplaintsController);
 router.get("/:id", viewComplaintDetails);
-router.put("/:id", verifyTokenFromCookies, checkIfAdmin, updateComplaintStatus);
+router.put("/:id", verifyTokenFromCookies, updateComplaintStatus);
 
 export default router;

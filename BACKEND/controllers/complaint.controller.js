@@ -78,7 +78,7 @@ export const viewComplaintDetails = async (req, res) => {
 export const updateComplaintStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
-
+  const user = getUserId(req);
   try {
     const complaint = await Complaint.findOne({ _id: id });
     if (!complaint) {
@@ -87,6 +87,7 @@ export const updateComplaintStatus = async (req, res) => {
       });
     }
     complaint.status = status || complaint.status;
+    complaint.updatedBy = user;
     await complaint.save();
     res
       .status(200)
