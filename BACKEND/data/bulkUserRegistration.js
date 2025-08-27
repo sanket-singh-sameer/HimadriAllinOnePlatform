@@ -58,6 +58,9 @@ export const bulkSignupController = async () => {
   } catch (err) {
     console.error("Signup Controller Error:", err);
   }
+  finally {
+    mongoose.connection.close();
+  }
 };
 
 
