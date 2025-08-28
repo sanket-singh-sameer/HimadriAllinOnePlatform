@@ -144,43 +144,43 @@ The application will be available at:
 
 
 HBH/
-├── package.json                    # Root package configuration
-├── README.md                       # Project documentation
-├── BACKEND/                        # Backend application
-│   ├── server.js                   # Express server entry point
+├── package.json                     # Root package configuration
+├── README.md                        # Project documentation
+├── BACKEND/                         # Backend application
+│   ├── server.js                    # Express server entry point
 │   ├── config/
-│   │   └── connectDB.js           # MongoDB connection
-│   ├── controllers/               # Route controllers
-│   │   ├── auth.controller.js     # Authentication logic
-│   │   ├── admin.controller.js    # Admin operations
-│   │   ├── complaint.controller.js # Complaint management
-│   │   ├── cgpi.controller.js     # Academic records
-│   │   ├── messmenu.controller.js # Mess menu operations
-│   │   └── notice.controller.js   # Notice management
-│   ├── models/                    # Mongoose schemas
-│   │   ├── user.model.js         # User schema
-│   │   ├── complaint.model.js    # Complaint schema
-│   │   ├── cgpi.model.js         # CGPI schema
-│   │   ├── messmenu.model.js     # Mess menu schema
-│   │   ├── notice.model.js       # Notice schema
-│   │   └── rooms.model.js        # Room schema
-│   ├── routes/                   # API routes
-│   ├── middlewares/              # Custom middleware
-│   ├── utils/                    # Utility functions
-│   ├── gmail/                    # Email service configuration
-│   └── data/                     # Data seeding scripts
-└── FRONTEND/                     # React application
-    ├── package.json              # Frontend dependencies
-    ├── vite.config.js           # Vite configuration
+│   │   └── connectDB.js             # MongoDB connection
+│   ├── controllers/                 # Route controllers
+│   │   ├── auth.controller.js       # Authentication logic
+│   │   ├── admin.controller.js      # Admin operations
+│   │   ├── complaint.controller.js  # Complaint management
+│   │   ├── cgpi.controller.js       # Academic records
+│   │   ├── messmenu.controller.js   # Mess menu operations
+│   │   └── notice.controller.js     # Notice management
+│   ├── models/                      # Mongoose schemas
+│   │   ├── user.model.js            # User schema
+│   │   ├── complaint.model.js       # Complaint schema
+│   │   ├── cgpi.model.js            # CGPI schema
+│   │   ├── messmenu.model.js        # Mess menu schema
+│   │   ├── notice.model.js          # Notice schema
+│   │   └── rooms.model.js           # Room schema
+│   ├── routes/                      # API routes
+│   ├── middlewares/                 # Custom middleware
+│   ├── utils/                       # Utility functions
+│   ├── gmail/                       # Email service configuration
+│   └── data/                        # Data seeding scripts
+└── FRONTEND/                        # React application
+    ├── package.json                 # Frontend dependencies
+    ├── vite.config.js               # Vite configuration
     ├── src/
-    │   ├── App.jsx              # Main app component
-    │   ├── main.jsx             # Entry point
-    │   ├── index.css            # Global styles
-    │   ├── Components/          # Reusable components
-    │   ├── Pages/               # Page components
-    │   ├── store/               # State management
-    │   └── Utils/               # Utility functions
-    └── public/                  # Static assets
+    │   ├── App.jsx                  # Main app component
+    │   ├── main.jsx                 # Entry point
+    │   ├── index.css                # Global styles
+    │   ├── Components/              # Reusable components
+    │   ├── Pages/                   # Page components
+    │   ├── store/                   # State management
+    │   └── Utils/                   # Utility functions
+    └── public/                      # Static assets
 
 
 ## 🔧 API Endpoints
