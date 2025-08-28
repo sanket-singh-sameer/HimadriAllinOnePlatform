@@ -133,14 +133,14 @@ export const otpVerificationController = async (req, res) => {
       return res.status(500).json({ message: "Error generating token" });
     }
     setCookies(res, token);
-    await welcomeGMail(
-      user.email,
-      user.name,
-      "HBH NITH",
-      process.env.CLIENT_URL || "http://localhost:5173/dashboard",
-      "sanketsinghsameer@proton.me",
-      process.env.SUPPORT_URL || "https://divyamsingh.me"
-    );
+    // await welcomeGMail(
+    //   user.email,
+    //   user.name,
+    //   "HBH NITH",
+    //   process.env.CLIENT_URL || "http://localhost:5173/dashboard",
+    //   "sanketsinghsameer@proton.me",
+    //   process.env.SUPPORT_URL || "https://divyamsingh.me"
+    // );
     return res.status(200).json({
       message: "Email verified successfully",
       user: { ...user._doc, password: undefined },
@@ -195,7 +195,7 @@ export const passwordResetController = async (req, res) => {
     user.resetPasswordToken = undefined;
     user.resetPasswordTokenExpiresAt = undefined;
     await user.save();
-    await passwordResetSuccessGMail(user.email);
+    // await passwordResetSuccessGMail(user.email);
     return res.status(200).json({ message: "Password reset successful" });
   } catch (error) {
     return res.status(500).json({ message: "Error resetting password", error });

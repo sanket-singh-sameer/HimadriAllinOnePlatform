@@ -348,7 +348,7 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap gap-3 sm:gap-4">
                 <a
-                  href="https://github.com"
+                  href="https://github.com/sanket-singh-sameer/HimadriAllinOnePlatform"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-12 h-12 bg-gray-800 hover:bg-gray-700 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg"
@@ -420,7 +420,7 @@ export default function Home() {
               </h3>
               <div className="space-y-3 sm:space-y-4">
                 <a
-                  href="https://github.com/"
+                  href="https://github.com/sanket-singh-sameer/HimadriAllinOnePlatform"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block !text-gray-300 hover:!text-white transition-colors duration-200 !font-medium text-base"
@@ -566,7 +566,7 @@ export default function Home() {
             </p>
             <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-6 order-1 sm:order-2">
               <a
-                href="https://github.com/your-repo"
+                href="https://github.com/sanket-singh-sameer/HimadriAllinOnePlatform"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="!text-gray-400 hover:!text-white transition-colors duration-300 text-sm font-medium"
