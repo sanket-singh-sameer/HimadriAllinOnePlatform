@@ -9,6 +9,7 @@ import {
   checkAuthController,
   updateProfileController,
   totalUserLoggedInController,
+  changePasswordController,
 } from "../controllers/auth.controller.js";
 import { verifyTokenFromCookies } from "../middlewares/verifyToken.middleware.js";
 import { getStudentByRoll } from "../controllers/admin.controller.js";
@@ -26,6 +27,7 @@ router.post("/forgot-password", passwordForgotController);
 router.post("/reset-password/:token", passwordResetController);
 
 router.put("/update-profile", verifyTokenFromCookies, updateProfileController);
+router.put("/change-password", verifyTokenFromCookies, changePasswordController);
 
 router.get(
   "/total-user-count",

@@ -9,11 +9,13 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { logout, isLoading, error, user } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [allNotices, setAllNotices] = useState([]);
   const [localIsLoading, setLocalIsLoading] = useState(false);
 
   const [formError, setFormError] = useState(null);
+  const [passwordError, setPasswordError] = useState(null);
   const [todaysMenu, setTodaysMenu] = useState(null);
   const [myComplaints, setMyComplaints] = useState(null);
   const [activeFeature, setActiveFeature] = useState("complaints");
@@ -29,6 +31,11 @@ const Dashboard = () => {
     name: user.name || "",
     room: user.room || "",
     phone: user.phone || "",
+  });
+  const [changePasswordForm, setChangePasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
   const fetchTodaysMenu = async () => {
@@ -63,6 +70,11 @@ const Dashboard = () => {
   const handleEditFormChange = (e) => {
     const { name, value } = e.target;
     setEditProfileForm((prev) => ({ ...prev, [name]: value }));
+  };
+  
+  const handlePasswordFormChange = (e) => {
+    const { name, value } = e.target;
+    setChangePasswordForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAddComplaint = async (e) => {
@@ -153,6 +165,53 @@ const Dashboard = () => {
       setIsOpen(false);
       setLocalIsLoading(false);
       console.error("Error updating profile:", error);
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setLocalIsLoading(true);
+    setPasswordError(null);
+
+    // Validate passwords match
+    if (changePasswordForm.newPassword !== changePasswordForm.confirmPassword) {
+      setPasswordError("New passwords do not match");
+      setLocalIsLoading(false);
+      return;
+    }
+
+    // Validate password length
+    if (changePasswordForm.newPassword.length < 8) {
+      setPasswordError("Password must be at least 8 characters long");
+      setLocalIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.put(
+        API_PATHS.CHANGE_PASSWORD,
+        {
+          currentPassword: changePasswordForm.currentPassword,
+          newPassword: changePasswordForm.newPassword,
+        }
+      );
+      
+      if (response.status === 200) {
+        toast.success("Password changed successfully");
+        setIsPasswordModalOpen(false);
+        setChangePasswordForm({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      }
+      setLocalIsLoading(false);
+    } catch (error) {
+      setPasswordError(
+        error.response?.data?.message || "Error changing password"
+      );
+      setLocalIsLoading(false);
+      console.error("Error changing password:", error);
     }
   };
 
@@ -519,6 +578,28 @@ const Dashboard = () => {
                     </span>
                   </button>
 
+                  <button
+                    onClick={() => setIsPasswordModalOpen(true)}
+                    className="w-full !bg-blue-600 !text-white hover:bg-gradient-to-r hover:from-blue-700 hover:to-blue-800 px-6 py-3 sm:px-8 sm:py-4 rounded-xl !font-bold tracking-wide border-2 border-blue-600 hover:border-blue-700 hover:shadow-xl hover:shadow-blue-600/25 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 transform transition-all duration-300 ease-out cursor-pointer group mt-3"
+                  >
+                    <span className="flex items-center gap-2 group-hover:translate-x-0.5 transition-transform duration-300">
+                      <svg
+                        className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v-2l-4.257-2.257A6 6 0 0117 9zm-5 8a2 2 0 100-4 2 2 0 000 4z"
+                        />
+                      </svg>
+                      Change Password
+                    </span>
+                  </button>
+
                   {isOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
                       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-10 relative transition-all">
@@ -585,6 +666,97 @@ const Dashboard = () => {
                           >
                             <p className="!m-0 !leading-none !text-lg !text-white !font-semibold !italic !opacity-100 ">
                               {localIsLoading ? "Saving..." : "Save Changes"}
+                            </p>
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  )}
+
+                  {isPasswordModalOpen && (
+                    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-10 relative transition-all">
+                        <button
+                          onClick={() => {
+                            setIsPasswordModalOpen(false);
+                            setPasswordError(null);
+                            setChangePasswordForm({
+                              currentPassword: "",
+                              newPassword: "",
+                              confirmPassword: "",
+                            });
+                          }}
+                          className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl"
+                        >
+                          ✕
+                        </button>
+
+                        <h3 className="text-2xl font-extrabold text-gray-900 mb-8 tracking-tight">
+                          Change Password
+                        </h3>
+
+                        <form
+                          onSubmit={handleChangePassword}
+                          className="space-y-6"
+                        >
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Current Password
+                            </label>
+                            <input
+                              value={changePasswordForm.currentPassword}
+                              type="password"
+                              name="currentPassword"
+                              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm"
+                              placeholder="Enter your current password"
+                              onChange={handlePasswordFormChange}
+                              required
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              New Password
+                            </label>
+                            <input
+                              value={changePasswordForm.newPassword}
+                              type="password"
+                              name="newPassword"
+                              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm"
+                              placeholder="Enter your new password (min 8 characters)"
+                              onChange={handlePasswordFormChange}
+                              required
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Confirm New Password
+                            </label>
+                            <input
+                              value={changePasswordForm.confirmPassword}
+                              type="password"
+                              name="confirmPassword"
+                              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm"
+                              placeholder="Confirm your new password"
+                              onChange={handlePasswordFormChange}
+                              required
+                            />
+                          </div>
+
+                          {passwordError && (
+                            <p className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
+                              {passwordError}
+                            </p>
+                          )}
+
+                          <button
+                            type="submit"
+                            className="w-full bg-blue-600 py-3.5 rounded-xl hover:bg-blue-700 shadow-lg cursor-pointer transition"
+                            disabled={localIsLoading}
+                          >
+                            <p className="!m-0 !leading-none !text-lg !text-white !font-semibold !italic !opacity-100">
+                              {localIsLoading ? "Changing..." : "Change Password"}
                             </p>
                           </button>
                         </form>
