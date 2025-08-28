@@ -127,4 +127,50 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
+
+  forgotPassword: async (email) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axiosInstance.post(API_PATHS.FORGOT_PASSWORD, {
+        email,
+      });
+      if (response.status === 200) {
+        set({
+          isLoading: false,
+          error: null,
+        });
+        return response.data;
+      }
+    } catch (error) {
+      set({
+        error: error.response.data.message || "Failed to send reset email",
+        isLoading: false,
+      });
+      console.error("Forgot password failed:", error);
+      throw error;
+    }
+  },
+
+  resetPassword: async (token, password) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axiosInstance.post(API_PATHS.RESET_PASSWORD(token), {
+        newPassword: password,
+      });
+      if (response.status === 200) {
+        set({
+          isLoading: false,
+          error: null,
+        });
+        return response.data;
+      }
+    } catch (error) {
+      set({
+        error: error.response.data.message || "Failed to reset password",
+        isLoading: false,
+      });
+      console.error("Reset password failed:", error);
+      throw error;
+    }
+  },
 }));

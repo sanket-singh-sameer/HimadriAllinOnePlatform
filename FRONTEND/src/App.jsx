@@ -12,6 +12,8 @@ import Dashboard from "./Pages/Dashboard";
 import Admin from "./Pages/Admin";
 import { useAuthStore } from "./store/authStore";
 import { FullPageLoader } from "./Components/LoadingSpinner";
+import ForgotPassword from "./Pages/ForgotPassword";
+import ResetPassword from "./Pages/ResetPassword";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -119,6 +121,18 @@ function App() {
             </RedirectAuthenticatedUser>
           }
         />
+        <Route
+          path="/forgot-password"
+          element={
+            <RedirectAuthenticatedUser>
+              <ForgotPassword />
+            </RedirectAuthenticatedUser>
+          }
+        />
+        <Route
+          path="/reset-password/:token"
+          element={<ResetPassword />}
+        />
         <Route path="/otp-verify" element={<OTPv />} />
         <Route
           path="/dashboard"
@@ -136,6 +150,7 @@ function App() {
             </AdminRoute>
           }
         />
+        <Route path="/test" element={<div>Test Route Works!</div>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </main>

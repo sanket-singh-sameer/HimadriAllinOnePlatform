@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import { useAuthStore } from "../store/authStore";
 import { toast } from "react-toastify";
 
-export default function Login() {
+export default function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const navigate = useNavigate();
-  const { login, error, isLoading } = useAuthStore();
+  const { forgotPassword, error, isLoading } = useAuthStore();
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -23,23 +23,53 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(email, password);
-      toast.success("Logged In Successfully");
-      navigate("/");
+      await forgotPassword(email);
+      setIsSubmitted(true);
+      toast.success("Password reset email sent successfully!");
     } catch (error) {
-      console.error("Error during login:", error);
-      toast.error("Login failed");
+      console.error("Error sending reset email:", error);
+      toast.error("Failed to send reset email");
     }
   };
+
+  if (isSubmitted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#f8f8f8] to-[#eaeaea] flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full mx-4">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Check Your Email</h2>
+            <p className="text-gray-600 mb-6">
+              We've sent a password reset link to <strong>{email}</strong>
+            </p>
+            <p className="text-sm text-gray-500 mb-6">
+              Didn't receive the email? Check your spam folder or try again.
+            </p>
+            <Link
+              to="/login"
+              className="inline-block bg-gray-900 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700 transition"
+            >
+              Back to Login
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-[#f8f8f8] to-[#eaeaea] flex flex-col md:flex-row overflow-hidden">
         <Link
-          to="/signup"
+          to="/login"
           className="absolute top-6 right-8 text-gray-700 px-5 py-2 rounded transition hover:underline underline-offset-2 hidden md:block z-10"
           data-aos="fade-left"
         >
-          <h6 className="!leading-none text-sm">New member? Signup</h6>
+          <h6 className="!leading-none text-sm">Remember password? Login</h6>
         </Link>
 
         <div className="left-box w-full md:w-2/5 md:min-h-screen bg-white px-[clamp(32px,5vw,96px)] pt-[clamp(2rem,5vw,12rem)] pb-6 border-r border-gray-200 shadow-sm">
@@ -58,10 +88,10 @@ export default function Login() {
             className="!leading-tight mt-6 text-gray-600  hidden md:block"
             data-aos="zoom-in"
           >
-            “This is an all-in-one platform created by students, managed by
-            students, and built for every hosteler’s life. It brings everything
+            "This is an all-in-one platform created by students, managed by
+            students, and built for every hosteler's life. It brings everything
             you need into one place—making hostel life simpler, smarter, and
-            more connected.”
+            more connected."
           </h6>
           <h6
             className="!leading-tight mt-12 md:mt-24 italic !font-bold text-gray-800 hidden md:block"
@@ -77,9 +107,11 @@ export default function Login() {
           data-aos="fade-left"
         >
           <h2 className="!leading-tight text-3xl font-bold tracking-wide">
-            Get Started
+            Reset Password
           </h2>
-          <h6 className="text-gray-600 italic">Log in and take charge</h6>
+          <h6 className="text-gray-600 italic text-center mt-2">
+            Enter your email and we'll send you a link to reset your password
+          </h6>
 
           <form
             className="flex flex-col gap-4 w-full max-w-sm mt-8"
@@ -97,39 +129,31 @@ export default function Login() {
                 required
               />
             </label>
-            <label className="flex flex-col text-left">
-              <span className="mb-1 text-gray-700">Password</span>
-              <input
-                value={password}
-                onChange={({ target }) => setPassword(target.value)}
-                type="password"
-                name="password"
-                className="px-3 py-2 rounded-lg bg-white text-gray-700 border border-gray-300 shadow-sm focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-400"
-                placeholder="Enter your password"
-                required
-              />
-            </label>
+            
             {error && <p className="text-red-700 !italic">{error}</p>}
+            
             <button
               type="submit"
-              className="mt-4 bg-gray-900 text-white font-bold py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer "
+              disabled={isLoading}
+              className="mt-4 bg-gray-900 text-white font-bold py-2 rounded-lg hover:bg-gray-700 transition shadow-md cursor-pointer disabled:opacity-50"
             >
               <p className="!leading-none !m-0 !italic !font-semibold">
-                {isLoading ? "Logging in..." : "Log In"}
+                {isLoading ? "Sending..." : "Send Reset Link"}
               </p>
             </button>
+            
             <div className="flex flex-col gap-3">
               <Link
-                to="/forgot-password"
+                to="/login"
                 className="text-sm text-gray-600 hover:underline ml-auto"
               >
-                <h6 className="!leading-none">Lost your password? Reset Now</h6>
+                <h6 className="!leading-none">Remember your password? Login</h6>
               </Link>
               <Link
                 to="/signup"
-                className="text-sm text-gray-600 hover:underline ml-auto block md:hidden"
+                className="text-sm text-gray-600 hover:underline ml-auto"
               >
-                <h6 className="!leading-none">New member? Signup</h6>
+                <h6 className="!leading-none">Don't have an account? Signup</h6>
               </Link>
             </div>
           </form>
