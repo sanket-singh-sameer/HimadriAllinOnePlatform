@@ -5,13 +5,13 @@ import crypto from "crypto";
 import { generateToken } from "../utils/jwtTokenOperations.js";
 import { clearCookies, setCookies } from "../utils/cookieOperations.js";
 import { generateOtp } from "../utils/otpGeneration.js";
-import {
-  otpVerificationMail,
-  passwordResetEmail,
-  passwordResetSuccessEmail,
-  welcomeEmail,
-} from "../resend/mailConfig.js";
 
+import {
+  otpVerificationGMail,
+  welcomeGMail,
+  resetPasswordGMail,
+  passwordResetSuccessGMail,
+} from "../gmail/gmailConfig.js";
 export const signupController = async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -41,7 +41,7 @@ export const signupController = async (req, res) => {
         isUserExists.verificationToken = otp;
         isUserExists.verificationTokenExpiresAt = Date.now() + 15 * 60 * 1000; // 15 minutes
         await isUserExists.save();
-        await otpVerificationMail(email, otp);
+        await otpVerificationGMail(email, otp);
 
         return res.status(201).json({
           message: "User registered successfully",
@@ -60,7 +60,7 @@ export const signupController = async (req, res) => {
       verificationTokenExpiresAt: Date.now() + 15 * 60 * 1000, // 15 minutes
     });
     await newUser.save();
-    await otpVerificationMail(email, otp);
+    await otpVerificationGMail(email, otp);
     return res.status(201).json({
       message: "User registered successfully",
       user: { ...newUser._doc, password: undefined },
@@ -133,7 +133,7 @@ export const otpVerificationController = async (req, res) => {
       return res.status(500).json({ message: "Error generating token" });
     }
     setCookies(res, token);
-    await welcomeEmail(
+    await welcomeGMail(
       user.email,
       user.name,
       "HBH NITH",
@@ -166,7 +166,7 @@ export const passwordForgotController = async (req, res) => {
     user.resetPasswordToken = crypto.randomBytes(16).toString("hex");
     user.resetPasswordTokenExpiresAt = Date.now() + 60 * 60 * 1000; // 1 hour
     await user.save();
-    await passwordResetEmail(email, user.resetPasswordToken);
+    await resetPasswordGMail(email, user.resetPasswordToken);
     return res.status(200).json({ message: "Password reset email sent" });
   } catch (error) {
     return res.status(500).json({ message: "Error resetting password", error });
@@ -195,7 +195,7 @@ export const passwordResetController = async (req, res) => {
     user.resetPasswordToken = undefined;
     user.resetPasswordTokenExpiresAt = undefined;
     await user.save();
-    await passwordResetSuccessEmail(user.email);
+    await passwordResetSuccessGMail(user.email);
     return res.status(200).json({ message: "Password reset successful" });
   } catch (error) {
     return res.status(500).json({ message: "Error resetting password", error });

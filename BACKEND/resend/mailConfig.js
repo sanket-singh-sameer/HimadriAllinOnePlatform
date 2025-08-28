@@ -11,7 +11,7 @@ dotenv.config();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export const otpVerificationMail = async (email, otp) => {
+export const otpVerificationGMail = async (email, otp) => {
   console.log(email, otp);
   const { data, error } = await resend.emails.send({
     from: "HBH NITH <onboarding@test.divyamsingh.me>",
@@ -30,7 +30,7 @@ export const otpVerificationMail = async (email, otp) => {
   console.log({ data });
 };
 
-export const welcomeEmail = async (
+export const welcomeGMail = async (
   email,
   userName,
   appName,
@@ -58,7 +58,7 @@ export const welcomeEmail = async (
   console.log({ data });
 };
 
-export const passwordResetEmail = async (email, resetToken) => {
+export const resetPasswordGMail = async (email, resetToken) => {
   console.log(email, resetToken);
   const { data, error } = await resend.emails.send({
     from: "HBH NITH <reset@test.divyamsingh.me>",
@@ -77,7 +77,7 @@ export const passwordResetEmail = async (email, resetToken) => {
   console.log({ data });
 };
 
-export const passwordResetSuccessEmail = async (email) => {
+export const passwordResetSuccessGMail = async (email) => {
   console.log(email);
   const { data, error } = await resend.emails.send({
     from: "HBH NITH <reset@test.divyamsingh.me>",
