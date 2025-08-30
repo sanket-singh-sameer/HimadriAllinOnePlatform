@@ -18,7 +18,7 @@ const Dashboard = () => {
   const [passwordError, setPasswordError] = useState(null);
   const [todaysMenu, setTodaysMenu] = useState(null);
   const [myComplaints, setMyComplaints] = useState(null);
-  const [activeFeature, setActiveFeature] = useState("complaints");
+  const [activeFeature, setActiveFeature] = useState("knowYourHostel");
   const [complaintForm, setComplaintForm] = useState({
     name: user.name || "",
     room: user.room || "",
@@ -71,7 +71,7 @@ const Dashboard = () => {
     const { name, value } = e.target;
     setEditProfileForm((prev) => ({ ...prev, [name]: value }));
   };
-  
+
   const handlePasswordFormChange = (e) => {
     const { name, value } = e.target;
     setChangePasswordForm((prev) => ({ ...prev, [name]: value }));
@@ -173,14 +173,12 @@ const Dashboard = () => {
     setLocalIsLoading(true);
     setPasswordError(null);
 
-    // Validate passwords match
     if (changePasswordForm.newPassword !== changePasswordForm.confirmPassword) {
       setPasswordError("New passwords do not match");
       setLocalIsLoading(false);
       return;
     }
 
-    // Validate password length
     if (changePasswordForm.newPassword.length < 8) {
       setPasswordError("Password must be at least 8 characters long");
       setLocalIsLoading(false);
@@ -188,14 +186,11 @@ const Dashboard = () => {
     }
 
     try {
-      const response = await axiosInstance.put(
-        API_PATHS.CHANGE_PASSWORD,
-        {
-          currentPassword: changePasswordForm.currentPassword,
-          newPassword: changePasswordForm.newPassword,
-        }
-      );
-      
+      const response = await axiosInstance.put(API_PATHS.CHANGE_PASSWORD, {
+        currentPassword: changePasswordForm.currentPassword,
+        newPassword: changePasswordForm.newPassword,
+      });
+
       if (response.status === 200) {
         toast.success("Password changed successfully");
         setIsPasswordModalOpen(false);
@@ -220,6 +215,11 @@ const Dashboard = () => {
     fetchMyComplaint();
     fetchAllNotices();
   }, []);
+
+  const openImage = (e) => {
+    e.preventDefault();
+    window.open("/mess-menu-30082025-pdf.pdf", "_blank");
+  };
 
   return (
     <>
@@ -256,7 +256,7 @@ const Dashboard = () => {
               {user.role !== "student" && (
                 <button
                   onClick={() => navigate("/admin")}
-                  className="group relative !text-gray-700 hover:!text-white transition-all duration-300 !font-semibold tracking-wide px-4 lg:px-6 py-2 lg:py-3 rounded-xl overflow-hidden border-2 border-gray-300 hover:border-gray-900"
+                  className="group relative !text-gray-700 hover:!text-white transition-all duration-300 !font-semibold tracking-wide px-4 lg:px-6 py-2 lg:py-3 rounded-xl overflow-hidden border-2 border-gray-300 hover:border-gray-900 cursor-pointer"
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     <span className="hidden lg:inline">Admin Panel</span>
@@ -756,7 +756,9 @@ const Dashboard = () => {
                             disabled={localIsLoading}
                           >
                             <p className="!m-0 !leading-none !text-lg !text-white !font-semibold !italic !opacity-100">
-                              {localIsLoading ? "Changing..." : "Change Password"}
+                              {localIsLoading
+                                ? "Changing..."
+                                : "Change Password"}
                             </p>
                           </button>
                         </form>
@@ -895,6 +897,16 @@ const Dashboard = () => {
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
                 <div className="flex flex-col space-y-2 sm:space-y-3 lg:space-y-4 mt-2 sm:mt-4 lg:mt-6">
                   <button
+                    onClick={() => setActiveFeature("knowYourHostel")}
+                    className={`w-full cursor-pointer px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl transition-all duration-300 font-bold tracking-wide border-2 hover:shadow-md hover:scale-105 ${
+                      activeFeature === "knowYourHostel"
+                        ? "bg-gray-900 text-white border-gray-900"
+                        : "bg-white text-gray-900 border-gray-200 hover:border-gray-400"
+                    }`}
+                  >
+                    Know Your Hostel
+                  </button>
+                  <button
                     onClick={() => setActiveFeature("complaints")}
                     className={`w-full cursor-pointer px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl transition-all duration-300 font-bold tracking-wide border-2 hover:shadow-md hover:scale-105 ${
                       activeFeature === "complaints"
@@ -917,6 +929,288 @@ const Dashboard = () => {
                 </div>
 
                 <div className="lg:col-span-3 bg-gray-50 rounded-lg sm:rounded-xl lg:rounded-2xl border border-gray-100 p-2 sm:p-3 md:p-4 lg:p-6 shadow-inner">
+                  {activeFeature === "knowYourHostel" && (
+                    <div className="w-full bg-gradient-to-br from-white via-gray-50 to-white rounded-lg sm:rounded-xl lg:rounded-2xl xl:rounded-3xl shadow-xl border border-gray-200 p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 max-w-7xl mx-auto space-y-6 sm:space-y-8 lg:space-y-10 relative overflow-hidden">
+                      <div className="relative text-center space-y-2 sm:space-y-3">
+                        <h3 className="!text-xl sm:!text-2xl md:!text-3xl lg:!text-4xl xl:!text-5xl !font-black  !text-gray-900  tracking-tight  leading-none px-2 sm:px-0">
+                          Himadri Boys Hostel
+                        </h3>
+                      </div>
+
+                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
+                        <div className="relative group order-1 xl:order-1">
+                          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl sm:rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                          <img
+                            src="/HBH-01-img.jpg "
+                            alt="Himadri Boys Hostel"
+                            className="relative w-full h-48 sm:h-64 md:h-72 lg:h-80 xl:h-96 object-cover rounded-2xl sm:rounded-3xl shadow-2xl border-2 sm:border-4 border-white group-hover:scale-[1.02] transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl sm:rounded-3xl"></div>
+                        </div>
+
+                        <div className="space-y-4 sm:space-y-6 order-2 xl:order-2">
+                          <h3 className="!text-lg sm:!text-xl md:!text-2xl lg:!text-3xl !font-bold !text-gray-900  tracking-tight text-center sm:!text-left">
+                            About Our Hostel
+                          </h3>
+                          <p className="!text-sm sm:!text-base lg:!text-lg !text-gray-700  !leading-relaxed  !font-normal text-center sm:!text-left px-2 sm:px-0">
+                            Himadri Boys Hostel, operational since 2013,
+                            accommodates ~710 students in 82 triple and 116
+                            four-seater rooms across seven elevator-accessible
+                            floors. It has a dining hall with a deep freezer,
+                            geyser-equipped bathrooms, water coolers, and
+                            high-speed Wi-Fi. Facilities include a common hall
+                            with LED TV, a recreation hall for badminton/table
+                            tennis, and three guest rooms. Outdoor courts for
+                            volleyball and basketball are nearby.
+                          </p>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                            <div className="group bg-gradient-to-br from-blue-50 to-blue-100 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-blue-200 hover:shadow-lg transition-all duration-300 hover:scale-105">
+                              <div className="flex items-center space-x-2 sm:space-x-3">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-lg sm:rounded-xl flex items-center justify-center transition-transform duration-300">
+                                  <svg
+                                    className="w-4 h-4 sm:w-5 sm:h-5 text-white"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                                    />
+                                  </svg>
+                                </div>
+                                <div>
+                                  <p className="!text-lg sm:!text-2xl !font-bold !text-blue-700  !leading-none">
+                                    500+
+                                  </p>
+                                  <p className="!text-xs !text-blue-600  !font-semibold  uppercase tracking-wide">
+                                    Students
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="group bg-gradient-to-br from-green-50 to-green-100 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-green-200 hover:shadow-lg transition-all duration-300 hover:scale-105">
+                              <div className="flex items-center space-x-2 sm:space-x-3">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-500 rounded-lg sm:rounded-xl flex items-center justify-center transition-transform duration-300">
+                                  <svg
+                                    className="w-4 h-4 sm:w-5 sm:h-5 text-white"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                                    />
+                                  </svg>
+                                </div>
+                                <div>
+                                  <p className="!text-lg sm:!text-2xl !font-bold !text-green-700  !leading-none">
+                                    200+
+                                  </p>
+                                  <p className="!text-xs !text-green-600  !font-semibold  uppercase tracking-wide">
+                                    Rooms
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="group bg-gradient-to-br from-purple-50 to-purple-100 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-purple-200 hover:shadow-lg transition-all duration-300 hover:scale-105">
+                              <div className="flex items-center space-x-2 sm:space-x-3">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-500 rounded-lg sm:rounded-xl flex items-center justify-center transition-transform duration-300">
+                                  <svg
+                                    className="w-4 h-4 sm:w-5 sm:h-5 text-white"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                    />
+                                  </svg>
+                                </div>
+                                <div>
+                                  <p className="!text-lg sm:!text-2xl !font-bold !text-purple-700  !leading-none">
+                                    24/7
+                                  </p>
+                                  <p className="!text-xs !text-purple-600  !font-semibold  uppercase tracking-wide">
+                                    Support
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6 lg:p-8 shadow-inner">
+                        <h3 className="!text-lg sm:!text-xl md:!text-2xl !font-bold  !text-gray-900  text-center mb-6 sm:mb-8 tracking-tight px-2 sm:px-0">
+                          World-Class Facilities
+                        </h3>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+                          {[
+                            {
+                              icon: "📶",
+                              title: "High-Speed Wi-Fi",
+                              desc: "24/7 Internet",
+                            },
+                            {
+                              icon: "🏋️‍♂️",
+                              title: "Indoor Sports",
+                              desc: "Badminton & Table Tennis",
+                            },
+                            {
+                              icon: "📺",
+                              title: "Common Room",
+                              desc: "TV & Games",
+                            },
+                            {
+                              icon: "🍽️",
+                              title: "Mess",
+                              desc: "Veg & Non-Veg",
+                            },
+                            {
+                              icon: "📚",
+                              title: "Study Rooms",
+                              desc: "Quiet Spaces",
+                            },
+                            {
+                              icon: "🔐",
+                              title: "24/7 Security",
+                              desc: "Safe Environment",
+                            },
+                            {
+                              icon: "🧺",
+                              title: "Laundry Service",
+                              desc: "Convenient Care",
+                            },
+                            {
+                              icon: "🚑",
+                              title: "Medical Aid",
+                              desc: "Emergency Care",
+                            },
+                          ].map((facility, index) => (
+                            <div
+                              key={index}
+                              className="group bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 text-center"
+                            >
+                              <div className="text-2xl sm:text-3xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
+                                {facility.icon}
+                              </div>
+                              <h3 className="!text-xs sm:!text-sm md:!text-base !font-bold  !text-gray-900  mb-1">
+                                {facility.title}
+                              </h3>
+                              <p className="!text-xs !text-gray-600  !font-medium ">
+                                {facility.desc}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl sm:rounded-3xl border border-gray-700 p-4 sm:p-6 lg:p-8 shadow-2xl text-white">
+                        <div className="text-center mb-6 sm:mb-8">
+                          <h3 className="!text-lg sm:!text-xl md:!text-2xl lg:!text-3xl !font-bold  !text-white  mb-2 sm:mb-3 tracking-tight px-2 sm:px-0">
+                            Important Contacts
+                          </h3>
+
+                          <p className="!text-sm !text-gray-300  mt-2 sm:mt-3 !font-medium px-2 sm:px-0">
+                            Dedicated hostel staff available for your assistance
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                          <div className="group bg-white/5 backdrop-blur-sm p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105">
+                            <div className="flex items-center space-x-3 sm:space-x-4 mb-3 sm:mb-4">
+                              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center transition-transform duration-300">
+                                <svg
+                                  className="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                  />
+                                </svg>
+                              </div>
+                              <div>
+                                <h3 className="!text-base sm:!text-lg !font-bold !text-left  !text-white  tracking-tight ">
+                                  Warden
+                                </h3>
+                                <p className="!text-xs sm:!text-sm !text-blue-300  !font-medium ">
+                                  Chief Administrator
+                                </p>
+                              </div>
+                            </div>
+                            <div className="space-y-1 sm:space-y-2">
+                              <p className="!text-sm sm:!text-base !text-gray-200 !text-left  !font-semibold ">
+                                Dr. Vivek Tiwari
+                              </p>
+                              <p className="!text-xs sm:!text-sm !text-gray-300  flex items-center space-x-2">
+                                <span>📞</span>
+                                <span className="!font-mono ">
+                                  +91 9456026603
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="group bg-white/5 backdrop-blur-sm p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105">
+                            <div className="flex items-center space-x-3 sm:space-x-4 mb-3 sm:mb-4">
+                              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg sm:rounded-xl flex items-center justify-center transition-transform duration-300">
+                                <svg
+                                  className="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                                  />
+                                </svg>
+                              </div>
+                              <div>
+                                <h3 className="!text-base sm:!text-lg !font-bold  !text-white !text-left  tracking-tight ">
+                                  Assistant Warden
+                                </h3>
+                                <p className="!text-xs sm:!text-sm !text-green-300 !text-left  !font-medium ">
+                                  Student Affairs
+                                </p>
+                              </div>
+                            </div>
+                            <div className="space-y-1 sm:space-y-2">
+                              <p className="!text-sm sm:!text-base !text-gray-200 !text-left  !font-semibold ">
+                                Dr. Aman Kumar
+                              </p>
+                              <p className="!text-xs sm:!text-sm !text-gray-300  flex items-center space-x-2">
+                                <span>📞</span>
+                                <span className="!font-mono ">
+                                  +91 7307364773
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {activeFeature === "complaints" && (
                     <div className="w-full bg-white rounded-lg sm:rounded-xl lg:rounded-2xl xl:rounded-3xl shadow-md border border-gray-100 p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 max-w-4xl mx-auto">
                       <h3 className="!text-xl sm:!text-2xl lg:!text-3xl xl:!text-4xl !font-semibold text-gray-900 text-center mb-4 sm:mb-6 lg:mb-8">
@@ -1224,6 +1518,34 @@ const Dashboard = () => {
                             {todaysMenu?.dinner || "N/A"}
                           </span>
                         </div>
+                      </div>
+
+                      <div className="mt-6 sm:mt-8 lg:mt-10 text-center">
+                        <button
+                          className="w-full sm:w-auto cursor-pointer !bg-gray-900 !text-white hover:!text-white hover:!bg-gray-700 px-4 sm:px-6 md:px-8 lg:px-10 py-3 sm:py-4 rounded-xl transition-all duration-300 !font-bold tracking-wide border-2 border-gray-900 hover:border-white flex items-center justify-center gap-2 sm:gap-3 mx-auto min-w-0 max-w-xs sm:max-w-sm md:max-w-md"
+                          onClick={openImage}
+                        >
+                          <svg
+                            className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.168 18.477 18.582 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                            />
+                          </svg>
+                          <span className="!text-sm sm:!text-base lg:!text-lg truncate">
+                            View Complete Menu
+                          </span>
+                        </button>
+
+                        <p className="!text-xs sm:!text-sm !text-gray-500 mt-3 sm:mt-4 !font-medium px-4 sm:px-0">
+                          Access weekly menu!
+                        </p>
                       </div>
                     </div>
                   )}
