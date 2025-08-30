@@ -53,6 +53,10 @@ const userSchema = new mongoose.Schema(
     verificationToken: {
       type: String,
     },
+    tokenRateLimit: {
+      type: Number,
+      default: 3,
+    },
     verificationTokenExpiresAt: {
       type: Date,
     },

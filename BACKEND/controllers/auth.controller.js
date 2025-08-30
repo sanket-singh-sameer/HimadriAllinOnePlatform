@@ -1,6 +1,9 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import { LocalStorage } from "node-localstorage";
+
+const localStorage = new LocalStorage("./scratch");
 
 import { generateToken } from "../utils/jwtTokenOperations.js";
 import { clearCookies, setCookies } from "../utils/cookieOperations.js";
@@ -40,8 +43,10 @@ export const signupController = async (req, res) => {
         isUserExists.password = hashedPassword;
         isUserExists.verificationToken = otp;
         isUserExists.verificationTokenExpiresAt = Date.now() + 15 * 60 * 1000; // 15 minutes
+        isUserExists.tokenRateLimit = 3;
         await isUserExists.save();
         await otpVerificationGMail(email, otp);
+        localStorage.setItem("email", email);
 
         return res.status(201).json({
           message: "User registered successfully",
@@ -113,15 +118,29 @@ export const logoutController = (req, res) => {
 
 export const otpVerificationController = async (req, res) => {
   const { otp } = req.body;
+  const email = localStorage.getItem("email");
   try {
     if (!otp) {
       return res.status(400).json({ message: "OTP is required" });
     }
     const user = await User.findOne({
-      verificationToken: otp,
+      email,
       verificationTokenExpiresAt: { $gt: Date.now() },
     });
     if (!user) {
+      return res
+        .status(404)
+        .json({ message: "Please signup again!" });
+    }
+
+    if (user.verificationToken !== otp) {
+      await User.updateOne({ email }, { $inc: { tokenRateLimit: -1 } });
+      if (user.tokenRateLimit <= 0 && !user.isVerified) {
+        await User.deleteOne({ email });
+        return res
+          .status(429)
+          .json({ message: "Too many requests, Signup again" });
+      }
       return res.status(404).json({ message: "Invalid OTP or OTP expired" });
     }
     user.isVerified = true;
@@ -132,6 +151,7 @@ export const otpVerificationController = async (req, res) => {
     if (!token) {
       return res.status(500).json({ message: "Error generating token" });
     }
+    localStorage.clear();
     setCookies(res, token);
     await welcomeGMail(
       user.email,
@@ -259,7 +279,9 @@ export const changePasswordController = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
     if (newPassword.length < 8) {
-      return res.status(400).json({ message: "Password must be at least 8 characters long" });
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 8 characters long" });
     }
     const user = await User.findById(req.userId);
     if (!user) {
