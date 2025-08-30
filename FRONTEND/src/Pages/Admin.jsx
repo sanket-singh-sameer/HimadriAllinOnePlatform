@@ -518,7 +518,7 @@ export default function Admin() {
               {user.role !== "admin" && (
                 <button
                   onClick={() => navigate("/dashboard")}
-                  className="group relative !text-gray-700 hover:!text-white transition-all duration-300 !font-semibold tracking-wide px-4 lg:px-6 py-2 lg:py-3 rounded-xl overflow-hidden border-2 border-gray-300 hover:border-gray-900"
+                  className="group relative cursor-pointer !text-gray-700 hover:!text-white transition-all duration-300 !font-semibold tracking-wide px-4 lg:px-6 py-2 lg:py-3 rounded-xl overflow-hidden border-2 border-gray-300 hover:border-gray-900"
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     <span className="hidden lg:inline">Student Dashboard</span>
@@ -619,7 +619,7 @@ export default function Admin() {
                       navigate("/dashboard");
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full group relative !text-gray-700 hover:!text-white transition-all duration-300 !font-semibold tracking-wide px-6 py-4 rounded-xl overflow-hidden border-2 border-gray-300 hover:border-gray-900 flex items-center justify-center gap-2"
+                    className="w-full cursor-pointer group relative !text-gray-700 hover:!text-white transition-all duration-300 !font-semibold tracking-wide px-6 py-4 rounded-xl overflow-hidden border-2 border-gray-300 hover:border-gray-900 flex items-center justify-center gap-2"
                   >
                     <span className="relative z-10 flex items-center gap-2">
                       Student Dashboard
