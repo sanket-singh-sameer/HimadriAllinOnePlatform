@@ -1,12 +1,28 @@
 import Notice from "../models/notice.model.js";
 import User from "../models/user.model.js";
 
+import imagekit from "../utils/imagekit.js";
+
+
+
+
 export const createNotice = async (req, res) => {
   const { title, description } = req.body;
+  const imageFile = req.file;
 
   try {
     const author = req.userId;
     const newNotice = new Notice({ title, description, author });
+
+    if (imageFile) {
+      const result = await imagekit.upload({
+        file: imageFile.buffer,
+        fileName: imageFile.originalname,
+        folder: "/notices"
+      });
+      newNotice.image = result.url;
+    }
+
     await newNotice.save();
     res
       .status(201)
