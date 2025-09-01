@@ -8,19 +8,19 @@ import imagekit from "../utils/imagekit.js";
 
 export const createNotice = async (req, res) => {
   const { title, description } = req.body;
-  const imageFile = req.file;
+  const mediaFile = req.file;
 
   try {
     const author = req.userId;
     const newNotice = new Notice({ title, description, author });
 
-    if (imageFile) {
+    if (mediaFile) {
       const result = await imagekit.upload({
-        file: imageFile.buffer,
-        fileName: imageFile.originalname,
+        file: mediaFile.buffer,
+        fileName: mediaFile.originalname,
         folder: "/notices"
       });
-      newNotice.image = result.url;
+      newNotice.media = result.url;
     }
 
     await newNotice.save();

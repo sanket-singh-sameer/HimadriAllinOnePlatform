@@ -69,12 +69,20 @@ export default function Admin() {
   const handleMediaChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("File size must be less than 5MB");
+        e.target.value = "";
+        return;
+      }
+
       const validTypes = [
         "image/jpeg",
         "image/jpg",
         "image/png",
         "application/pdf",
       ];
+      
       if (validTypes.includes(file.type)) {
         setNoticeForm((prev) => ({ ...prev, media: file }));
       } else {
@@ -94,22 +102,37 @@ export default function Admin() {
     e.preventDefault();
     setLocalIsLoading(true);
     try {
-      const noticeData = {
-        ...noticeForm,
-      };
+      // Create FormData to handle file upload
+      const formData = new FormData();
+      formData.append('title', noticeForm.title);
+      formData.append('description', noticeForm.description);
+      
+      // Only append media if it exists
+      if (noticeForm.media) {
+        formData.append('media', noticeForm.media);
+      }
 
       const response = await axiosInstance.post(
         API_PATHS.ADD_NOTICE,
-        noticeData
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
       );
+      
       if (response.status === 200 || response.status === 201) {
         fetchAllNotices();
         setNoticeForm({ title: "", description: "", media: null });
+        // Clear the file input
+        const fileInput = document.getElementById("media-upload");
+        if (fileInput) fileInput.value = "";
         toast.success(response.data.message);
       }
     } catch (error) {
       console.error("Error adding notice:", error);
-      toast.error("Error adding notice");
+      toast.error(error.response?.data?.message || "Error adding notice");
     } finally {
       setLocalIsLoading(false);
       setShowAddNoticeForm(false);
@@ -1217,6 +1240,36 @@ export default function Admin() {
                                 {notice.description}
                               </p>
 
+                              {/* Media Display */}
+                              {notice.media && (
+                                <div className="mb-4">
+                                  {notice.media.toLowerCase().endsWith('.pdf') ? (
+                                    <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg border">
+                                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                      </svg>
+                                      <a 
+                                        href={notice.media}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                                      >
+                                        View PDF Attachment
+                                      </a>
+                                    </div>
+                                  ) : (
+                                    <img 
+                                      src={notice.media}
+                                      alt="Notice attachment"
+                                      className="w-full max-w-sm rounded-lg border shadow-sm"
+                                      onError={(e) => {
+                                        e.target.style.display = 'none';
+                                      }}
+                                    />
+                                  )}
+                                </div>
+                              )}
+
                               <div className="flex items-center justify-end pt-3 border-t border-gray-100">
                                 <p className="!text-gray-700 !text-sm sm:!text-base !leading-relaxed !font-semibold">
                                   {notice.author}
@@ -2295,6 +2348,7 @@ export default function Admin() {
                           </label>
                           <input
                             id="media-upload"
+                            name="media"
                             type="file"
                             accept=".jpg,.jpeg,.png,.pdf"
                             onChange={handleMediaChange}
