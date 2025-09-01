@@ -31,12 +31,13 @@ export default function Admin() {
   const [activeFeature, setActiveFeature] = useState("statistics");
   const [todaysMenu, setTodaysMenu] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("profile");
   const [showAddNoticeForm, setShowAddNoticeForm] = useState(false);
   const [passwordError, setPasswordError] = useState(null);
   const [noticeForm, setNoticeForm] = useState({
     title: "",
     description: "",
+    media: null,
   });
   const [editProfileForm, setEditProfileForm] = useState({
     name: user.name || "",
@@ -65,6 +66,30 @@ export default function Admin() {
     setNoticeForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleMediaChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const validTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "application/pdf",
+      ];
+      if (validTypes.includes(file.type)) {
+        setNoticeForm((prev) => ({ ...prev, media: file }));
+      } else {
+        toast.error("Please select a valid file (JPG, PNG, or PDF)");
+        e.target.value = "";
+      }
+    }
+  };
+
+  const removeMedia = () => {
+    setNoticeForm((prev) => ({ ...prev, media: null }));
+    const fileInput = document.getElementById("media-upload");
+    if (fileInput) fileInput.value = "";
+  };
+
   const handleAddNewNoticeForm = async (e) => {
     e.preventDefault();
     setLocalIsLoading(true);
@@ -79,7 +104,7 @@ export default function Admin() {
       );
       if (response.status === 200 || response.status === 201) {
         fetchAllNotices();
-        setNoticeForm({ title: "", description: "" });
+        setNoticeForm({ title: "", description: "", media: null });
         toast.success(response.data.message);
       }
     } catch (error) {
@@ -128,14 +153,12 @@ export default function Admin() {
     setLocalIsLoading(true);
     setPasswordError(null);
 
-    // Validate passwords match
     if (changePasswordForm.newPassword !== changePasswordForm.confirmPassword) {
       setPasswordError("New passwords do not match");
       setLocalIsLoading(false);
       return;
     }
 
-    // Validate password length
     if (changePasswordForm.newPassword.length < 8) {
       setPasswordError("Password must be at least 8 characters long");
       setLocalIsLoading(false);
@@ -143,14 +166,11 @@ export default function Admin() {
     }
 
     try {
-      const response = await axiosInstance.put(
-        API_PATHS.CHANGE_PASSWORD,
-        {
-          currentPassword: changePasswordForm.currentPassword,
-          newPassword: changePasswordForm.newPassword,
-        }
-      );
-      
+      const response = await axiosInstance.put(API_PATHS.CHANGE_PASSWORD, {
+        currentPassword: changePasswordForm.currentPassword,
+        newPassword: changePasswordForm.newPassword,
+      });
+
       if (response.status === 200) {
         toast.success("Password changed successfully");
         setIsPasswordModalOpen(false);
@@ -678,8 +698,7 @@ export default function Admin() {
 
           <div className="p-4 sm:p-6 md:p-8 lg:p-10 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 flex-1">
             <div className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 p-4 sm:p-6 md:p-8 border border-gray-100 hover:border-gray-200 flex flex-col relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-blue-50 to-transparent rounded-bl-3xl"></div>
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-gray-50 to-transparent rounded-tr-3xl"></div>
+              
 
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6 sm:mb-8">
@@ -836,111 +855,17 @@ export default function Admin() {
                           d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                         />
                       </svg>
-                      Edit Profile
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={() => setIsPasswordModalOpen(true)}
-                    className="w-full !bg-blue-600 !text-white hover:bg-gradient-to-r hover:from-blue-700 hover:to-blue-800 px-6 py-3 sm:px-8 sm:py-4 rounded-xl !font-bold tracking-wide border-2 border-blue-600 hover:border-blue-700 hover:shadow-xl hover:shadow-blue-600/25 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 transform transition-all duration-300 ease-out cursor-pointer group mt-3"
-                  >
-                    <span className="flex items-center gap-2 group-hover:translate-x-0.5 transition-transform duration-300">
-                      <svg
-                        className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v-2l-4.257-2.257A6 6 0 0117 9zm-5 8a2 2 0 100-4 2 2 0 000 4z"
-                        />
-                      </svg>
-                      Change Password
+                      Edit Profile & Settings
                     </span>
                   </button>
 
                   {isOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-10 relative transition-all">
-                        <button
-                          onClick={() => setIsOpen(false)}
-                          className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl"
-                        >
-                          ✕
-                        </button>
-
-                        <h3 className="text-2xl font-extrabold text-gray-900 mb-8 tracking-tight">
-                          Edit Profile
-                        </h3>
-
-                        <form
-                          onSubmit={handleEditFormSubmit}
-                          className="space-y-6 "
-                        >
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Full Name
-                            </label>
-                            <input
-                              value={editProfileForm.name}
-                              type="text"
-                              name="name"
-                              onChange={handleEditFormChange}
-                              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm"
-                              placeholder="Enter Your Name"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Phone Number
-                            </label>
-                            <input
-                              value={editProfileForm.phone}
-                              type="text"
-                              name="phone"
-                              onChange={handleEditFormChange}
-                              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm"
-                              placeholder="Enter Your Phone Number"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Room No
-                            </label>
-                            <input
-                              value={editProfileForm.room}
-                              type="text"
-                              name="room"
-                              onChange={handleEditFormChange}
-                              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm"
-                              placeholder="Enter Your Room Number"
-                            />
-                          </div>
-
-                          <button
-                            type="submit"
-                            className="w-full bg-gray-900 py-3.5 rounded-xl hover:bg-gray-700 shadow-lg cursor-pointer transition"
-                          >
-                            <p className="!m-0 !leading-none !text-lg !text-white !font-semibold !italic !opacity-100 ">
-                              {localIsLoading ? "Saving..." : "Save Changes"}
-                            </p>
-                          </button>
-                        </form>
-                      </div>
-                    </div>
-                  )}
-
-                  {isPasswordModalOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-10 relative transition-all">
+                    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
+                      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[80vh] overflow-y-auto relative transition-all">
                         <button
                           onClick={() => {
-                            setIsPasswordModalOpen(false);
+                            setIsOpen(false);
+                            setActiveTab("profile");
                             setPasswordError(null);
                             setChangePasswordForm({
                               currentPassword: "",
@@ -948,80 +873,217 @@ export default function Admin() {
                               confirmPassword: "",
                             });
                           }}
-                          className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl"
+                          className="cursor-pointer absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl z-10"
                         >
                           ✕
                         </button>
 
-                        <h3 className="text-2xl font-extrabold text-gray-900 mb-8 tracking-tight">
-                          Change Password
-                        </h3>
+                        <div className="p-6 sm:p-8">
+                          <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4 sm:mb-6 tracking-tight text-center">
+                            Profile Settings
+                          </h3>
 
-                        <form
-                          onSubmit={handleChangePassword}
-                          className="space-y-6"
-                        >
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Current Password
-                            </label>
-                            <input
-                              value={changePasswordForm.currentPassword}
-                              type="password"
-                              name="currentPassword"
-                              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm"
-                              placeholder="Enter your current password"
-                              onChange={handlePasswordFormChange}
-                              required
-                            />
+                          <div className="flex bg-gray-100 rounded-xl p-1 mb-4 sm:mb-6">
+                            <button
+                              onClick={() => setActiveTab("profile")}
+                              className={`cursor-pointer flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${
+                                activeTab === "profile"
+                                  ? "bg-white text-gray-900 shadow-sm"
+                                  : "text-gray-600 hover:text-gray-900"
+                              }`}
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                />
+                              </svg>
+                              Profile Info
+                            </button>
+                            <button
+                              onClick={() => setActiveTab("password")}
+                              className={`cursor-pointer flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${
+                                activeTab === "password"
+                                  ? "bg-white text-gray-900 shadow-sm"
+                                  : "text-gray-600 hover:text-gray-900"
+                              }`}
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v-2l-4.257-2.257A6 6 0 0117 9zm-5 8a2 2 0 100-4 2 2 0 000 4z"
+                                />
+                              </svg>
+                              Password
+                            </button>
                           </div>
 
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              New Password
-                            </label>
-                            <input
-                              value={changePasswordForm.newPassword}
-                              type="password"
-                              name="newPassword"
-                              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm"
-                              placeholder="Enter your new password (min 8 characters)"
-                              onChange={handlePasswordFormChange}
-                              required
-                            />
-                          </div>
+                          {activeTab === "profile" && (
+                            <form
+                              onSubmit={handleEditFormSubmit}
+                              className="space-y-4"
+                            >
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="sm:col-span-2">
+                                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Full Name
+                                  </label>
+                                  <input
+                                    value={editProfileForm.name}
+                                    type="text"
+                                    name="name"
+                                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm transition-all duration-200"
+                                    placeholder="Enter Your Name"
+                                    onChange={handleEditFormChange}
+                                  />
+                                </div>
 
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Confirm New Password
-                            </label>
-                            <input
-                              value={changePasswordForm.confirmPassword}
-                              type="password"
-                              name="confirmPassword"
-                              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm"
-                              placeholder="Confirm your new password"
-                              onChange={handlePasswordFormChange}
-                              required
-                            />
-                          </div>
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Phone Number
+                                  </label>
+                                  <input
+                                    value={editProfileForm.phone}
+                                    type="tel"
+                                    name="phone"
+                                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm transition-all duration-200"
+                                    placeholder="Enter Phone Number"
+                                    onChange={handleEditFormChange}
+                                  />
+                                </div>
 
-                          {passwordError && (
-                            <p className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
-                              {passwordError}
-                            </p>
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Room Number
+                                  </label>
+                                  <input
+                                    value={editProfileForm.room}
+                                    type="text"
+                                    name="room"
+                                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm transition-all duration-200"
+                                    placeholder="Enter Room Number"
+                                    onChange={handleEditFormChange}
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="pt-2">
+                                <button
+                                  type="submit"
+                                  className="w-full bg-gray-900 text-white py-3.5 rounded-xl hover:bg-gray-700 shadow-lg cursor-pointer transition-all duration-300 font-semibold text-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+                                  disabled={localIsLoading}
+                                >
+                                  {localIsLoading
+                                    ? "Saving Changes..."
+                                    : "Save Changes"}
+                                </button>
+                              </div>
+                            </form>
                           )}
 
-                          <button
-                            type="submit"
-                            className="w-full bg-blue-600 py-3.5 rounded-xl hover:bg-blue-700 shadow-lg cursor-pointer transition"
-                            disabled={localIsLoading}
-                          >
-                            <p className="!m-0 !leading-none !text-lg !text-white !font-semibold !italic !opacity-100">
-                              {localIsLoading ? "Changing..." : "Change Password"}
-                            </p>
-                          </button>
-                        </form>
+                          {activeTab === "password" && (
+                            <form
+                              onSubmit={handleChangePassword}
+                              className="space-y-4"
+                            >
+                              <div className="space-y-4">
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Current Password
+                                  </label>
+                                  <input
+                                    value={changePasswordForm.currentPassword}
+                                    type="password"
+                                    name="currentPassword"
+                                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition-all duration-200"
+                                    placeholder="Enter your current password"
+                                    onChange={handlePasswordFormChange}
+                                    required
+                                  />
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                      New Password
+                                    </label>
+                                    <input
+                                      value={changePasswordForm.newPassword}
+                                      type="password"
+                                      name="newPassword"
+                                      className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition-all duration-200"
+                                      placeholder="Enter new password"
+                                      onChange={handlePasswordFormChange}
+                                      required
+                                    />
+                                  </div>
+
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                      Confirm New Password
+                                    </label>
+                                    <input
+                                      value={changePasswordForm.confirmPassword}
+                                      type="password"
+                                      name="confirmPassword"
+                                      className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition-all duration-200"
+                                      placeholder="Confirm new password"
+                                      onChange={handlePasswordFormChange}
+                                      required
+                                    />
+                                  </div>
+                                </div>
+
+                                {passwordError && (
+                                  <div className="flex items-center gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 shadow-sm">
+                                    <svg
+                                      className="shrink-0 h-5 w-5 text-red-500"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M12 9v2m0 4h.01M21 12A9 9 0 1 1 3 12a9 9 0 0 1 18 0z"
+                                      />
+                                    </svg>
+                                    <p className="!text-sm !font-medium text-red-700 !leading-tight">
+                                      {passwordError}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="pt-2">
+                                <button
+                                  type="submit"
+                                  className="w-full bg-blue-600 text-white py-3.5 rounded-xl hover:bg-blue-700 shadow-lg cursor-pointer transition-all duration-300 font-semibold text-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+                                  disabled={localIsLoading}
+                                >
+                                  {localIsLoading
+                                    ? "Changing Password..."
+                                    : "Change Password"}
+                                </button>
+                              </div>
+                            </form>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -1030,8 +1092,7 @@ export default function Admin() {
             </div>
 
             <div className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 p-4 sm:p-6 md:p-8 lg:p-10 border border-gray-100 hover:border-gray-200 lg:col-span-2 flex flex-col relative overflow-hidden z-0">
-              <div className="absolute top-0 right-0 w-32 h-32 sm:w-40 sm:h-40 bg-gradient-to-bl from-green-50 to-transparent rounded-bl-3xl"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-tr from-blue-50 to-transparent rounded-tr-3xl"></div>
+              
 
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6 sm:mb-8">
@@ -1086,7 +1147,7 @@ export default function Admin() {
                   </button>
                 </div>
 
-                <ul className="space-y-4 sm:space-y-6 text-gray-700 text-sm sm:text-base max-h-[360px] sm:max-h-[490px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                <ul className="space-y-4 sm:space-y-6 text-gray-700 text-sm sm:text-base max-h-[360px] sm:max-h-[490px] overflow-y-auto pr-2 scrollbar-thin">
                   <ul className="space-y-3 sm:space-y-4">
                     {allNotices.map(
                       (notice, index) =>
@@ -1829,108 +1890,360 @@ export default function Admin() {
       </div>
 
       {showAddNoticeForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-xl mx-4">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="!text-2xl font-bold text-gray-900">
-                Add New Notice
-              </h3>
-              <button
-                onClick={() => {
-                  setShowAddNoticeForm(false);
-                  setNoticeForm({ title: "", description: "" });
-                }}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            <form onSubmit={handleAddNewNoticeForm} className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={noticeForm.title}
-                  onChange={handleNoticeFormChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-                  placeholder="Enter notice title"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Description
-                </label>
-                <textarea
-                  name="description"
-                  value={noticeForm.description}
-                  onChange={handleNoticeFormChange}
-                  rows="4"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent resize-none"
-                  placeholder="Enter notice description"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Author
-                </label>
-                <input
-                  type="text"
-                  name="author"
-                  value={user.name}
-                  readOnly
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-                  placeholder="Enter author name"
-                  required
-                />
-              </div>
-
-              <div className="text-sm text-gray-500">
-                <span className="font-medium">Date:</span>{" "}
-                {new Date().toLocaleDateString()}
-              </div>
-
-              <div className="flex gap-4 pt-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-xs sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-2 sm:mx-4 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto scrollbar-premium">
+            <div className="sticky top-0 bg-white rounded-t-2xl sm:rounded-t-3xl border-b border-gray-100 px-4 sm:px-6 md:px-8 py-4 sm:py-6 z-10">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                    <svg
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="!text-lg sm:!text-xl md:!text-2xl !font-bold text-gray-900">
+                    Add New Notice
+                  </h3>
+                </div>
                 <button
-                  type="button"
                   onClick={() => {
                     setShowAddNoticeForm(false);
-                    setNoticeForm({ title: "", description: "" });
+                    setNoticeForm({ title: "", description: "", media: null });
+                    removeMedia();
                   }}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+                  className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer p-1.5 sm:p-2 rounded-full hover:bg-gray-100"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-6 py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-700 transition-colors"
-                >
-                  {localIsLoading ? "Adding..." : "Add Notice"}
+                  <svg
+                    className="w-5 h-5 sm:w-6 sm:h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
                 </button>
               </div>
-            </form>
+            </div>
+
+            <div className="px-4 sm:px-6 md:px-8 py-4 sm:py-6">
+              <form
+                onSubmit={handleAddNewNoticeForm}
+                className="space-y-6 sm:space-y-8"
+              >
+                <div className="space-y-2 sm:space-y-3">
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700">
+                    Notice Title
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={noticeForm.title}
+                    onChange={handleNoticeFormChange}
+                    className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200 text-sm sm:text-base"
+                    placeholder="Enter a clear and descriptive title"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2 sm:space-y-3">
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700">
+                    Description
+                  </label>
+                  <textarea
+                    name="description"
+                    value={noticeForm.description}
+                    onChange={handleNoticeFormChange}
+                    rows="4"
+                    className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent resize-none transition-all duration-200 text-sm sm:text-base"
+                    placeholder="Provide detailed information about the notice"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2 sm:space-y-3">
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700">
+                    Attach Media{" "}
+                    <span className="text-gray-500 font-normal">
+                      (Optional)
+                    </span>
+                  </label>
+
+                  {!noticeForm.media ? (
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 text-center hover:border-gray-400 transition-colors duration-200">
+                      <div className="space-y-3 sm:space-y-4">
+                        <div className="flex justify-center">
+                          <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                            <svg
+                              className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-gray-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                        <div>
+                          <label
+                            htmlFor="media-upload"
+                            className="cursor-pointer inline-flex items-center px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-900 text-white font-semibold rounded-lg sm:rounded-xl hover:bg-gray-700 transition-colors duration-200 text-sm sm:text-base"
+                          >
+                            <svg
+                              className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                              />
+                            </svg>
+                            <span className="hidden sm:inline">
+                              Choose File
+                            </span>
+                            <span className="sm:hidden">Upload</span>
+                          </label>
+                          <input
+                            id="media-upload"
+                            type="file"
+                            accept=".jpg,.jpeg,.png,.pdf"
+                            onChange={handleMediaChange}
+                            className="hidden"
+                          />
+                        </div>
+                        <p className="text-xs sm:text-sm text-gray-500">
+                          <span className="hidden sm:inline">
+                            Support for JPG, PNG, and PDF files
+                          </span>
+                          <span className="sm:hidden">JPG, PNG, PDF only</span>
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg sm:rounded-xl p-4 sm:p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                            {noticeForm.media.type.startsWith("image/") ? (
+                              <svg
+                                className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                              </svg>
+                            ) : (
+                              <svg
+                                className="w-5 h-5 sm:w-6 sm:h-6 text-red-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                                />
+                              </svg>
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">
+                              {noticeForm.media.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {(noticeForm.media.size / 1024 / 1024).toFixed(2)}{" "}
+                              MB
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={removeMedia}
+                          className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer p-1.5 sm:p-2 rounded-full hover:bg-red-50 flex-shrink-0"
+                        >
+                          <svg
+                            className="w-4 h-4 sm:w-5 sm:h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Author Section */}
+                <div className="space-y-2 sm:space-y-3">
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700">
+                    Author
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="author"
+                      value={user.name}
+                      readOnly
+                      className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 rounded-lg sm:rounded-xl bg-gray-50 text-gray-600 cursor-not-allowed text-sm sm:text-base pr-10 sm:pr-12"
+                    />
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                      <svg
+                        className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Date Display */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                  <div className="flex items-center space-x-2">
+                    <svg
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <span className="text-xs sm:text-sm font-medium text-blue-700">
+                      <span className="hidden sm:inline">
+                        Publication Date:{" "}
+                      </span>
+                      <span className="sm:hidden">Date: </span>
+                      {new Date().toLocaleDateString("en-US", {
+                        weekday: window.innerWidth < 640 ? "short" : "long",
+                        year: "numeric",
+                        month: window.innerWidth < 640 ? "short" : "long",
+                        day: "numeric",
+                      })}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddNoticeForm(false);
+                      setNoticeForm({
+                        title: "",
+                        description: "",
+                        media: null,
+                      });
+                      removeMedia();
+                    }}
+                    className="cursor-pointer w-full sm:flex-1 px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg sm:rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 text-sm sm:text-base order-2 sm:order-1"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={localIsLoading}
+                    className="cursor-pointer w-full sm:flex-1 px-4 sm:px-6 py-3 sm:py-4 bg-gray-900 text-white font-semibold rounded-lg sm:rounded-xl hover:bg-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base flex items-center justify-center space-x-1.5 sm:space-x-2 order-1 sm:order-2"
+                  >
+                    {localIsLoading ? (
+                      <>
+                        <svg
+                          className="animate-spin w-4 h-4 sm:w-5 sm:h-5 text-white"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
+                        </svg>
+                        <span className="hidden sm:inline">Publishing...</span>
+                        <span className="sm:hidden">Publishing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          className="w-4 h-4 sm:w-5 sm:h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                          />
+                        </svg>
+                        <span className="hidden sm:inline">Publish Notice</span>
+                        <span className="sm:hidden">Publish</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
     </>
   );
-}
+} 
