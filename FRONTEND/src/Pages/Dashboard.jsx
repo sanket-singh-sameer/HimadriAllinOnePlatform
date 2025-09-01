@@ -11,6 +11,7 @@ const Dashboard = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("profile");
   const [allNotices, setAllNotices] = useState([]);
   const [localIsLoading, setLocalIsLoading] = useState(false);
 
@@ -416,8 +417,7 @@ const Dashboard = () => {
 
           <div className="p-4 sm:p-6 md:p-8 lg:p-10 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 flex-1">
             <div className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 p-4 sm:p-6 md:p-8 border border-gray-100 hover:border-gray-200 flex flex-col relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-blue-50 to-transparent rounded-bl-3xl"></div>
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-gray-50 to-transparent rounded-tr-3xl"></div>
+              
 
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6 sm:mb-8">
@@ -574,111 +574,17 @@ const Dashboard = () => {
                           d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                         />
                       </svg>
-                      Edit Profile
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={() => setIsPasswordModalOpen(true)}
-                    className="w-full !bg-blue-600 !text-white hover:bg-gradient-to-r hover:from-blue-700 hover:to-blue-800 px-6 py-3 sm:px-8 sm:py-4 rounded-xl !font-bold tracking-wide border-2 border-blue-600 hover:border-blue-700 hover:shadow-xl hover:shadow-blue-600/25 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 transform transition-all duration-300 ease-out cursor-pointer group mt-3"
-                  >
-                    <span className="flex items-center gap-2 group-hover:translate-x-0.5 transition-transform duration-300">
-                      <svg
-                        className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v-2l-4.257-2.257A6 6 0 0117 9zm-5 8a2 2 0 100-4 2 2 0 000 4z"
-                        />
-                      </svg>
-                      Change Password
+                      Edit Profile & Settings
                     </span>
                   </button>
 
                   {isOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-10 relative transition-all">
-                        <button
-                          onClick={() => setIsOpen(false)}
-                          className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl"
-                        >
-                          ✕
-                        </button>
-
-                        <h3 className="text-2xl font-extrabold text-gray-900 mb-8 tracking-tight">
-                          Edit Profile
-                        </h3>
-
-                        <form
-                          onSubmit={handleEditProfile}
-                          className="space-y-6"
-                        >
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Full Name
-                            </label>
-                            <input
-                              value={editProfileForm.name}
-                              type="text"
-                              name="name"
-                              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm"
-                              placeholder="Enter Your Name"
-                              onChange={handleEditFormChange}
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Phone Number
-                            </label>
-                            <input
-                              value={editProfileForm.phone}
-                              type="tel"
-                              name="phone"
-                              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm"
-                              placeholder="Enter Your Phone Number (+91 9876543210)"
-                              onChange={handleEditFormChange}
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Room No
-                            </label>
-                            <input
-                              value={editProfileForm.room}
-                              type="number"
-                              name="room"
-                              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm"
-                              placeholder="Enter Your Room Number"
-                              onChange={handleEditFormChange}
-                            />
-                          </div>
-
-                          <button
-                            type="submit"
-                            className="w-full bg-gray-900 py-3.5 rounded-xl hover:bg-gray-700 shadow-lg cursor-pointer transition"
-                          >
-                            <p className="!m-0 !leading-none !text-lg !text-white !font-semibold !italic !opacity-100 ">
-                              {localIsLoading ? "Saving..." : "Save Changes"}
-                            </p>
-                          </button>
-                        </form>
-                      </div>
-                    </div>
-                  )}
-
-                  {isPasswordModalOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-10 relative transition-all">
+                    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
+                      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[80vh] overflow-y-auto relative transition-all">
                         <button
                           onClick={() => {
-                            setIsPasswordModalOpen(false);
+                            setIsOpen(false);
+                            setActiveTab("profile");
                             setPasswordError(null);
                             setChangePasswordForm({
                               currentPassword: "",
@@ -686,82 +592,217 @@ const Dashboard = () => {
                               confirmPassword: "",
                             });
                           }}
-                          className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl"
+                          className="cursor-pointer absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl z-10"
                         >
                           ✕
                         </button>
 
-                        <h3 className="text-2xl font-extrabold text-gray-900 mb-8 tracking-tight">
-                          Change Password
-                        </h3>
+                        <div className="p-6 sm:p-8">
+                          <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4 sm:mb-6 tracking-tight text-center">
+                            Profile Settings
+                          </h3>
 
-                        <form
-                          onSubmit={handleChangePassword}
-                          className="space-y-6"
-                        >
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Current Password
-                            </label>
-                            <input
-                              value={changePasswordForm.currentPassword}
-                              type="password"
-                              name="currentPassword"
-                              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm"
-                              placeholder="Enter your current password"
-                              onChange={handlePasswordFormChange}
-                              required
-                            />
+                          <div className="flex bg-gray-100 rounded-xl p-1 mb-4 sm:mb-6">
+                            <button
+                              onClick={() => setActiveTab("profile")}
+                              className={`cursor-pointer flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${
+                                activeTab === "profile"
+                                  ? "bg-white text-gray-900 shadow-sm"
+                                  : "text-gray-600 hover:text-gray-900"
+                              }`}
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                />
+                              </svg>
+                              Profile Info
+                            </button>
+                            <button
+                              onClick={() => setActiveTab("password")}
+                              className={`cursor-pointer flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${
+                                activeTab === "password"
+                                  ? "bg-white text-gray-900 shadow-sm"
+                                  : "text-gray-600 hover:text-gray-900"
+                              }`}
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v-2l-4.257-2.257A6 6 0 0117 9zm-5 8a2 2 0 100-4 2 2 0 000 4z"
+                                />
+                              </svg>
+                              Password
+                            </button>
                           </div>
 
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              New Password
-                            </label>
-                            <input
-                              value={changePasswordForm.newPassword}
-                              type="password"
-                              name="newPassword"
-                              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm"
-                              placeholder="Enter your new password (min 8 characters)"
-                              onChange={handlePasswordFormChange}
-                              required
-                            />
-                          </div>
+                          {activeTab === "profile" && (
+                            <form
+                              onSubmit={handleEditProfile}
+                              className="space-y-4"
+                            >
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="sm:col-span-2">
+                                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Full Name
+                                  </label>
+                                  <input
+                                    value={editProfileForm.name}
+                                    type="text"
+                                    name="name"
+                                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm transition-all duration-200"
+                                    placeholder="Enter Your Name"
+                                    onChange={handleEditFormChange}
+                                  />
+                                </div>
 
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Confirm New Password
-                            </label>
-                            <input
-                              value={changePasswordForm.confirmPassword}
-                              type="password"
-                              name="confirmPassword"
-                              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm"
-                              placeholder="Confirm your new password"
-                              onChange={handlePasswordFormChange}
-                              required
-                            />
-                          </div>
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Phone Number
+                                  </label>
+                                  <input
+                                    value={editProfileForm.phone}
+                                    type="tel"
+                                    name="phone"
+                                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm transition-all duration-200"
+                                    placeholder="Enter Phone Number"
+                                    onChange={handleEditFormChange}
+                                  />
+                                </div>
 
-                          {passwordError && (
-                            <p className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
-                              {passwordError}
-                            </p>
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Room Number
+                                  </label>
+                                  <input
+                                    value={editProfileForm.room}
+                                    type="number"
+                                    name="room"
+                                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm transition-all duration-200"
+                                    placeholder="Enter Room Number"
+                                    onChange={handleEditFormChange}
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="pt-2">
+                                <button
+                                  type="submit"
+                                  className="w-full bg-gray-900 text-white py-3.5 rounded-xl hover:bg-gray-700 shadow-lg cursor-pointer transition-all duration-300 font-semibold text-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+                                  disabled={localIsLoading}
+                                >
+                                  {localIsLoading
+                                    ? "Saving Changes..."
+                                    : "Save Changes"}
+                                </button>
+                              </div>
+                            </form>
                           )}
 
-                          <button
-                            type="submit"
-                            className="w-full bg-blue-600 py-3.5 rounded-xl hover:bg-blue-700 shadow-lg cursor-pointer transition"
-                            disabled={localIsLoading}
-                          >
-                            <p className="!m-0 !leading-none !text-lg !text-white !font-semibold !italic !opacity-100">
-                              {localIsLoading
-                                ? "Changing..."
-                                : "Change Password"}
-                            </p>
-                          </button>
-                        </form>
+                          {activeTab === "password" && (
+                            <form
+                              onSubmit={handleChangePassword}
+                              className="space-y-4"
+                            >
+                              <div className="space-y-4">
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Current Password
+                                  </label>
+                                  <input
+                                    value={changePasswordForm.currentPassword}
+                                    type="password"
+                                    name="currentPassword"
+                                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition-all duration-200"
+                                    placeholder="Enter your current password"
+                                    onChange={handlePasswordFormChange}
+                                    required
+                                  />
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                      New Password
+                                    </label>
+                                    <input
+                                      value={changePasswordForm.newPassword}
+                                      type="password"
+                                      name="newPassword"
+                                      className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition-all duration-200"
+                                      placeholder="Enter new password"
+                                      onChange={handlePasswordFormChange}
+                                      required
+                                    />
+                                  </div>
+
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                      Confirm New Password
+                                    </label>
+                                    <input
+                                      value={changePasswordForm.confirmPassword}
+                                      type="password"
+                                      name="confirmPassword"
+                                      className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition-all duration-200"
+                                      placeholder="Confirm new password"
+                                      onChange={handlePasswordFormChange}
+                                      required
+                                    />
+                                  </div>
+                                </div>
+
+                                {passwordError && (
+                                  <div className="flex items-center gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 shadow-sm">
+                                    <svg
+                                      className="shrink-0 h-5 w-5 text-red-500"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M12 9v2m0 4h.01M21 12A9 9 0 1 1 3 12a9 9 0 0 1 18 0z"
+                                      />
+                                    </svg>
+                                    <p className="!text-sm !font-medium text-red-700 !leading-tight">
+                                      {passwordError}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="pt-2">
+                                <button
+                                  type="submit"
+                                  className="w-full bg-blue-600 text-white py-3.5 rounded-xl hover:bg-blue-700 shadow-lg cursor-pointer transition-all duration-300 font-semibold text-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+                                  disabled={localIsLoading}
+                                >
+                                  {localIsLoading
+                                    ? "Changing Password..."
+                                    : "Change Password"}
+                                </button>
+                              </div>
+                            </form>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -770,8 +811,7 @@ const Dashboard = () => {
             </div>
 
             <div className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 p-4 sm:p-6 md:p-8 lg:p-10 border border-gray-100 hover:border-gray-200 lg:col-span-2 flex flex-col relative overflow-hidden z-0">
-              <div className="absolute top-0 right-0 w-32 h-32 sm:w-40 sm:h-40 bg-gradient-to-bl from-green-50 to-transparent rounded-bl-3xl"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-tr from-blue-50 to-transparent rounded-tr-3xl"></div>
+             
 
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6 sm:mb-8">
@@ -931,12 +971,35 @@ const Dashboard = () => {
                 <div className="lg:col-span-3 bg-gray-50 rounded-lg sm:rounded-xl lg:rounded-2xl border border-gray-100 p-2 sm:p-3 md:p-4 lg:p-6 shadow-inner">
                   {activeFeature === "knowYourHostel" && (
                     <div className="w-full bg-gradient-to-br from-white via-gray-50 to-white rounded-lg sm:rounded-xl lg:rounded-2xl xl:rounded-3xl shadow-xl border border-gray-200 p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 max-w-7xl mx-auto space-y-6 sm:space-y-8 lg:space-y-10 relative overflow-hidden">
-                      <div className="relative text-center space-y-2 sm:space-y-3">
+                      <button
+                        onClick={() =>
+                          window.open("/hostel-booklet-pdf.pdf", "_blank")
+                        }
+                        className="absolute top-2 sm:top-3 md:top-4 lg:top-6 xl:top-8 right-2 sm:right-3 md:right-4 lg:right-6 xl:right-8 z-10 group bg-white text-gray-900 hover:bg-gray-100 hover:shadow-lg px-2 sm:px-3 md:px-4 lg:px-5 py-1.5 sm:py-2 md:py-2.5 lg:py-3 rounded-md sm:rounded-lg md:rounded-xl transition-all duration-300 font-medium sm:font-semibold text-xs sm:text-sm md:text-base lg:text-lg tracking-wide border border-gray-300 sm:border-2 sm:border-gray-900 hover:scale-105 active:scale-95 flex items-center gap-1 sm:gap-1.5 md:gap-2 cursor-pointer shadow-sm sm:shadow-md"
+                      >
+                        <svg
+                          className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 transition-transform duration-300 group-hover:rotate-12 flex-shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.168 18.477 18.582 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                          />
+                        </svg>
+                        <span className="hidden sm:inline md:text-sm lg:text-base whitespace-nowrap">
+                          View Hostel Booklet
+                        </span>
+                        <span className="sm:hidden text-xs">Booklet</span>
+                      </button>{" "}
+                      <div className="relative text-center space-y-2 sm:space-y-3 pt-12 sm:pt-14 md:pt-16 lg:pt-18 xl:pt-20">
                         <h3 className="!text-xl sm:!text-2xl md:!text-3xl lg:!text-4xl xl:!text-5xl !font-black  !text-gray-900  tracking-tight  leading-none px-2 sm:px-0">
                           Himadri Boys Hostel
                         </h3>
                       </div>
-
                       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
                         <div className="relative group order-1 xl:order-1">
                           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl sm:rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -1051,7 +1114,6 @@ const Dashboard = () => {
                           </div>
                         </div>
                       </div>
-
                       <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-6 lg:p-8 shadow-inner">
                         <h3 className="!text-lg sm:!text-xl md:!text-2xl !font-bold  !text-gray-900  text-center mb-6 sm:mb-8 tracking-tight px-2 sm:px-0">
                           World-Class Facilities
@@ -1116,7 +1178,6 @@ const Dashboard = () => {
                           ))}
                         </div>
                       </div>
-
                       <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl sm:rounded-3xl border border-gray-700 p-4 sm:p-6 lg:p-8 shadow-2xl text-white">
                         <div className="text-center mb-6 sm:mb-8">
                           <h3 className="!text-lg sm:!text-xl md:!text-2xl lg:!text-3xl !font-bold  !text-white  mb-2 sm:mb-3 tracking-tight px-2 sm:px-0">
