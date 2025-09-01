@@ -698,8 +698,6 @@ export default function Admin() {
 
           <div className="p-4 sm:p-6 md:p-8 lg:p-10 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 flex-1">
             <div className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 p-4 sm:p-6 md:p-8 border border-gray-100 hover:border-gray-200 flex flex-col relative overflow-hidden">
-              
-
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6 sm:mb-8">
                   <div className="flex items-center space-x-2 sm:space-x-3">
@@ -1092,8 +1090,6 @@ export default function Admin() {
             </div>
 
             <div className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 p-4 sm:p-6 md:p-8 lg:p-10 border border-gray-100 hover:border-gray-200 lg:col-span-2 flex flex-col relative overflow-hidden z-0">
-              
-
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6 sm:mb-8">
                   <div className="flex items-center space-x-2 sm:space-x-3">
@@ -1740,96 +1736,387 @@ export default function Admin() {
                   )}
 
                   {activeFeature === "searchStudent" && (
-                    <div className="w-full bg-white rounded-3xl shadow-md border border-gray-100 p-4 sm:p-6 md:p-8 lg:p-10 max-w-4xl mx-auto space-y-4 sm:space-y-6 md:space-y-8">
-                      <h3 className="!text-4xl !font-semibold text-gray-900 text-center">
-                        Search Student
-                      </h3>
+                    <div className="w-full bg-white rounded-3xl shadow-md border border-gray-100 p-4 sm:p-6 md:p-8 lg:p-10 max-w-4xl mx-auto space-y-6 sm:space-y-8">
+                      <div className="text-center space-y-4">
+                        <div className="flex items-center justify-center space-x-3">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl flex items-center justify-center">
+                            <svg
+                              className="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                              />
+                            </svg>
+                          </div>
+                          <h3 className="!text-3xl sm:!text-4xl !font-bold text-gray-900">
+                            Student Records
+                          </h3>
+                        </div>
+                        <p className="text-gray-600 text-sm sm:text-base max-w-2xl mx-auto">
+                          Search and view comprehensive student information
+                          including academic and personal details
+                        </p>
+                      </div>
 
-                      <div className="flex justify-center">
-                        <div className="relative w-full sm:w-2/3">
-                          <input
-                            type="text"
-                            placeholder="Enter Roll Number"
-                            className="w-full px-5 py-3 pl-12 border border-gray-200 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300 text-gray-700 placeholder-gray-400 transition-all duration-300"
-                            onChange={handleRollSearchText}
-                            value={searchRollNumber}
-                          />
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={2}
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"
+                      <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                        <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                          <div className="relative w-full sm:w-96">
+                            <input
+                              type="text"
+                              placeholder="Enter Roll Number (e.g., 1769, 2024001)"
+                              className="w-full px-4 py-3 pl-12 pr-4 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 text-gray-700 placeholder-gray-400 transition-all duration-300 bg-white"
+                              onChange={handleRollSearchText}
+                              value={searchRollNumber}
                             />
-                          </svg>
+                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                              <svg
+                                className="w-5 h-5 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"
+                                />
+                              </svg>
+                            </div>
+                          </div>
+                          <button className="px-6 py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors duration-200 flex items-center space-x-2 whitespace-nowrap">
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"
+                              />
+                            </svg>
+                            <span>Search</span>
+                          </button>
                         </div>
                       </div>
 
-                      <div className="bg-white rounded-3xl shadow-xl border border-gray-100 max-w-lg mx-auto p-8 sm:p-10 space-y-6 relative">
-                        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-24 h-2 bg-gray-200 rounded-full"></div>
-
-                        <div className="flex flex-col items-center space-y-2">
-                          <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 text-3xl font-bold shadow-inner">
-                            {studentDetails?.name?.charAt(0) || (
-                              <span className="text-gray-400">JD</span>
-                            )}
-                          </div>
-                          <p className="text-gray-900 !font-extrabold text-2xl sm:text-3xl">
-                            {studentDetails?.name || (
-                              <span className="text-gray-400">Jane Doe</span>
-                            )}
-                          </p>
-                          <p className="text-gray-700 !font-medium text-base sm:text-lg">
-                            Roll No:{" "}
-                            {studentDetails?.roll || (
-                              <span className="text-gray-400">1769</span>
-                            )}
-                          </p>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h3 className="!text-xl !font-bold text-gray-900">
+                            Search Results
+                          </h3>
+                          {studentDetails && (
+                            <div className="flex items-center space-x-2 text-sm text-gray-600">
+                              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                              <span>Record Found</span>
+                            </div>
+                          )}
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                          <div className="bg-gray-50 rounded-2xl p-5 shadow-sm flex flex-col items-center justify-center hover:shadow-md transition">
-                            <p className="!font-medium text-gray-900 mb-1">
-                              Room No
-                            </p>
-                            <p className="!text-base text-gray-700">
-                              {studentDetails?.room || (
-                                <span className="text-gray-400">509</span>
-                              )}
-                            </p>
-                          </div>
-                          <div className="bg-gray-50 rounded-2xl p-5 shadow-sm flex flex-col items-center justify-center hover:shadow-md transition">
-                            <p className="!font-medium text-gray-900 mb-1">
-                              Father Name
-                            </p>
-                            <p className="!text-base text-gray-700">
-                              {studentDetails?.fatherName || (
-                                <span className="text-gray-400">Mr. Sam</span>
-                              )}
-                            </p>
-                          </div>
+                        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg">
+                          <div className="overflow-x-auto">
+                            <table className="w-full">
+                              <thead>
+                                <tr className="bg-gradient-to-r from-gray-900 to-gray-800 text-white">
+                                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                                    <div className="flex items-center space-x-2">
+                                      <svg
+                                        className="w-4 h-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                        />
+                                      </svg>
+                                      <span>Student Info</span>
+                                    </div>
+                                  </th>
+                                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                                    <div className="flex items-center space-x-2">
+                                      <svg
+                                        className="w-4 h-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
+                                        />
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M8 5v6l3-3 3 3V5"
+                                        />
+                                      </svg>
+                                      <span>Academic</span>
+                                    </div>
+                                  </th>
+                                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                                    <div className="flex items-center space-x-2">
+                                      <svg
+                                        className="w-4 h-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                        />
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                        />
+                                      </svg>
+                                      <span>Contact & Housing</span>
+                                    </div>
+                                  </th>
+                                </tr>
+                              </thead>
 
-                          <div className="bg-blue-50 rounded-2xl p-5 shadow-sm flex flex-col items-center justify-center hover:shadow-md transition">
-                            <p className="!font-medium text-blue-700 mb-1">
-                              CGPA
-                            </p>
-                            <p className="!text-base text-blue-800 font-semibold">
-                              {studentDetails?.cgpi || (
-                                <span className="text-gray-400">8.9</span>
-                              )}
-                            </p>
+                              <tbody>
+                                {studentDetails ? (
+                                  <tr className="hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100">
+                                    {/* Student Info Column */}
+                                    <td className="px-6 py-6">
+                                      <div className="flex items-center space-x-4">
+                                        <div className="w-12 h-12 bg-gradient-to-br from-gray-700 to-gray-900 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                          {studentDetails.name?.charAt(0) ||
+                                            "S"}
+                                        </div>
+                                        <div>
+                                          <div className="text-lg font-bold text-gray-900">
+                                            {studentDetails.name || "N/A"}
+                                          </div>
+                                          <div className="text-sm text-gray-600 font-medium">
+                                            Roll: {studentDetails.roll || "N/A"}
+                                          </div>
+                                          <div className="text-sm text-gray-500">
+                                            Father:{" "}
+                                            {studentDetails.fatherName || "N/A"}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </td>
+
+                                    {/* Academic Column */}
+                                    <td className="px-6 py-6">
+                                      <div className="space-y-3">
+                                        <div className="flex items-center space-x-3">
+                                          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                            {studentDetails.cgpi || "N/A"}
+                                          </div>
+                                          <div>
+                                            <div className="text-sm font-medium text-gray-700">
+                                              CGPA Score
+                                            </div>
+                                            <div className="text-xs text-gray-500">
+                                              Current Performance
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                          <div
+                                            className={`w-3 h-3 rounded-full ${
+                                              parseFloat(studentDetails.cgpi) >=
+                                              8.5
+                                                ? "bg-green-500"
+                                                : parseFloat(
+                                                    studentDetails.cgpi
+                                                  ) >= 7.0
+                                                ? "bg-yellow-500"
+                                                : "bg-red-500"
+                                            }`}
+                                          ></div>
+                                          <span className="text-xs font-medium text-gray-600">
+                                            {parseFloat(studentDetails.cgpi) >=
+                                            8.5
+                                              ? "Excellent"
+                                              : parseFloat(
+                                                  studentDetails.cgpi
+                                                ) >= 7.0
+                                              ? "Good"
+                                              : "Needs Improvement"}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </td>
+
+                                    {/* Contact & Housing Column */}
+                                    <td className="px-6 py-6">
+                                      <div className="space-y-4">
+                                        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
+                                          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                            <svg
+                                              className="w-4 h-4 text-green-600"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              viewBox="0 0 24 24"
+                                            >
+                                              <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                                              />
+                                            </svg>
+                                          </div>
+                                          <div>
+                                            <div className="text-sm font-semibold text-gray-900">
+                                              Room{" "}
+                                              {studentDetails.room || "N/A"}
+                                            </div>
+                                            <div className="text-xs text-gray-500">
+                                              Hostel Accommodation
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
+                                          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                            <svg
+                                              className="w-4 h-4 text-blue-600"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              viewBox="0 0 24 24"
+                                            >
+                                              <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                              />
+                                            </svg>
+                                          </div>
+                                          <div>
+                                            <div className="text-sm font-semibold text-gray-900">
+                                              {studentDetails.email || "N/A"}
+                                            </div>
+                                            <div className="text-xs text-gray-500">
+                                              Email Address
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
+                                          <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                                            <svg
+                                              className="w-4 h-4 text-purple-600"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              viewBox="0 0 24 24"
+                                            >
+                                              <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                                              />
+                                            </svg>
+                                          </div>
+                                          <div>
+                                            <div className="text-sm font-semibold text-gray-900">
+                                              {studentDetails.phone || "N/A"}
+                                            </div>
+                                            <div className="text-xs text-gray-500">
+                                              Phone Number
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ) : (
+                                  <tr>
+                                    <td
+                                      colSpan="3"
+                                      className="px-6 py-12 text-center"
+                                    >
+                                      <div className="flex flex-col items-center space-y-4">
+                                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center">
+                                          <svg
+                                            className="w-10 h-10 text-gray-400"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                          >
+                                            <path
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              strokeWidth={2}
+                                              d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"
+                                            />
+                                          </svg>
+                                        </div>
+                                        <div className="text-center">
+                                          <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                            No Student Found
+                                          </h3>
+                                          <p className="text-gray-500 text-sm max-w-md">
+                                            {searchRollNumber
+                                              ? "No student record found for the entered roll number. Please verify and try again."
+                                              : "Enter a roll number in the search field above to find student details."}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )}
+                              </tbody>
+                            </table>
                           </div>
                         </div>
 
-                        <div className="text-center text-gray-500 text-sm mt-2 tracking-wide">
-                          Academic Details Overview
-                        </div>
+                        {/* Additional Info Footer */}
+                        {studentDetails && (
+                          <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 border border-gray-200">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <svg
+                                  className="w-5 h-5 text-gray-600"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                  />
+                                </svg>
+                                <span className="text-sm font-medium text-gray-700">
+                                  Complete student profile information
+                                </span>
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                Last updated: {new Date().toLocaleDateString()}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -2246,4 +2533,4 @@ export default function Admin() {
       )}
     </>
   );
-} 
+}
