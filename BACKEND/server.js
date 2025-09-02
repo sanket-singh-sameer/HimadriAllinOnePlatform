@@ -24,7 +24,6 @@ const allowedOrigins = [
 ]
 
 app.use(cors({
-  // origin: process.env.CLIENT_URL ||  "http://localhost:5173",
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps, curl)
     if (!origin) return callback(null, true);

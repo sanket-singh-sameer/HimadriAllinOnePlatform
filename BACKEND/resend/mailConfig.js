@@ -66,7 +66,7 @@ export const resetPasswordGMail = async (email, resetToken) => {
     subject: "Password Reset",
     html: PASSWORD_RESET_REQUEST_TEMPLATE.replaceAll(
       "{resetURL}",
-      `${process.env.CLIENT_URL}/reset-password/${resetToken}`
+      `https://nith.org.in/reset-password/${resetToken}`
     ),
   });
 
