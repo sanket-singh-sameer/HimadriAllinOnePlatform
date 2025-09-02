@@ -18,7 +18,7 @@ const app = express();
 const __dirname = path.resolve();
 
 const allowedOrigins = [
-  "https://nith.org.in/", 
+  "https://nith.org.in", 
   "http://localhost:5173",
   process.env.CLIENT_URL
 ]

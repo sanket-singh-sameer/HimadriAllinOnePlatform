@@ -973,7 +973,7 @@ const Dashboard = () => {
                     <div className="w-full bg-gradient-to-br from-white via-gray-50 to-white rounded-lg sm:rounded-xl lg:rounded-2xl xl:rounded-3xl shadow-xl border border-gray-200 p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 max-w-7xl mx-auto space-y-6 sm:space-y-8 lg:space-y-10 relative overflow-hidden">
                       <button
                         onClick={() =>
-                          window.open("/hostel-booklet-pdf.pdf", "_blank")
+                          window.open("https://github.com/sanket-singh-sameer/HimadriAllinOnePlatform/raw/refs/heads/main/FRONTEND/public/hostel-booklet-pdf.pdf", "_blank")
                         }
                         className="absolute top-2 sm:top-3 md:top-4 lg:top-6 xl:top-8 right-2 sm:right-3 md:right-4 lg:right-6 xl:right-8 z-10 group bg-white text-gray-900 hover:bg-gray-100 hover:shadow-lg px-2 sm:px-3 md:px-4 lg:px-5 py-1.5 sm:py-2 md:py-2.5 lg:py-3 rounded-md sm:rounded-lg md:rounded-xl transition-all duration-300 font-medium sm:font-semibold text-xs sm:text-sm md:text-base lg:text-lg tracking-wide border border-gray-300 sm:border-2 sm:border-gray-900 hover:scale-105 active:scale-95 flex items-center gap-1 sm:gap-1.5 md:gap-2 cursor-pointer shadow-sm sm:shadow-md"
                       >
