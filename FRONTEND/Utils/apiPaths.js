@@ -30,5 +30,14 @@ export const API_PATHS = {
   FETCH_USER_DETAILS: (roll) => `/auth/${roll}`,
 
   FETCH_TOTAL_COMPLAINTS: "/complaints/stats",
-  FETCH_TOTAL_USERS: "/auth/total-user-count"
+  FETCH_TOTAL_USERS: "/auth/total-user-count",
+
+  // unavailabe as of now
+  // GET_MY_SNACKS_PREFERENCE: "/mess/my-snacks",
+  // UPDATE_MY_SNACKS_PREFERENCE: "/mess/my-snacks",
+  
+  CHECK_SNACKS_BY_ROLL: (roll) => `/mess/snacks/${roll}`,
+  ADD_TO_SNACKS_LIST: (roll) => `/mess/snacks/${roll}/true`,
+  REMOVE_FROM_SNACKS_LIST: (roll) => `/mess/snacks/${roll}/false`,
+  UPDATE_SNACKS_STATUS: (roll) => `/mess/snacks/${roll}/update-status`,
 };

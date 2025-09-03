@@ -458,6 +458,15 @@ export default function Admin() {
       try {
         const student = await getStudentByRoll(rollNumber);
         const cgpiData = await getCGPIByRoll(rollNumber);
+        
+        // Fetch snacks information
+        let snacksInfo = { optedForSnacks: false };
+        try {
+          const snacksResponse = await axiosInstance.get(API_PATHS.CHECK_SNACKS_BY_ROLL(rollNumber));
+          snacksInfo = { optedForSnacks: snacksResponse.data.optedForSnacks };
+        } catch (snacksError) {
+          console.warn("Could not fetch snacks info:", snacksError);
+        }
 
         if (student || cgpiData) {
           setStudentDetails({
@@ -469,17 +478,20 @@ export default function Admin() {
             role: student?.role || "N/A",
             fatherName: cgpiData?.fName || "N/A",
             cgpi: cgpiData?.cgpi || "N/A",
+            snacksInfo: snacksInfo,
           });
 
           console.log("Student details set:", {
             student,
             cgpiData,
+            snacksInfo,
             combined: {
               name: student?.name,
               roll: student?.roll,
               room: student?.room,
               fatherName: cgpiData?.fName,
               cgpi: cgpiData?.cgpi,
+              snacksInfo,
             },
           });
         } else {
@@ -508,6 +520,99 @@ export default function Admin() {
     const roomValue = e.target.value;
     setRoomSearchFilter(roomValue);
     applyFilters(selectedStatusFilter, selectedCategoryFilter, roomValue);
+  };
+
+  // Snacks Management Functions
+  const handleSearchStudent = async () => {
+    if (!searchRollNumber) return;
+    
+    setLocalIsLoading(true);
+    try {
+      const student = await getStudentByRoll(searchRollNumber);
+      const snacksResponse = await axiosInstance.get(API_PATHS.CHECK_SNACKS_BY_ROLL(searchRollNumber));
+      
+      if (student) {
+        setStudentDetails({
+          ...student,
+          snacksInfo: {
+            optedForSnacks: snacksResponse.data.optedForSnacks
+          }
+        });
+        toast.success("Student found!");
+      } else {
+        toast.error("Student not found");
+        setStudentDetails(null);
+      }
+    } catch (error) {
+      console.error("Error searching student:", error);
+      toast.error("Error searching student");
+      setStudentDetails(null);
+    } finally {
+      setLocalIsLoading(false);
+    }
+  };
+
+  const handleAddToSnacksList = async (rollNumber) => {
+    setLocalIsLoading(true);
+    try {
+      const response = await axiosInstance.put(API_PATHS.ADD_TO_SNACKS_LIST(rollNumber));
+      toast.success(response.data.message);
+      
+      // Update student details
+      setStudentDetails(prev => ({
+        ...prev,
+        snacksInfo: {
+          optedForSnacks: true
+        }
+      }));
+    } catch (error) {
+      console.error("Error adding to snacks list:", error);
+      toast.error("Error adding student to snacks list");
+    } finally {
+      setLocalIsLoading(false);
+    }
+  };
+
+  const handleRemoveFromSnacksList = async (rollNumber) => {
+    setLocalIsLoading(true);
+    try {
+      const response = await axiosInstance.put(API_PATHS.REMOVE_FROM_SNACKS_LIST(rollNumber));
+      toast.success(response.data.message);
+      
+      // Update student details
+      setStudentDetails(prev => ({
+        ...prev,
+        snacksInfo: {
+          optedForSnacks: false
+        }
+      }));
+    } catch (error) {
+      console.error("Error removing from snacks list:", error);
+      toast.error("Error removing student from snacks list");
+    } finally {
+      setLocalIsLoading(false);
+    }
+  };
+
+  const handleToggleSnacksStatus = async (rollNumber) => {
+    setLocalIsLoading(true);
+    try {
+      const response = await axiosInstance.put(API_PATHS.UPDATE_SNACKS_STATUS(rollNumber));
+      toast.success(response.data.message);
+      
+      // Update student details
+      setStudentDetails(prev => ({
+        ...prev,
+        snacksInfo: {
+          optedForSnacks: response.data.optedForSnacks
+        }
+      }));
+    } catch (error) {
+      console.error("Error toggling snacks status:", error);
+      toast.error("Error updating snacks status");
+    } finally {
+      setLocalIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -2019,7 +2124,7 @@ export default function Admin() {
                                           </div>
                                           <div>
                                             <div className="text-sm font-semibold text-gray-900">
-                                              Room {user?.room || "N/A"}
+                                              Room {studentDetails?.room || "N/A"}
                                             </div>
                                             <div className="text-xs text-gray-500">
                                               Hostel Accommodation
@@ -2072,7 +2177,7 @@ export default function Admin() {
                                           </div>
                                           <div>
                                             <div className="text-sm font-semibold text-gray-900">
-                                              {user?.phone || "N/A"}
+                                              {studentDetails?.phone || "N/A"}
                                             </div>
                                             <div className="text-xs text-gray-500">
                                               Phone Number
@@ -2151,6 +2256,107 @@ export default function Admin() {
                             </div>
                           </div>
                         )}
+
+                        {/* Snacks Management Section */}
+                        {studentDetails && (
+                          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                            <div className="flex items-center justify-between mb-4">
+                              <h4 className="text-xl font-semibold text-gray-800 flex items-center space-x-2">
+                                <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.168 18.477 18.582 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                </svg>
+                                <span>Snacks Management</span>
+                              </h4>
+                              {localIsLoading && (
+                                <div className="flex items-center space-x-2">
+                                  <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                                  <span className="text-sm text-gray-600">Processing...</span>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              {/* Current Status */}
+                              <div className="bg-gray-50 rounded-lg p-4">
+                                <h5 className="font-medium text-gray-900 mb-3 flex items-center space-x-2">
+                                  <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                  <span>Current Status</span>
+                                </h5>
+                                <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                                  <div className="flex items-center space-x-3">
+                                    <div className={`w-3 h-3 rounded-full ${
+                                      studentDetails.snacksInfo?.optedForSnacks ? 'bg-green-500' : 'bg-red-500'
+                                    }`}></div>
+                                    <span className="text-sm font-medium text-gray-900">
+                                      {studentDetails.snacksInfo?.optedForSnacks ? 'Opted for Snacks' : 'Not Opted for Snacks'}
+                                    </span>
+                                  </div>
+                                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                    studentDetails.snacksInfo?.optedForSnacks 
+                                      ? 'bg-green-100 text-green-800' 
+                                      : 'bg-red-100 text-red-800'
+                                  }`}>
+                                    {studentDetails.snacksInfo?.optedForSnacks ? 'Active' : 'Inactive'}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Actions */}
+                              <div className="bg-gray-50 rounded-lg p-4">
+                                <h5 className="font-medium text-gray-900 mb-3 flex items-center space-x-2">
+                                  <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a1 1 0 01-1-1V9a1 1 0 011-1h1a2 2 0 100-4H4a1 1 0 01-1-1V4a1 1 0 011-1h3a1 1 0 001-1v-1z" />
+                                  </svg>
+                                  <span>Quick Actions</span>
+                                </h5>
+                                <div className="space-y-3">
+                                  {!studentDetails.snacksInfo?.optedForSnacks ? (
+                                    <button
+                                      onClick={() => handleAddToSnacksList(studentDetails.roll)}
+                                      disabled={localIsLoading}
+                                      className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
+                                    >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                      </svg>
+                                      <span>{localIsLoading ? 'Processing...' : 'Add to Snacks List'}</span>
+                                    </button>
+                                  ) : (
+                                    <button
+                                      onClick={() => handleRemoveFromSnacksList(studentDetails.roll)}
+                                      disabled={localIsLoading}
+                                      className="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
+                                    >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                      </svg>
+                                      <span>{localIsLoading ? 'Processing...' : 'Remove from Snacks List'}</span>
+                                    </button>
+                                  )}
+                                  
+                                  <button
+                                    onClick={() => handleToggleSnacksStatus(studentDetails.roll)}
+                                    disabled={localIsLoading}
+                                    className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                    </svg>
+                                    <span>{localIsLoading ? 'Processing...' : 'Toggle Status'}</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                              <p className="text-xs text-blue-700">
+                                <strong>Note:</strong> Changes will be reflected immediately. Students will receive snacks during snack time if they are opted in.
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -2200,6 +2406,113 @@ export default function Admin() {
                             {todaysMenu?.dinner || "N/A"}
                           </span>
                         </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeFeature === "manageSnacks" && (
+                    <div className="w-full bg-white rounded-3xl shadow-md border border-gray-100 p-4 sm:p-6 md:p-8 lg:p-10 max-w-4xl mx-auto">
+                      <h3 className="!text-4xl !font-semibold text-gray-900 text-center mb-6">
+                        Manage Student Snacks Preferences
+                      </h3>
+                      <p className="!text-center !text-gray-600 mt-2 !text-lg mb-8">
+                        Add or remove students from the snacks list
+                      </p>
+
+                      <div className="space-y-6">
+                        {/* Search Student Section */}
+                        <div className="bg-gray-50 rounded-xl p-6">
+                          <h4 className="text-xl font-semibold text-gray-800 mb-4">Search Student</h4>
+                          <div className="flex flex-col sm:flex-row gap-3">
+                            <input
+                              type="text"
+                              placeholder="Enter roll number (e.g., 21MCA001)"
+                              value={searchRollNumber}
+                              onChange={(e) => setSearchRollNumber(e.target.value.toUpperCase())}
+                              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                            <button
+                              onClick={handleSearchStudent}
+                              disabled={!searchRollNumber || localIsLoading}
+                              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                              {localIsLoading ? 'Searching...' : 'Search'}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Student Details and Snacks Management */}
+                        {studentDetails && (
+                          <div className="bg-white rounded-xl border border-gray-200 p-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              {/* Student Info */}
+                              <div>
+                                <h4 className="text-xl font-semibold text-gray-800 mb-4">Student Information</h4>
+                                <div className="space-y-3">
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-600">Name:</span>
+                                    <span className="font-medium">{studentDetails.name}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-600">Roll Number:</span>
+                                    <span className="font-medium">{studentDetails.roll}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-600">Room:</span>
+                                    <span className="font-medium">{studentDetails.room}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-600">Email:</span>
+                                    <span className="font-medium">{studentDetails.email}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Snacks Management */}
+                              <div>
+                                <h4 className="text-xl font-semibold text-gray-800 mb-4">Snacks Management</h4>
+                                <div className="space-y-4">
+                                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                    <div>
+                                      <p className="font-medium text-gray-900">Current Status:</p>
+                                      <p className={`text-sm ${studentDetails.snacksInfo?.optedForSnacks ? 'text-green-600' : 'text-red-600'}`}>
+                                        {studentDetails.snacksInfo?.optedForSnacks ? 'Opted for Snacks' : 'Not Opted for Snacks'}
+                                      </p>
+                                    </div>
+                                    <div className={`w-4 h-4 rounded-full ${
+                                      studentDetails.snacksInfo?.optedForSnacks ? 'bg-green-500' : 'bg-red-500'
+                                    }`}></div>
+                                  </div>
+
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <button
+                                      onClick={() => handleAddToSnacksList(studentDetails.roll)}
+                                      disabled={localIsLoading || studentDetails.snacksInfo?.optedForSnacks}
+                                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                      {localIsLoading ? 'Processing...' : 'Add to Snacks'}
+                                    </button>
+                                    <button
+                                      onClick={() => handleRemoveFromSnacksList(studentDetails.roll)}
+                                      disabled={localIsLoading || !studentDetails.snacksInfo?.optedForSnacks}
+                                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                      {localIsLoading ? 'Processing...' : 'Remove from Snacks'}
+                                    </button>
+                                  </div>
+
+                                  <button
+                                    onClick={() => handleToggleSnacksStatus(studentDetails.roll)}
+                                    disabled={localIsLoading}
+                                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                  >
+                                    {localIsLoading ? 'Processing...' : 'Toggle Status'}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
