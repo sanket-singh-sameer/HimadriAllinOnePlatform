@@ -1240,7 +1240,6 @@ export default function Admin() {
                                 {notice.description}
                               </p>
 
-                              {/* Media Display */}
                               {notice.media && (
                                 <div className="mb-4">
                                   {notice.media.toLowerCase().endsWith('.pdf') ? (

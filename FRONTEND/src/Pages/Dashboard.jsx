@@ -959,6 +959,35 @@ const Dashboard = () => {
                                 {notice.description}
                               </p>
 
+                              {notice.media && (
+                                <div className="mb-4">
+                                  {notice.media.toLowerCase().endsWith('.pdf') ? (
+                                    <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg border">
+                                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                      </svg>
+                                      <a 
+                                        href={notice.media}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                                      >
+                                        View PDF Attachment
+                                      </a>
+                                    </div>
+                                  ) : (
+                                    <img 
+                                      src={notice.media}
+                                      alt="Notice attachment"
+                                      className="w-full max-w-sm rounded-lg border shadow-sm"
+                                      onError={(e) => {
+                                        e.target.style.display = 'none';
+                                      }}
+                                    />
+                                  )}
+                                </div>
+                              )}
+
                               <div className="flex items-center justify-end pt-3 border-t border-gray-100">
                                 <p className="!text-gray-700 !text-sm sm:!text-base !leading-relaxed !font-semibold">
                                   {notice.author}
