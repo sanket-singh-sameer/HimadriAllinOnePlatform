@@ -57,8 +57,9 @@ export const updateMySnacksPreference = async (req, res) => {
 };
 
 export const checkIfOptedForSnacks = async (req, res) => {
-  const { roll } = req.params;
+  let { roll } = req.params;
   try {
+    roll = roll.toUpperCase()
     const userId = await User.findOne({ roll });
     if (!userId) {
       return res.status(404).json({ message: "User not found" });

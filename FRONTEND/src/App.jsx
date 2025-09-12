@@ -2,7 +2,7 @@ import React from "react";
 import { useEffect } from "react";
 import AOS from "aos";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer } from "react-toastify";
 
 import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
@@ -14,6 +14,7 @@ import { useAuthStore } from "./store/authStore";
 import { FullPageLoader } from "./Components/LoadingSpinner";
 import ForgotPassword from "./Pages/ForgotPassword";
 import ResetPassword from "./Pages/ResetPassword";
+import MessSnacks from "./Pages/MessSnacks";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -82,7 +83,6 @@ function App() {
 
   return (
     <main className="main-container">
-
       <ToastContainer
         position="top-center"
         autoClose={3000}
@@ -129,10 +129,7 @@ function App() {
             </RedirectAuthenticatedUser>
           }
         />
-        <Route
-          path="/reset-password/:token"
-          element={<ResetPassword />}
-        />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/otp-verify" element={<OTPv />} />
         <Route
           path="/dashboard"
@@ -150,6 +147,7 @@ function App() {
             </AdminRoute>
           }
         />
+        <Route path="/mess/:roll" element={<MessSnacks />} />
         <Route path="/test" element={<div>Test Route Works!</div>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
