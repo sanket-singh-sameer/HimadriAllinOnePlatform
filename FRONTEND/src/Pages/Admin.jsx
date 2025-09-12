@@ -82,7 +82,7 @@ export default function Admin() {
         "image/png",
         "application/pdf",
       ];
-      
+
       if (validTypes.includes(file.type)) {
         setNoticeForm((prev) => ({ ...prev, media: file }));
       } else {
@@ -104,12 +104,12 @@ export default function Admin() {
     try {
       // Create FormData to handle file upload
       const formData = new FormData();
-      formData.append('title', noticeForm.title);
-      formData.append('description', noticeForm.description);
-      
+      formData.append("title", noticeForm.title);
+      formData.append("description", noticeForm.description);
+
       // Only append media if it exists
       if (noticeForm.media) {
-        formData.append('media', noticeForm.media);
+        formData.append("media", noticeForm.media);
       }
 
       const response = await axiosInstance.post(
@@ -117,11 +117,11 @@ export default function Admin() {
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         }
       );
-      
+
       if (response.status === 200 || response.status === 201) {
         fetchAllNotices();
         setNoticeForm({ title: "", description: "", media: null });
@@ -458,11 +458,13 @@ export default function Admin() {
       try {
         const student = await getStudentByRoll(rollNumber);
         const cgpiData = await getCGPIByRoll(rollNumber);
-        
+
         // Fetch snacks information
         let snacksInfo = { optedForSnacks: false };
         try {
-          const snacksResponse = await axiosInstance.get(API_PATHS.CHECK_SNACKS_BY_ROLL(rollNumber));
+          const snacksResponse = await axiosInstance.get(
+            API_PATHS.CHECK_SNACKS_BY_ROLL(rollNumber)
+          );
           snacksInfo = { optedForSnacks: snacksResponse.data.optedForSnacks };
         } catch (snacksError) {
           console.warn("Could not fetch snacks info:", snacksError);
@@ -525,18 +527,20 @@ export default function Admin() {
   // Snacks Management Functions
   const handleSearchStudent = async () => {
     if (!searchRollNumber) return;
-    
+
     setLocalIsLoading(true);
     try {
       const student = await getStudentByRoll(searchRollNumber);
-      const snacksResponse = await axiosInstance.get(API_PATHS.CHECK_SNACKS_BY_ROLL(searchRollNumber));
-      
+      const snacksResponse = await axiosInstance.get(
+        API_PATHS.CHECK_SNACKS_BY_ROLL(searchRollNumber)
+      );
+
       if (student) {
         setStudentDetails({
           ...student,
           snacksInfo: {
-            optedForSnacks: snacksResponse.data.optedForSnacks
-          }
+            optedForSnacks: snacksResponse.data.optedForSnacks,
+          },
         });
         toast.success("Student found!");
       } else {
@@ -555,15 +559,17 @@ export default function Admin() {
   const handleAddToSnacksList = async (rollNumber) => {
     setLocalIsLoading(true);
     try {
-      const response = await axiosInstance.put(API_PATHS.ADD_TO_SNACKS_LIST(rollNumber));
+      const response = await axiosInstance.put(
+        API_PATHS.ADD_TO_SNACKS_LIST(rollNumber)
+      );
       toast.success(response.data.message);
-      
+
       // Update student details
-      setStudentDetails(prev => ({
+      setStudentDetails((prev) => ({
         ...prev,
         snacksInfo: {
-          optedForSnacks: true
-        }
+          optedForSnacks: true,
+        },
       }));
     } catch (error) {
       console.error("Error adding to snacks list:", error);
@@ -576,15 +582,17 @@ export default function Admin() {
   const handleRemoveFromSnacksList = async (rollNumber) => {
     setLocalIsLoading(true);
     try {
-      const response = await axiosInstance.put(API_PATHS.REMOVE_FROM_SNACKS_LIST(rollNumber));
+      const response = await axiosInstance.put(
+        API_PATHS.REMOVE_FROM_SNACKS_LIST(rollNumber)
+      );
       toast.success(response.data.message);
-      
+
       // Update student details
-      setStudentDetails(prev => ({
+      setStudentDetails((prev) => ({
         ...prev,
         snacksInfo: {
-          optedForSnacks: false
-        }
+          optedForSnacks: false,
+        },
       }));
     } catch (error) {
       console.error("Error removing from snacks list:", error);
@@ -597,15 +605,17 @@ export default function Admin() {
   const handleToggleSnacksStatus = async (rollNumber) => {
     setLocalIsLoading(true);
     try {
-      const response = await axiosInstance.put(API_PATHS.UPDATE_SNACKS_STATUS(rollNumber));
+      const response = await axiosInstance.put(
+        API_PATHS.UPDATE_SNACKS_STATUS(rollNumber)
+      );
       toast.success(response.data.message);
-      
+
       // Update student details
-      setStudentDetails(prev => ({
+      setStudentDetails((prev) => ({
         ...prev,
         snacksInfo: {
-          optedForSnacks: response.data.optedForSnacks
-        }
+          optedForSnacks: response.data.optedForSnacks,
+        },
       }));
     } catch (error) {
       console.error("Error toggling snacks status:", error);
@@ -1347,12 +1357,24 @@ export default function Admin() {
 
                               {notice.media && (
                                 <div className="mb-4">
-                                  {notice.media.toLowerCase().endsWith('.pdf') ? (
+                                  {notice.media
+                                    .toLowerCase()
+                                    .endsWith(".pdf") ? (
                                     <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg border">
-                                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                      <svg
+                                        className="w-5 h-5 text-red-600"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                                        />
                                       </svg>
-                                      <a 
+                                      <a
                                         href={notice.media}
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -1362,12 +1384,12 @@ export default function Admin() {
                                       </a>
                                     </div>
                                   ) : (
-                                    <img 
+                                    <img
                                       src={notice.media}
                                       alt="Notice attachment"
                                       className="w-full max-w-sm rounded-lg border shadow-sm"
                                       onError={(e) => {
-                                        e.target.style.display = 'none';
+                                        e.target.style.display = "none";
                                       }}
                                     />
                                   )}
@@ -1462,6 +1484,16 @@ export default function Admin() {
                   >
                     View Statistics
                   </button>
+                  {/* <button
+                    onClick={() => setActiveFeature("idScan")}
+                    className={`w-full cursor-pointer px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl transition-all duration-300 font-bold tracking-wide border-2 hover:shadow-md hover:scale-105 ${
+                      activeFeature === "idScan"
+                        ? "bg-gray-900 text-white border-gray-900"
+                        : "bg-white text-gray-900 border-gray-200 hover:border-gray-400"
+                    }`}
+                  >
+                    Smart ID Scan
+                  </button> */}
                   <button
                     onClick={() => setActiveFeature("complaints")}
                     className={`w-full cursor-pointer px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl transition-all duration-300 font-bold tracking-wide border-2 hover:shadow-md hover:scale-105 ${
@@ -1556,6 +1588,16 @@ export default function Admin() {
                       </div>
                     </div>
                   )}
+                  
+                  {/* {activeFeature === "idScan" && (
+                    <div className="w-full bg-white rounded-3xl shadow-lg border border-gray-100 p-4 sm:p-6 md:p-8 lg:p-10 max-w-5xl mx-auto">
+                      <h3 className="!text-3xl sm:!text-4xl !font-semibold text-gray-900 text-center mb-8 sm:mb-12">
+                        Smart ID Scan
+                      </h3>
+                      <div className="flex flex-col items-center justify-center">
+                      </div>
+                    </div>
+                  )} */}
 
                   {activeFeature === "complaints" && (
                     <div className="w-full bg-white rounded-3xl shadow-md border border-gray-100 p-4 sm:p-6 md:p-8 lg:p-10 max-w-4xl mx-auto">
@@ -2123,7 +2165,8 @@ export default function Admin() {
                                           </div>
                                           <div>
                                             <div className="text-sm font-semibold text-gray-900">
-                                              Room {studentDetails?.room || "N/A"}
+                                              Room{" "}
+                                              {studentDetails?.room || "N/A"}
                                             </div>
                                             <div className="text-xs text-gray-500">
                                               Hostel Accommodation
@@ -2227,7 +2270,6 @@ export default function Admin() {
                           </div>
                         </div>
 
-                        {/* Additional Info Footer */}
                         {studentDetails && (
                           <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 border border-gray-200">
                             <div className="flex items-center justify-between">
@@ -2256,103 +2298,262 @@ export default function Admin() {
                           </div>
                         )}
 
-                        {/* Snacks Management Section */}
                         {studentDetails && (
-                          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                            <div className="flex items-center justify-between mb-4">
-                              <h4 className="text-xl font-semibold text-gray-800 flex items-center space-x-2">
-                                <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.168 18.477 18.582 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                </svg>
-                                <span>Snacks Management</span>
-                              </h4>
-                              {localIsLoading && (
-                                <div className="flex items-center space-x-2">
-                                  <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                                  <span className="text-sm text-gray-600">Processing...</span>
+                          <div className="group bg-white rounded-3xl border border-gray-100 shadow-lg hover:shadow-2xl transition-all duration-500 p-6 sm:p-8 md:p-10 relative overflow-hidden">
+                            <div className="relative z-10">
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+                                <div className="flex items-center space-x-3">
+                                  <div>
+                                    <h3 className="!text-2xl sm:!text-3xl !font-black !text-gray-900 tracking-tight leading-none">
+                                      Student Management!
+                                    </h3>
+                                    <p className="!text-sm !text-gray-600 !font-medium opacity-90 !text-left">
+                                      Administer student profiles
+                                    </p>
+                                  </div>
                                 </div>
-                              )}
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              {/* Current Status */}
-                              <div className="bg-gray-50 rounded-lg p-4">
-                                <h5 className="font-medium text-gray-900 mb-3 flex items-center space-x-2">
-                                  <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                  </svg>
-                                  <span>Current Status</span>
-                                </h5>
-                                <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
-                                  <div className="flex items-center space-x-3">
-                                    <div className={`w-3 h-3 rounded-full ${
-                                      studentDetails.snacksInfo?.optedForSnacks ? 'bg-green-500' : 'bg-red-500'
-                                    }`}></div>
-                                    <span className="text-sm font-medium text-gray-900">
-                                      {studentDetails.snacksInfo?.optedForSnacks ? 'Opted for Snacks' : 'Not Opted for Snacks'}
+                                {localIsLoading && (
+                                  <div className="flex items-center space-x-3 bg-gray-50 px-4 py-2.5 rounded-xl border border-gray-200">
+                                    <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></div>
+                                    <span className="text-sm font-semibold text-gray-900">
+                                      Processing...
                                     </span>
                                   </div>
-                                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                                    studentDetails.snacksInfo?.optedForSnacks 
-                                      ? 'bg-green-100 text-green-800' 
-                                      : 'bg-red-100 text-red-800'
-                                  }`}>
-                                    {studentDetails.snacksInfo?.optedForSnacks ? 'Active' : 'Inactive'}
-                                  </span>
+                                )}
+                              </div>
+
+                              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+                                <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl p-6 border border-gray-200/50 hover:border-gray-300 transition-all duration-300 group/status">
+                                  <div className="flex items-center justify-between mb-5">
+                                    <h3 className="!text-lg !font-bold !text-gray-900 flex items-center space-x-2">
+                                      <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-200">
+                                        <svg
+                                          className="w-4 h-4 text-gray-700"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                          />
+                                        </svg>
+                                      </div>
+                                      <span>Current Status!</span>
+                                    </h3>
+                                  </div>
+
+                                  <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm group-hover/status:shadow-md transition-all duration-300">
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center space-x-4">
+                                        <div
+                                          className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                                            studentDetails.snacksInfo
+                                              ?.optedForSnacks
+                                              ? "bg-gray-900 shadow-lg shadow-gray-900/25"
+                                              : "bg-gray-100 border-2 border-dashed border-gray-300"
+                                          }`}
+                                        >
+                                          {studentDetails.snacksInfo
+                                            ?.optedForSnacks ? (
+                                            <svg
+                                              className="w-6 h-6 text-white"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              viewBox="0 0 24 24"
+                                            >
+                                              <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M5 13l4 4L19 7"
+                                              />
+                                            </svg>
+                                          ) : (
+                                            <svg
+                                              className="w-6 h-6 text-gray-400"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              viewBox="0 0 24 24"
+                                            >
+                                              <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M6 18L18 6M6 6l12 12"
+                                              />
+                                            </svg>
+                                          )}
+                                        </div>
+                                        <div>
+                                          <p className="!text-base !text-left !font-bold !text-gray-900">
+                                            {studentDetails.snacksInfo
+                                              ?.optedForSnacks
+                                              ? "Opted for Snacks!"
+                                              : "Not Opted for Snacks"}
+                                          </p>
+                                          <p className="!text-sm !text-gray-600 !opacity-90">
+                                            {studentDetails.snacksInfo
+                                              ?.optedForSnacks
+                                              ? "Student will receive snacks"
+                                              : "Student will not receive snacks"}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl p-6 border border-gray-200/50 hover:border-gray-300 transition-all duration-300 group/actions">
+                                  <div className="flex items-center justify-between mb-5">
+                                    <h3 className="!text-lg !font-bold !text-gray-900 flex items-center space-x-2">
+                                      <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-200">
+                                        <svg
+                                          className="w-4 h-4 text-gray-700"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a1 1 0 01-1-1V9a1 1 0 011-1h1a2 2 0 100-4H4a1 1 0 01-1-1V4a1 1 0 011-1h3a1 1 0 001-1v-1z"
+                                          />
+                                        </svg>
+                                      </div>
+                                      <span>Quick Actions!</span>
+                                    </h3>
+                                  </div>
+
+                                  <div className="space-y-4">
+                                    {!studentDetails.snacksInfo
+                                      ?.optedForSnacks ? (
+                                      <button
+                                        onClick={() =>
+                                          handleAddToSnacksList(
+                                            studentDetails.roll
+                                          )
+                                        }
+                                        disabled={localIsLoading}
+                                        className="w-full group/btn cursor-pointer px-6 py-4 bg-gray-900 text-white font-bold rounded-xl hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl hover:shadow-gray-900/25 hover:scale-[1.02] active:scale-[0.98] border-2 border-gray-900"
+                                      >
+                                        <div className="w-5 h-5 bg-white/20 rounded-lg flex items-center justify-center group-hover/btn:bg-white/30 transition-colors duration-300">
+                                          <svg
+                                            className="w-3 h-3"
+                                            fill="currentColor"
+                                            viewBox="0 0 24 24"
+                                          >
+                                            <path
+                                              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                              stroke="currentColor"
+                                              strokeWidth={2}
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                            />
+                                          </svg>
+                                        </div>
+                                        <span className="group-hover/btn:translate-x-0.5 transition-transform duration-300">
+                                          {localIsLoading
+                                            ? "Processing..."
+                                            : "Add to Snacks List"}
+                                        </span>
+                                      </button>
+                                    ) : (
+                                      <button
+                                        onClick={() =>
+                                          handleRemoveFromSnacksList(
+                                            studentDetails.roll
+                                          )
+                                        }
+                                        disabled={localIsLoading}
+                                        className="w-full group/btn cursor-pointer px-6 py-4 bg-white text-gray-900 font-bold rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl border-2 border-gray-900 hover:border-black hover:scale-[1.02] active:scale-[0.98]"
+                                      >
+                                        <div className="w-5 h-5 bg-gray-900/10 rounded-lg flex items-center justify-center group-hover/btn:bg-gray-900/20 transition-colors duration-300">
+                                          <svg
+                                            className="w-3 h-3"
+                                            fill="currentColor"
+                                            viewBox="0 0 24 24"
+                                          >
+                                            <path
+                                              d="M20 12H4"
+                                              stroke="currentColor"
+                                              strokeWidth={2}
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                            />
+                                          </svg>
+                                        </div>
+                                        <span className="group-hover/btn:translate-x-0.5 transition-transform duration-300">
+                                          {localIsLoading
+                                            ? "Processing..."
+                                            : "Remove from Snacks List"}
+                                        </span>
+                                      </button>
+                                    )}
+
+                                    <button
+                                      onClick={() =>
+                                        handleToggleSnacksStatus(
+                                          studentDetails.roll
+                                        )
+                                      }
+                                      disabled={localIsLoading}
+                                      className="w-full group/btn cursor-pointer px-6 py-4 bg-gray-100 text-gray-900 font-bold rounded-xl hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center space-x-3 border-2 border-gray-300 hover:border-gray-400 hover:scale-[1.02] active:scale-[0.98]"
+                                    >
+                                      <div className="w-5 h-5 bg-gray-900/10 rounded-lg flex items-center justify-center group-hover/btn:bg-gray-900/20 transition-colors duration-300">
+                                        <svg
+                                          className="w-3 h-3"
+                                          fill="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path
+                                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                                            stroke="currentColor"
+                                            strokeWidth={2}
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          />
+                                        </svg>
+                                      </div>
+                                      <span className="group-hover/btn:translate-x-0.5 transition-transform duration-300">
+                                        {localIsLoading
+                                          ? "Processing..."
+                                          : "Toggle Status"}
+                                      </span>
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
 
-                              {/* Actions */}
-                              <div className="bg-gray-50 rounded-lg p-4">
-                                <h5 className="font-medium text-gray-900 mb-3 flex items-center space-x-2">
-                                  <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a1 1 0 01-1-1V9a1 1 0 011-1h1a2 2 0 100-4H4a1 1 0 01-1-1V4a1 1 0 011-1h3a1 1 0 001-1v-1z" />
-                                  </svg>
-                                  <span>Quick Actions</span>
-                                </h5>
-                                <div className="space-y-3">
-                                  {!studentDetails.snacksInfo?.optedForSnacks ? (
-                                    <button
-                                      onClick={() => handleAddToSnacksList(studentDetails.roll)}
-                                      disabled={localIsLoading}
-                                      className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
-                                    >
-                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                      </svg>
-                                      <span>{localIsLoading ? 'Processing...' : 'Add to Snacks List'}</span>
-                                    </button>
-                                  ) : (
-                                    <button
-                                      onClick={() => handleRemoveFromSnacksList(studentDetails.roll)}
-                                      disabled={localIsLoading}
-                                      className="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
-                                    >
-                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                                      </svg>
-                                      <span>{localIsLoading ? 'Processing...' : 'Remove from Snacks List'}</span>
-                                    </button>
-                                  )}
-                                  
-                                  <button
-                                    onClick={() => handleToggleSnacksStatus(studentDetails.roll)}
-                                    disabled={localIsLoading}
-                                    className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
-                                  >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                                    </svg>
-                                    <span>{localIsLoading ? 'Processing...' : 'Toggle Status'}</span>
-                                  </button>
+                              <div className="mt-8 relative">
+                                <div className="absolute inset-0 bg-gradient-to-r from-gray-900/5 to-black/10 rounded-2xl blur-xl"></div>
+                                <div className="relative bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                                  <div className="flex items-start space-x-4">
+                                    <div className="flex-1">
+                                      <h3 className="!text-sm !font-bold !text-gray-900 mb-2">
+                                        Important Note!
+                                      </h3>
+                                      <p className="!text-sm !text-gray-700 !leading-relaxed !opacity-90">
+                                        Changes will be reflected immediately.
+                                        Students will receive snacks during
+                                        snack time if they are opted in. Please
+                                        ensure accurate updates to maintain
+                                        proper meal planning and inventory
+                                        management.
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
+                                    <span>
+                                      Last updated:{" "}
+                                      {new Date().toLocaleTimeString()}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-
-                            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                              <p className="text-xs text-blue-700">
-                                <strong>Note:</strong> Changes will be reflected immediately. Students will receive snacks during snack time if they are opted in.
-                              </p>
                             </div>
                           </div>
                         )}
@@ -2419,15 +2620,20 @@ export default function Admin() {
                       </p>
 
                       <div className="space-y-6">
-                        {/* Search Student Section */}
                         <div className="bg-gray-50 rounded-xl p-6">
-                          <h4 className="text-xl font-semibold text-gray-800 mb-4">Search Student</h4>
+                          <h4 className="text-xl font-semibold text-gray-800 mb-4">
+                            Search Student
+                          </h4>
                           <div className="flex flex-col sm:flex-row gap-3">
                             <input
                               type="text"
                               placeholder="Enter roll number (e.g., 21MCA001)"
                               value={searchRollNumber}
-                              onChange={(e) => setSearchRollNumber(e.target.value.toUpperCase())}
+                              onChange={(e) =>
+                                setSearchRollNumber(
+                                  e.target.value.toUpperCase()
+                                )
+                              }
                               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                             <button
@@ -2435,77 +2641,134 @@ export default function Admin() {
                               disabled={!searchRollNumber || localIsLoading}
                               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                              {localIsLoading ? 'Searching...' : 'Search'}
+                              {localIsLoading ? "Searching..." : "Search"}
                             </button>
                           </div>
                         </div>
 
-                        {/* Student Details and Snacks Management */}
                         {studentDetails && (
                           <div className="bg-white rounded-xl border border-gray-200 p-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                               {/* Student Info */}
                               <div>
-                                <h4 className="text-xl font-semibold text-gray-800 mb-4">Student Information</h4>
+                                <h4 className="text-xl font-semibold text-gray-800 mb-4">
+                                  Student Information
+                                </h4>
                                 <div className="space-y-3">
                                   <div className="flex justify-between">
                                     <span className="text-gray-600">Name:</span>
-                                    <span className="font-medium">{studentDetails.name}</span>
+                                    <span className="font-medium">
+                                      {studentDetails.name}
+                                    </span>
                                   </div>
                                   <div className="flex justify-between">
-                                    <span className="text-gray-600">Roll Number:</span>
-                                    <span className="font-medium">{studentDetails.roll}</span>
+                                    <span className="text-gray-600">
+                                      Roll Number:
+                                    </span>
+                                    <span className="font-medium">
+                                      {studentDetails.roll}
+                                    </span>
                                   </div>
                                   <div className="flex justify-between">
                                     <span className="text-gray-600">Room:</span>
-                                    <span className="font-medium">{studentDetails.room}</span>
+                                    <span className="font-medium">
+                                      {studentDetails.room}
+                                    </span>
                                   </div>
                                   <div className="flex justify-between">
-                                    <span className="text-gray-600">Email:</span>
-                                    <span className="font-medium">{studentDetails.email}</span>
+                                    <span className="text-gray-600">
+                                      Email:
+                                    </span>
+                                    <span className="font-medium">
+                                      {studentDetails.email}
+                                    </span>
                                   </div>
                                 </div>
                               </div>
 
-                              {/* Snacks Management */}
                               <div>
-                                <h4 className="text-xl font-semibold text-gray-800 mb-4">Snacks Management</h4>
+                                <h4 className="text-xl font-semibold text-gray-800 mb-4">
+                                  Snacks Management
+                                </h4>
                                 <div className="space-y-4">
                                   <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                                     <div>
-                                      <p className="font-medium text-gray-900">Current Status:</p>
-                                      <p className={`text-sm ${studentDetails.snacksInfo?.optedForSnacks ? 'text-green-600' : 'text-red-600'}`}>
-                                        {studentDetails.snacksInfo?.optedForSnacks ? 'Opted for Snacks' : 'Not Opted for Snacks'}
+                                      <p className="font-medium text-gray-900">
+                                        Current Status:
+                                      </p>
+                                      <p
+                                        className={`text-sm ${
+                                          studentDetails.snacksInfo
+                                            ?.optedForSnacks
+                                            ? "text-green-600"
+                                            : "text-red-600"
+                                        }`}
+                                      >
+                                        {studentDetails.snacksInfo
+                                          ?.optedForSnacks
+                                          ? "Opted for Snacks"
+                                          : "Not Opted for Snacks"}
                                       </p>
                                     </div>
-                                    <div className={`w-4 h-4 rounded-full ${
-                                      studentDetails.snacksInfo?.optedForSnacks ? 'bg-green-500' : 'bg-red-500'
-                                    }`}></div>
+                                    <div
+                                      className={`w-4 h-4 rounded-full ${
+                                        studentDetails.snacksInfo
+                                          ?.optedForSnacks
+                                          ? "bg-green-500"
+                                          : "bg-red-500"
+                                      }`}
+                                    ></div>
                                   </div>
 
                                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <button
-                                      onClick={() => handleAddToSnacksList(studentDetails.roll)}
-                                      disabled={localIsLoading || studentDetails.snacksInfo?.optedForSnacks}
+                                      onClick={() =>
+                                        handleAddToSnacksList(
+                                          studentDetails.roll
+                                        )
+                                      }
+                                      disabled={
+                                        localIsLoading ||
+                                        studentDetails.snacksInfo
+                                          ?.optedForSnacks
+                                      }
                                       className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                     >
-                                      {localIsLoading ? 'Processing...' : 'Add to Snacks'}
+                                      {localIsLoading
+                                        ? "Processing..."
+                                        : "Add to Snacks"}
                                     </button>
                                     <button
-                                      onClick={() => handleRemoveFromSnacksList(studentDetails.roll)}
-                                      disabled={localIsLoading || !studentDetails.snacksInfo?.optedForSnacks}
+                                      onClick={() =>
+                                        handleRemoveFromSnacksList(
+                                          studentDetails.roll
+                                        )
+                                      }
+                                      disabled={
+                                        localIsLoading ||
+                                        !studentDetails.snacksInfo
+                                          ?.optedForSnacks
+                                      }
                                       className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                     >
-                                      {localIsLoading ? 'Processing...' : 'Remove from Snacks'}
+                                      {localIsLoading
+                                        ? "Processing..."
+                                        : "Remove from Snacks"}
                                     </button>
                                   </div>
 
                                   <button
-                                    onClick={() => handleToggleSnacksStatus(studentDetails.roll)}
+                                    onClick={() =>
+                                      handleToggleSnacksStatus(
+                                        studentDetails.roll
+                                      )
+                                    }
                                     disabled={localIsLoading}
                                     className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                   >
-                                    {localIsLoading ? 'Processing...' : 'Toggle Status'}
+                                    {localIsLoading
+                                      ? "Processing..."
+                                      : "Toggle Status"}
                                   </button>
                                 </div>
                               </div>

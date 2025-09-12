@@ -11,11 +11,13 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.12",
+    "@zxing/library": "^0.21.3",
     "aos": "^2.3.4",
     "axios": "^1.11.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hot-toast": "^2.6.0",
+    "react-qr-barcode-scanner": "^2.1.9",
     "react-router-dom": "^7.8.0",
     "react-toastify": "^11.0.5",
     "rechart": "^0.0.1",
