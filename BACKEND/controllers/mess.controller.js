@@ -84,8 +84,9 @@ export const checkIfOptedForSnacks = async (req, res) => {
 };
 
 export const addToSnacksList = async (req, res) => {
-  const { roll } = req.params;
+  let { roll } = req.params;
   try {
+    roll = roll.toUpperCase()
     const userId = await User.findOne({ roll });
     if (!userId) {
       return res.status(404).json({ message: "User not found" });
@@ -113,8 +114,9 @@ export const addToSnacksList = async (req, res) => {
 };
 
 export const removeFromSnacksList = async (req, res) => {
-  const { roll } = req.params;
+  let { roll } = req.params;
   try {
+    roll = roll.toUpperCase()
     const userId = await User.findOne({ roll });
     if (!userId) {
       return res.status(404).json({ message: "User not found" });
@@ -142,8 +144,9 @@ export const removeFromSnacksList = async (req, res) => {
 };
 
 export const updateOptedForSnacks = async (req, res) => {
-  const { roll } = req.params;
+  let { roll } = req.params;
   try {
+    roll = roll.toUpperCase()
     const userId = await User.findOne({ roll });
     if (!userId) {
       return res.status(404).json({ message: "User not found" });
