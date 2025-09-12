@@ -1484,6 +1484,16 @@ export default function Admin() {
                   >
                     View Statistics
                   </button>
+                  {/* <button
+                    onClick={() => setActiveFeature("idScan")}
+                    className={`w-full cursor-pointer px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl transition-all duration-300 font-bold tracking-wide border-2 hover:shadow-md hover:scale-105 ${
+                      activeFeature === "idScan"
+                        ? "bg-gray-900 text-white border-gray-900"
+                        : "bg-white text-gray-900 border-gray-200 hover:border-gray-400"
+                    }`}
+                  >
+                    Smart ID Scan
+                  </button> */}
                   <button
                     onClick={() => setActiveFeature("complaints")}
                     className={`w-full cursor-pointer px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl transition-all duration-300 font-bold tracking-wide border-2 hover:shadow-md hover:scale-105 ${
@@ -1578,6 +1588,16 @@ export default function Admin() {
                       </div>
                     </div>
                   )}
+                  
+                  {/* {activeFeature === "idScan" && (
+                    <div className="w-full bg-white rounded-3xl shadow-lg border border-gray-100 p-4 sm:p-6 md:p-8 lg:p-10 max-w-5xl mx-auto">
+                      <h3 className="!text-3xl sm:!text-4xl !font-semibold text-gray-900 text-center mb-8 sm:mb-12">
+                        Smart ID Scan
+                      </h3>
+                      <div className="flex flex-col items-center justify-center">
+                      </div>
+                    </div>
+                  )} */}
 
                   {activeFeature === "complaints" && (
                     <div className="w-full bg-white rounded-3xl shadow-md border border-gray-100 p-4 sm:p-6 md:p-8 lg:p-10 max-w-4xl mx-auto">
@@ -2600,7 +2620,6 @@ export default function Admin() {
                       </p>
 
                       <div className="space-y-6">
-                        {/* Search Student Section */}
                         <div className="bg-gray-50 rounded-xl p-6">
                           <h4 className="text-xl font-semibold text-gray-800 mb-4">
                             Search Student
@@ -2627,7 +2646,6 @@ export default function Admin() {
                           </div>
                         </div>
 
-                        {/* Student Details and Snacks Management */}
                         {studentDetails && (
                           <div className="bg-white rounded-xl border border-gray-200 p-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -2668,7 +2686,6 @@ export default function Admin() {
                                 </div>
                               </div>
 
-                              {/* Snacks Management */}
                               <div>
                                 <h4 className="text-xl font-semibold text-gray-800 mb-4">
                                   Snacks Management
