@@ -45,6 +45,11 @@ const MessSnacks = () => {
       ) : (
         <div>The user {roll} has not opted for snacks ❌</div>
       )}
+      {snacks.mess && snacks.mess.tookSnacksAt && (
+        <div style={{ marginTop: "20px" }}>
+          Checked at: <strong>{new Date(snacks.mess.tookSnacksAt).toLocaleString()}</strong>
+        </div>
+      )}
     </div>
   );
 };

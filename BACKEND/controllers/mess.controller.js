@@ -3,14 +3,14 @@ import User from "../models/user.model.js";
 
 export const getMySnacksPreference = async (req, res) => {
   try {
-    const userId = req.user.id; 
-    
+    const userId = req.user.id;
+
     let mess = await Mess.findOne({ user: userId });
     if (!mess) {
       mess = new Mess({ user: userId, optedForSnacks: false });
       await mess.save();
     }
-    
+
     res.status(200).json({
       message: "Your snacks preference retrieved successfully",
       optedForSnacks: mess.optedForSnacks,
@@ -23,15 +23,15 @@ export const getMySnacksPreference = async (req, res) => {
 
 export const updateMySnacksPreference = async (req, res) => {
   try {
-    const userId = req.user.id; 
+    const userId = req.user.id;
     const { optedForSnacks } = req.body;
-    
-    if (typeof optedForSnacks !== 'boolean') {
-      return res.status(400).json({ 
-        message: "optedForSnacks must be a boolean value" 
+
+    if (typeof optedForSnacks !== "boolean") {
+      return res.status(400).json({
+        message: "optedForSnacks must be a boolean value",
       });
     }
-    
+
     // Find or create mess record for the user
     let mess = await Mess.findOne({ user: userId });
     if (!mess) {
@@ -39,13 +39,13 @@ export const updateMySnacksPreference = async (req, res) => {
     } else {
       mess.optedForSnacks = optedForSnacks;
     }
-    
+
     await mess.save();
-    
-    const statusMessage = mess.optedForSnacks 
+
+    const statusMessage = mess.optedForSnacks
       ? "You have opted for snacks"
       : "You have opted out of snacks";
-    
+
     res.status(200).json({
       message: statusMessage,
       optedForSnacks: mess.optedForSnacks,
@@ -59,19 +59,26 @@ export const updateMySnacksPreference = async (req, res) => {
 export const checkIfOptedForSnacks = async (req, res) => {
   let { roll } = req.params;
   try {
-    roll = roll.toUpperCase()
+    roll = roll.toUpperCase();
     const userId = await User.findOne({ roll });
     if (!userId) {
       return res.status(404).json({ message: "User not found" });
     }
-    
+
     // Find or create mess record for the user
     let mess = await Mess.findOne({ user: userId._id });
     if (!mess) {
-      mess = new Mess({ user: userId._id, optedForSnacks: false });
+      mess = new Mess({
+        user: userId._id,
+        optedForSnacks: false,
+        tookSnacksAt: new Date(),
+      });
       await mess.save();
     }
-    
+
+    mess.tookSnacksAt = new Date();
+    await mess.save();
+
     res.status(200).json({
       message: `Showing mess details for roll number ${roll}`,
       mess: mess,
@@ -86,12 +93,12 @@ export const checkIfOptedForSnacks = async (req, res) => {
 export const addToSnacksList = async (req, res) => {
   let { roll } = req.params;
   try {
-    roll = roll.toUpperCase()
+    roll = roll.toUpperCase();
     const userId = await User.findOne({ roll });
     if (!userId) {
       return res.status(404).json({ message: "User not found" });
     }
-    
+
     // Find or create mess record for the user
     let mess = await Mess.findOne({ user: userId._id });
     if (!mess) {
@@ -99,9 +106,9 @@ export const addToSnacksList = async (req, res) => {
     } else {
       mess.optedForSnacks = true;
     }
-    
+
     await mess.save();
-    
+
     res.status(200).json({
       message: `Student with roll number ${roll} opted for snacks`,
       mess: mess,
@@ -116,12 +123,12 @@ export const addToSnacksList = async (req, res) => {
 export const removeFromSnacksList = async (req, res) => {
   let { roll } = req.params;
   try {
-    roll = roll.toUpperCase()
+    roll = roll.toUpperCase();
     const userId = await User.findOne({ roll });
     if (!userId) {
       return res.status(404).json({ message: "User not found" });
     }
-    
+
     // Find or create mess record for the user
     let mess = await Mess.findOne({ user: userId._id });
     if (!mess) {
@@ -129,9 +136,9 @@ export const removeFromSnacksList = async (req, res) => {
     } else {
       mess.optedForSnacks = false;
     }
-    
+
     await mess.save();
-    
+
     res.status(200).json({
       message: `Student with roll number ${roll} opted out of snacks`,
       mess: mess,
@@ -146,12 +153,12 @@ export const removeFromSnacksList = async (req, res) => {
 export const updateOptedForSnacks = async (req, res) => {
   let { roll } = req.params;
   try {
-    roll = roll.toUpperCase()
+    roll = roll.toUpperCase();
     const userId = await User.findOne({ roll });
     if (!userId) {
       return res.status(404).json({ message: "User not found" });
     }
-    
+
     // Find or create mess record for the user
     let mess = await Mess.findOne({ user: userId._id });
     if (!mess) {
@@ -159,13 +166,13 @@ export const updateOptedForSnacks = async (req, res) => {
     } else {
       mess.optedForSnacks = !mess.optedForSnacks;
     }
-    
+
     await mess.save();
-    
-    const statusMessage = mess.optedForSnacks 
+
+    const statusMessage = mess.optedForSnacks
       ? `Student with roll number ${roll} opted for snacks`
       : `Student with roll number ${roll} opted out of snacks`;
-    
+
     res.status(200).json({
       message: statusMessage,
       mess: mess,
