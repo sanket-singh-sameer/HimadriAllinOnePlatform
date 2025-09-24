@@ -978,8 +978,9 @@ const Dashboard = () => {
                                   ) : (
                                     <img 
                                       src={notice.media}
+                                      onClick={() => window.open(`${notice.media}`)}
                                       alt="Notice attachment"
-                                      className="w-full max-w-sm rounded-lg border shadow-sm"
+                                      className="w-full max-w-sm rounded-lg border shadow-sm cursor-pointer"
                                       onError={(e) => {
                                         e.target.style.display = 'none';
                                       }}
