@@ -1118,7 +1118,7 @@ const Dashboard = () => {
                           />
                         </svg>
                         <span className="hidden sm:inline md:text-sm lg:text-base whitespace-nowrap">
-                          View Hostel Booklet
+                          Download Hostel Booklet
                         </span>
                         <span className="sm:hidden text-xs">Booklet</span>
                       </button>{" "}

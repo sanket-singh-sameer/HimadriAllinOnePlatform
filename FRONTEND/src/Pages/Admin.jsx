@@ -6,6 +6,8 @@ import { set } from "mongoose";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
+import Footer from "../Components/Footer";
+
 export default function Admin() {
   const { logout, isLoading, error, user } = useAuthStore();
   const navigate = useNavigate();
