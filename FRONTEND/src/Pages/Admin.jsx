@@ -1387,7 +1387,8 @@ export default function Admin() {
                                     <img
                                       src={notice.media}
                                       alt="Notice attachment"
-                                      className="w-full max-w-sm rounded-lg border shadow-sm"
+                                      className="w-full max-w-sm rounded-lg border shadow-sm cursor-pointer"
+                                      onClick={() => window.open(`${notice.media}`)}
                                       onError={(e) => {
                                         e.target.style.display = "none";
                                       }}
