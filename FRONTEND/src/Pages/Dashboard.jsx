@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useAuthStore } from "../store/authStore";
 import { API_PATHS } from "../../Utils/apiPaths";
 import axiosInstance from "../../Utils/axiosInstance";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
+
+import Footer from "../Components/Footer";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -15,7 +17,6 @@ const Dashboard = () => {
   const [allNotices, setAllNotices] = useState([]);
   const [searchRollNumber, setSearchRollNumber] = useState("");
   const [studentDetails, setStudentDetails] = useState(null);
-  
 
   const [localIsLoading, setLocalIsLoading] = useState(false);
 
@@ -961,12 +962,24 @@ const Dashboard = () => {
 
                               {notice.media && (
                                 <div className="mb-4">
-                                  {notice.media.toLowerCase().endsWith('.pdf') ? (
+                                  {notice.media
+                                    .toLowerCase()
+                                    .endsWith(".pdf") ? (
                                     <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg border">
-                                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                      <svg
+                                        className="w-5 h-5 text-red-600"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                                        />
                                       </svg>
-                                      <a 
+                                      <a
                                         href={notice.media}
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -976,13 +989,15 @@ const Dashboard = () => {
                                       </a>
                                     </div>
                                   ) : (
-                                    <img 
+                                    <img
                                       src={notice.media}
-                                      onClick={() => window.open(`${notice.media}`)}
+                                      onClick={() =>
+                                        window.open(`${notice.media}`)
+                                      }
                                       alt="Notice attachment"
                                       className="w-full max-w-sm rounded-lg border shadow-sm cursor-pointer"
                                       onError={(e) => {
-                                        e.target.style.display = 'none';
+                                        e.target.style.display = "none";
                                       }}
                                     />
                                   )}
@@ -1082,7 +1097,10 @@ const Dashboard = () => {
                     <div className="w-full bg-gradient-to-br from-white via-gray-50 to-white rounded-lg sm:rounded-xl lg:rounded-2xl xl:rounded-3xl shadow-xl border border-gray-200 p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 max-w-7xl mx-auto space-y-6 sm:space-y-8 lg:space-y-10 relative overflow-hidden">
                       <button
                         onClick={() =>
-                          window.open("https://github.com/sanket-singh-sameer/HimadriAllinOnePlatform/raw/refs/heads/main/FRONTEND/public/hostel-booklet-pdf.pdf", "_blank")
+                          window.open(
+                            "https://github.com/sanket-singh-sameer/HimadriAllinOnePlatform/raw/refs/heads/main/FRONTEND/public/hostel-booklet-pdf.pdf",
+                            "_blank"
+                          )
                         }
                         className="absolute top-2 sm:top-3 md:top-4 lg:top-6 xl:top-8 right-2 sm:right-3 md:right-4 lg:right-6 xl:right-8 z-10 group bg-white text-gray-900 hover:bg-gray-100 hover:shadow-lg px-2 sm:px-3 md:px-4 lg:px-5 py-1.5 sm:py-2 md:py-2.5 lg:py-3 rounded-md sm:rounded-lg md:rounded-xl transition-all duration-300 font-medium sm:font-semibold text-xs sm:text-sm md:text-base lg:text-lg tracking-wide border border-gray-300 sm:border-2 sm:border-gray-900 hover:scale-105 active:scale-95 flex items-center gap-1 sm:gap-1.5 md:gap-2 cursor-pointer shadow-sm sm:shadow-md"
                       >
@@ -1100,7 +1118,7 @@ const Dashboard = () => {
                           />
                         </svg>
                         <span className="hidden sm:inline md:text-sm lg:text-base whitespace-nowrap">
-                          View Hostel Booklet
+                          Download Hostel Booklet
                         </span>
                         <span className="sm:hidden text-xs">Booklet</span>
                       </button>{" "}
@@ -1874,7 +1892,8 @@ const Dashboard = () => {
                                           </div>
                                           <div>
                                             <div className="text-sm font-semibold text-gray-900">
-                                              Room {studentDetails.room || "N/A"}
+                                              Room{" "}
+                                              {studentDetails.room || "N/A"}
                                             </div>
                                             <div className="text-xs text-gray-500">
                                               Hostel Accommodation
@@ -2090,6 +2109,7 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+         <Footer></Footer>
         </main>
       </div>
     </>

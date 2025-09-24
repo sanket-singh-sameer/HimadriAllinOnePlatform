@@ -3,8 +3,10 @@ import { API_PATHS } from "../../Utils/apiPaths";
 import axiosInstance from "../../Utils/axiosInstance";
 import { useAuthStore } from "../store/authStore";
 import { set } from "mongoose";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
+
+import Footer from "../Components/Footer";
 
 export default function Admin() {
   const { logout, isLoading, error, user } = useAuthStore();
@@ -1388,7 +1390,9 @@ export default function Admin() {
                                       src={notice.media}
                                       alt="Notice attachment"
                                       className="w-full max-w-sm rounded-lg border shadow-sm cursor-pointer"
-                                      onClick={() => window.open(`${notice.media}`)}
+                                      onClick={() =>
+                                        window.open(`${notice.media}`)
+                                      }
                                       onError={(e) => {
                                         e.target.style.display = "none";
                                       }}
@@ -1485,16 +1489,7 @@ export default function Admin() {
                   >
                     View Statistics
                   </button>
-                  {/* <button
-                    onClick={() => setActiveFeature("idScan")}
-                    className={`w-full cursor-pointer px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl transition-all duration-300 font-bold tracking-wide border-2 hover:shadow-md hover:scale-105 ${
-                      activeFeature === "idScan"
-                        ? "bg-gray-900 text-white border-gray-900"
-                        : "bg-white text-gray-900 border-gray-200 hover:border-gray-400"
-                    }`}
-                  >
-                    Smart ID Scan
-                  </button> */}
+
                   <button
                     onClick={() => setActiveFeature("complaints")}
                     className={`w-full cursor-pointer px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl transition-all duration-300 font-bold tracking-wide border-2 hover:shadow-md hover:scale-105 ${
@@ -1589,16 +1584,6 @@ export default function Admin() {
                       </div>
                     </div>
                   )}
-                  
-                  {/* {activeFeature === "idScan" && (
-                    <div className="w-full bg-white rounded-3xl shadow-lg border border-gray-100 p-4 sm:p-6 md:p-8 lg:p-10 max-w-5xl mx-auto">
-                      <h3 className="!text-3xl sm:!text-4xl !font-semibold text-gray-900 text-center mb-8 sm:mb-12">
-                        Smart ID Scan
-                      </h3>
-                      <div className="flex flex-col items-center justify-center">
-                      </div>
-                    </div>
-                  )} */}
 
                   {activeFeature === "complaints" && (
                     <div className="w-full bg-white rounded-3xl shadow-md border border-gray-100 p-4 sm:p-6 md:p-8 lg:p-10 max-w-4xl mx-auto">
@@ -1813,8 +1798,11 @@ export default function Admin() {
                                   className="w-full flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 sm:p-6 lg:p-8 text-left cursor-pointer gap-3 sm:gap-0"
                                 >
                                   <div className="flex flex-col items-start justify-center space-y-1 sm:space-y-1">
-                                    <h3 className="text-lg sm:text-xl lg:!text-2xl !font-bold !text-gray-900 !tracking-tight !leading-snug">
-                                      Complaint #{complaint.serial}
+                                    <h3 className="text-lg sm:text-xl lg:!text-2xl !font-bold !text-gray-900 !tracking-tight !leading-snug flex items-center">
+                                      Complaint #{complaint.serial} &nbsp;
+                                      <span className="font-light text-lg">
+                                        [Registerd on: {complaint.date}]
+                                      </span>
                                     </h3>
                                     <p className="text-sm sm:!text-base !font-medium !text-gray-600 !leading-snug !opacity-100 line-clamp-2">
                                       {complaint.title}
@@ -3140,6 +3128,7 @@ export default function Admin() {
           </div>
         </div>
       )}
+      <Footer></Footer>
     </>
   );
 }
