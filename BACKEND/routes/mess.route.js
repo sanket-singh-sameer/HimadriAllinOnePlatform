@@ -12,7 +12,7 @@ import {
 
 const router = express.Router();
 
-router.get("/snacks/:roll", checkIfCommittee, checkIfOptedForSnacks);
+router.get("/snacks/:roll", checkIfOptedForSnacks);
 router.put("/snacks/:roll/true", checkIfCommittee, addToSnacksList);
 router.put("/snacks/:roll/false", checkIfCommittee, removeFromSnacksList);
 router.put("/snacks/:roll/update-status", checkIfCommittee, updateOptedForSnacks);

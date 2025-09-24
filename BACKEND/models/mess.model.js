@@ -6,6 +6,10 @@ const messSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  tookSnacksAt:{
+    type: Date,
+    required: false
+  }
 });
 
 const Mess = mongoose.model("Mess", messSchema);

@@ -12,6 +12,7 @@ import messMenuRoutes from "./routes/messmenu.route.js";
 import noticeRoutes from "./routes/notice.router.js";
 import cgpiRoutes from "./routes/cgpi.route.js";
 import messRoutes from "./routes/mess.route.js"
+import equipmentRoutes from "./routes/equipment.route.js";
 
 
 dotenv.config();
@@ -49,7 +50,7 @@ app.use("/api/v1/messmenu", messMenuRoutes);
 app.use("/api/v1/notice", noticeRoutes);
 app.use("/api/v1/cgpi", cgpiRoutes);
 app.use("/api/v1/mess", messRoutes);
-
+app.use("/api/v1/equipment", equipmentRoutes);
 
 const PORT = process.env.PORT || 3000;
 
