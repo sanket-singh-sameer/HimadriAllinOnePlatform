@@ -104,12 +104,10 @@ export default function Admin() {
     e.preventDefault();
     setLocalIsLoading(true);
     try {
-      // Create FormData to handle file upload
       const formData = new FormData();
       formData.append("title", noticeForm.title);
       formData.append("description", noticeForm.description);
 
-      // Only append media if it exists
       if (noticeForm.media) {
         formData.append("media", noticeForm.media);
       }
@@ -127,7 +125,6 @@ export default function Admin() {
       if (response.status === 200 || response.status === 201) {
         fetchAllNotices();
         setNoticeForm({ title: "", description: "", media: null });
-        // Clear the file input
         const fileInput = document.getElementById("media-upload");
         if (fileInput) fileInput.value = "";
         toast.success(response.data.message);
@@ -2070,13 +2067,11 @@ export default function Admin() {
                                   <tr className="hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100">
                                     <td className="px-8 py-6">
                                       <div className="flex items-center gap-6">
-                                        {/* Avatar */}
                                         <div className="w-14 h-14 bg-gradient-to-br from-gray-700 to-gray-900 rounded-full flex items-center justify-center text-white font-semibold text-xl shadow-md">
                                           {studentDetails.name?.charAt(0) ||
                                             "S"}
                                         </div>
 
-                                        {/* Details */}
                                         <div className="flex flex-col gap-1">
                                           <div className="text-lg font-semibold text-gray-900 leading-tight">
                                             {studentDetails.name || "N/A"}
