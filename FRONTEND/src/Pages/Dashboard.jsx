@@ -21,6 +21,7 @@ const Dashboard = () => {
   const [localIsLoading, setLocalIsLoading] = useState(false);
   const [outpassForm, setOutpassForm] = useState({
     name: user.name || "",
+    email: user.email || "",
     rollNumber: user.roll || "",
     semester: "",
     roomNumber: user.room || "",
@@ -2223,6 +2224,22 @@ const Dashboard = () => {
                                 placeholder="Enter your full name"
                               />
                             </div>
+                            <div>
+                              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2">
+                                Email
+                                <span className="text-red-500">*</span>
+                              </label>
+                              <input
+                                type="text"
+                                name="name"
+                                value={outpassForm.email}
+                                onChange={handleOutpassFormChange}
+                                required
+                                readOnly
+                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base bg-gray-50"
+                                placeholder="Enter your full name"
+                              />
+                            </div>
 
                             <div>
                               <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2">
@@ -2319,7 +2336,7 @@ const Dashboard = () => {
                                 onChange={handleOutpassFormChange}
                                 required
                                 className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
-                                placeholder="Enter destination (e.g., Home, Delhi, etc.)"
+                                placeholder="Enter destination (e.g., Market)"
                               />
                             </div>
 
@@ -2442,9 +2459,9 @@ const Dashboard = () => {
                               />
                             </svg>
                             <div>
-                              <h5 className="!text-sm sm:!text-base !font-bold !text-amber-900 mb-1">
+                              <h6 className="!text-sm sm:!text-base !font-bold !text-amber-900 mb-4">
                                 Important Guidelines
-                              </h5>
+                              </h6>
                               <ul className="!text-xs sm:!text-sm !text-amber-800 space-y-1 list-disc list-inside">
                                 <li>
                                   Ensure all contact numbers are accurate and
