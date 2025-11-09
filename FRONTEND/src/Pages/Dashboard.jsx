@@ -111,34 +111,53 @@ const Dashboard = () => {
     setLocalIsLoading(true);
 
     try {
-      console.log("Outpass Request:", outpassForm);
+      const outpassData = {
+        fullName: outpassForm.name,
+        email: outpassForm.email,
+        rollNumber: outpassForm.rollNumber,
+        semester: outpassForm.semester,
+        roomNumber: outpassForm.roomNumber,
+        placeOfVisit: outpassForm.placeOfVisit,
+        outDate: outpassForm.outDate,
+        outTime: outpassForm.outTime,
+        expectedReturnTime: outpassForm.expectedReturnTime,
+        studentContact: outpassForm.studentContact,
+        emergencyContact: outpassForm.emergencyContact,
+      };
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await axiosInstance.post(
+        API_PATHS.SUBMIT_OUTPASS,
+        outpassData
+      );
 
-      toast.success("Outpass request submitted successfully!");
+      if (response.status === 201) {
+        toast.success("Outpass request submitted successfully!");
 
-      // Reset form
-      setOutpassForm({
-        name: user.name || "",
-        rollNumber: user.roll || "",
-        semester: "",
-        roomNumber: user.room || "",
-        placeOfVisit: "",
-        purpose: "",
-        outDate: "",
-        outTime: "",
-        expectedReturnDate: "",
-        expectedReturnTime: "",
-        studentContact: user.phone || "",
-        parentContact: "",
-        parentName: "",
-        emergencyContact: "",
-      });
+        // Reset form
+        setOutpassForm({
+          name: user.name || "",
+          email: user.email || "",
+          rollNumber: user.roll || "",
+          semester: "",
+          roomNumber: user.room || "",
+          placeOfVisit: "",
+          purpose: "",
+          outDate: "",
+          outTime: "",
+          expectedReturnDate: "",
+          expectedReturnTime: "",
+          studentContact: user.phone || "",
+          parentContact: "",
+          parentName: "",
+          emergencyContact: "",
+        });
+      }
 
       setLocalIsLoading(false);
     } catch (error) {
       console.error("Error submitting outpass:", error);
-      toast.error("Failed to submit outpass request");
+      const errorMessage = error.response?.data?.message || "Failed to submit outpass request";
+      toast.error(errorMessage);
       setLocalIsLoading(false);
     }
   };

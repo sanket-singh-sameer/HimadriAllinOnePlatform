@@ -40,4 +40,10 @@ export const API_PATHS = {
   ADD_TO_SNACKS_LIST: (roll) => `/mess/snacks/${roll}/true`,
   REMOVE_FROM_SNACKS_LIST: (roll) => `/mess/snacks/${roll}/false`,
   UPDATE_SNACKS_STATUS: (roll) => `/mess/snacks/${roll}/update-status`,
+
+  // Outpass Management
+  SUBMIT_OUTPASS: "/id/outpass/submit",
+  GET_MY_OUTPASSES: "/id/outpass/my",
+  GET_ALL_OUTPASSES: "/id/outpass/all",
+  UPDATE_OUTPASS_STATUS: (id) => `/id/outpass/${id}/status`,
 };
