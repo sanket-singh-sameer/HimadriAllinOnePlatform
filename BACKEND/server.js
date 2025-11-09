@@ -14,6 +14,7 @@ import cgpiRoutes from "./routes/cgpi.route.js";
 import messRoutes from "./routes/mess.route.js"
 import equipmentRoutes from "./routes/equipment.route.js";
 import idRoutes from "./routes/id.route.js";
+import { startOutpassExpirationScheduler } from "./utils/outpassScheduler.js";
 
 dotenv.config();
 
@@ -64,5 +65,6 @@ if(process.env.NODE_ENV === "production"){
 
 app.listen(PORT, () => {
   connectDB();
+  startOutpassExpirationScheduler();
   console.log(`Server is running on port ${PORT}`);
 });

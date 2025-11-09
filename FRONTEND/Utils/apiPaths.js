@@ -46,4 +46,8 @@ export const API_PATHS = {
   GET_MY_OUTPASSES: "/id/outpass/my",
   GET_ALL_OUTPASSES: "/id/outpass/all",
   UPDATE_OUTPASS_STATUS: (id) => `/id/outpass/${id}/status`,
+
+  // Mess Attendance
+  MARK_MESS_ATTENDANCE: (roll) => `/id/mess-attendance/${roll}`,
+  EXPORT_MESS_ATTENDANCE: "/id/mess-attendance/export",
 };

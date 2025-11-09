@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import MessAttendence from "../models/messattendence.model.js";
 import Outpass from "../models/outpass.model.js";
+import ExcelJS from "exceljs";
 
 export const viewIDByRoll = async (req, res) => {
   let { roll } = req.params;
@@ -40,7 +41,7 @@ export const viewIDByRoll = async (req, res) => {
 
 export const markMessAttendence = async (req, res) => {
   let { roll } = req.params;
-  const { date, attendance } = req.body;
+  const { date } = req.body;
   
   try {
     roll = roll.toUpperCase();
@@ -48,33 +49,6 @@ export const markMessAttendence = async (req, res) => {
     
     if (!user) {
       return res.status(404).json({ message: "User not found" });
-    }
-
-    // Validate attendance data
-    if (!attendance || typeof attendance !== 'object') {
-      return res.status(400).json({ 
-        message: "Attendance data is required and must be an object with at least one meal (breakfast, lunch, or dinner)" 
-      });
-    }
-
-    const { breakfast, lunch, dinner } = attendance;
-
-    // At least one meal must be provided
-    if (breakfast === undefined && lunch === undefined && dinner === undefined) {
-      return res.status(400).json({ 
-        message: "At least one meal attendance (breakfast, lunch, or dinner) must be provided" 
-      });
-    }
-
-    // Validate the provided meal fields are boolean
-    if (breakfast !== undefined && typeof breakfast !== 'boolean') {
-      return res.status(400).json({ message: "breakfast must be a boolean value" });
-    }
-    if (lunch !== undefined && typeof lunch !== 'boolean') {
-      return res.status(400).json({ message: "lunch must be a boolean value" });
-    }
-    if (dinner !== undefined && typeof dinner !== 'boolean') {
-      return res.status(400).json({ message: "dinner must be a boolean value" });
     }
 
     // Use current date if not provided
@@ -90,65 +64,92 @@ export const markMessAttendence = async (req, res) => {
       attendanceDate.setHours(0, 0, 0, 0);
     }
 
+    // Determine which meal to mark based on current time
+    const currentTime = new Date();
+    const currentHour = currentTime.getHours();
+    
+    let attendance = {
+      breakfast: false,
+      lunch: false,
+      dinner: false
+    };
+    
+    let mealType = "";
+    
+    // 6 AM to 10 AM - Breakfast
+    if (currentHour >= 6 && currentHour < 10) {
+      attendance.breakfast = true;
+      mealType = "breakfast";
+    }
+    // 11 AM to 3 PM (15:00) - Lunch
+    else if (currentHour >= 11 && currentHour < 15) {
+      attendance.lunch = true;
+      mealType = "lunch";
+    }
+    // 6 PM (18:00) to 10 PM (22:00) - Dinner
+    else if (currentHour >= 18 && currentHour < 22) {
+      attendance.dinner = true;
+      mealType = "dinner";
+    }
+    else {
+      return res.status(400).json({ 
+        message: "Mess attendance can only be marked during meal times: Breakfast (6 AM - 10 AM), Lunch (11 AM - 3 PM), or Dinner (6 PM - 10 PM)" 
+      });
+    }
+
     // Check if attendance for this date already exists
     let messAttendance = await MessAttendence.findOne({ 
       user: user._id, 
       date: attendanceDate 
     });
 
-    const currentTime = new Date();
-
     if (messAttendance) {
-      // Update only the provided meal fields
-      if (breakfast !== undefined) {
-        messAttendance.attendence.breakfast.attended = breakfast;
-        if (breakfast) {
-          messAttendance.attendence.breakfast.markedAt = currentTime;
-        }
+      // Update only the meal for current time slot
+      if (attendance.breakfast) {
+        messAttendance.attendence.breakfast.attended = true;
+        messAttendance.attendence.breakfast.markedAt = currentTime;
       }
-      if (lunch !== undefined) {
-        messAttendance.attendence.lunch.attended = lunch;
-        if (lunch) {
-          messAttendance.attendence.lunch.markedAt = currentTime;
-        }
+      if (attendance.lunch) {
+        messAttendance.attendence.lunch.attended = true;
+        messAttendance.attendence.lunch.markedAt = currentTime;
       }
-      if (dinner !== undefined) {
-        messAttendance.attendence.dinner.attended = dinner;
-        if (dinner) {
-          messAttendance.attendence.dinner.markedAt = currentTime;
-        }
+      if (attendance.dinner) {
+        messAttendance.attendence.dinner.attended = true;
+        messAttendance.attendence.dinner.markedAt = currentTime;
       }
       await messAttendance.save();
 
       return res.status(200).json({
-        message: `Mess attendance updated for roll number ${roll} on ${attendanceDate.toDateString()}`,
+        message: `${mealType.charAt(0).toUpperCase() + mealType.slice(1)} attendance marked for ${roll} on ${attendanceDate.toDateString()}`,
         attendance: messAttendance,
+        markedMeal: mealType
       });
     } else {
-      // Create new attendance record with provided meals, default others to false
+      // Create new attendance record with the appropriate meal marked
       messAttendance = new MessAttendence({
         user: user._id,
         date: attendanceDate,
         attendence: {
           breakfast: {
-            attended: breakfast !== undefined ? breakfast : false,
-            markedAt: breakfast ? currentTime : undefined,
+            attended: attendance.breakfast,
+            markedAt: attendance.breakfast ? currentTime : undefined,
           },
           lunch: {
-            attended: lunch !== undefined ? lunch : false,
-            markedAt: lunch ? currentTime : undefined,
+            attended: attendance.lunch,
+            markedAt: attendance.lunch ? currentTime : undefined,
           },
           dinner: {
-            attended: dinner !== undefined ? dinner : false,
-            markedAt: dinner ? currentTime : undefined,
+            attended: attendance.dinner,
+            markedAt: attendance.dinner ? currentTime : undefined,
           },
         },
       });
       await messAttendance.save();
 
       return res.status(201).json({
-        message: `Mess attendance marked for roll number ${roll} on ${attendanceDate.toDateString()}`,
+        message: `${mealType.charAt(0).toUpperCase() + mealType.slice(1)} attendance marked for ${roll} on ${attendanceDate.toDateString()}`,
         attendance: messAttendance,
+        markedMeal: mealType
       });
     }
   } catch (error) {
@@ -263,6 +264,9 @@ export const getMyOutpasses = async (req, res) => {
   try {
     const userId = req.userId;
 
+    // Update expired outpasses before fetching
+    await Outpass.updateExpiredOutpasses();
+
     const outpasses = await Outpass.find({ user: userId })
       .sort({ createdAt: -1 })
       .lean();
@@ -280,6 +284,9 @@ export const getMyOutpasses = async (req, res) => {
 export const getAllOutpasses = async (req, res) => {
   try {
     const { status, startDate, endDate } = req.query;
+
+    // Update expired outpasses before fetching
+    await Outpass.updateExpiredOutpasses();
 
     let query = {};
 
@@ -331,6 +338,19 @@ export const updateOutpassStatus = async (req, res) => {
       return res.status(404).json({ message: "Outpass request not found" });
     }
 
+    // Check if outpass is expired
+    const now = new Date();
+    if (outpass.status === "pending") {
+      const twoHoursLater = new Date(outpass.createdAt.getTime() + 2 * 60 * 60 * 1000);
+      if (now >= twoHoursLater) {
+        outpass.status = "expired";
+        await outpass.save();
+        return res.status(400).json({ 
+          message: "This outpass request has expired (more than 2 hours old)" 
+        });
+      }
+    }
+
     if (outpass.status !== "pending") {
       return res.status(400).json({ 
         message: `Outpass request is already ${outpass.status}` 
@@ -356,6 +376,208 @@ export const updateOutpassStatus = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in updateOutpassStatus:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const exportMessAttendance = async (req, res) => {
+  try {
+    const { startDate, endDate, roll } = req.query;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({ 
+        message: "Start date and end date are required" 
+      });
+    }
+
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    if (start > end) {
+      return res.status(400).json({ 
+        message: "Start date cannot be after end date" 
+      });
+    }
+
+    // Build query for attendance records
+    let query = {
+      date: {
+        $gte: start,
+        $lte: end,
+      },
+    };
+
+    // If roll number is provided, filter by specific student
+    if (roll) {
+      const student = await User.findOne({ roll: roll.toUpperCase() });
+      if (!student) {
+        return res.status(404).json({ 
+          message: `Student with roll number ${roll} not found` 
+        });
+      }
+      query.user = student._id;
+    }
+
+    // Fetch attendance records
+    const attendanceRecords = await MessAttendence.find(query)
+      .populate("user", "name roll email room phone")
+      .sort({ date: 1, "user.roll": 1 })
+      .lean();
+
+    if (attendanceRecords.length === 0) {
+      const message = roll 
+        ? `No attendance records found for student ${roll} in the selected date range`
+        : "No attendance records found for the selected date range";
+      return res.status(404).json({ message });
+    }
+
+    // Create Excel workbook
+    const workbook = new ExcelJS.Workbook();
+    const sheetName = roll ? `Attendance - ${roll}` : "Mess Attendance - All Students";
+    const worksheet = workbook.addWorksheet(sheetName);
+
+    // Set up columns
+    worksheet.columns = [
+      { header: "Date", key: "date", width: 15 },
+      { header: "Roll Number", key: "roll", width: 15 },
+      { header: "Name", key: "name", width: 25 },
+      { header: "Room", key: "room", width: 10 },
+      { header: "Email", key: "email", width: 30 },
+      { header: "Phone", key: "phone", width: 15 },
+      { header: "Breakfast", key: "breakfast", width: 12 },
+      { header: "Breakfast Time", key: "breakfastTime", width: 18 },
+      { header: "Lunch", key: "lunch", width: 12 },
+      { header: "Lunch Time", key: "lunchTime", width: 18 },
+      { header: "Dinner", key: "dinner", width: 12 },
+      { header: "Dinner Time", key: "dinnerTime", width: 18 },
+    ];
+
+    // Style header row
+    worksheet.getRow(1).font = { bold: true, size: 12 };
+    worksheet.getRow(1).fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF1F2937" }, // Gray-900
+    };
+    worksheet.getRow(1).font = { bold: true, color: { argb: "FFFFFFFF" } };
+    worksheet.getRow(1).alignment = { vertical: "middle", horizontal: "center" };
+    worksheet.getRow(1).height = 25;
+
+    // Add data rows
+    attendanceRecords.forEach((record) => {
+      const row = {
+        date: new Date(record.date).toLocaleDateString("en-GB"),
+        roll: record.user?.roll || "N/A",
+        name: record.user?.name || "N/A",
+        room: record.user?.room || "N/A",
+        email: record.user?.email || "N/A",
+        phone: record.user?.phone || "N/A",
+        breakfast: record.attendence?.breakfast?.attended ? "✓" : "✗",
+        breakfastTime: record.attendence?.breakfast?.markedAt 
+          ? new Date(record.attendence.breakfast.markedAt).toLocaleTimeString("en-GB")
+          : "-",
+        lunch: record.attendence?.lunch?.attended ? "✓" : "✗",
+        lunchTime: record.attendence?.lunch?.markedAt 
+          ? new Date(record.attendence.lunch.markedAt).toLocaleTimeString("en-GB")
+          : "-",
+        dinner: record.attendence?.dinner?.attended ? "✓" : "✗",
+        dinnerTime: record.attendence?.dinner?.markedAt 
+          ? new Date(record.attendence.dinner.markedAt).toLocaleTimeString("en-GB")
+          : "-",
+      };
+      
+      const addedRow = worksheet.addRow(row);
+      
+      // Style attendance columns with colors
+      if (record.attendence?.breakfast?.attended) {
+        addedRow.getCell("breakfast").fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFD1FAE5" }, // Green-100
+        };
+        addedRow.getCell("breakfast").font = { color: { argb: "FF065F46" } }; // Green-800
+      } else {
+        addedRow.getCell("breakfast").fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFFEE2E2" }, // Red-100
+        };
+        addedRow.getCell("breakfast").font = { color: { argb: "FF991B1B" } }; // Red-800
+      }
+
+      if (record.attendence?.lunch?.attended) {
+        addedRow.getCell("lunch").fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFD1FAE5" },
+        };
+        addedRow.getCell("lunch").font = { color: { argb: "FF065F46" } };
+      } else {
+        addedRow.getCell("lunch").fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFFEE2E2" },
+        };
+        addedRow.getCell("lunch").font = { color: { argb: "FF991B1B" } };
+      }
+
+      if (record.attendence?.dinner?.attended) {
+        addedRow.getCell("dinner").fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFD1FAE5" },
+        };
+        addedRow.getCell("dinner").font = { color: { argb: "FF065F46" } };
+      } else {
+        addedRow.getCell("dinner").fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFFEE2E2" },
+        };
+        addedRow.getCell("dinner").font = { color: { argb: "FF991B1B" } };
+      }
+
+      // Center align attendance marks
+      addedRow.getCell("breakfast").alignment = { horizontal: "center", vertical: "middle" };
+      addedRow.getCell("lunch").alignment = { horizontal: "center", vertical: "middle" };
+      addedRow.getCell("dinner").alignment = { horizontal: "center", vertical: "middle" };
+    });
+
+    // Add borders to all cells
+    worksheet.eachRow({ includeEmpty: false }, (row) => {
+      row.eachCell((cell) => {
+        cell.border = {
+          top: { style: "thin", color: { argb: "FFD1D5DB" } },
+          left: { style: "thin", color: { argb: "FFD1D5DB" } },
+          bottom: { style: "thin", color: { argb: "FFD1D5DB" } },
+          right: { style: "thin", color: { argb: "FFD1D5DB" } },
+        };
+      });
+    });
+
+    // Generate Excel file
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    // Set headers for file download
+    const filename = roll 
+      ? `mess_attendance_${roll}_${startDate}_to_${endDate}.xlsx`
+      : `mess_attendance_all_students_${startDate}_to_${endDate}.xlsx`;
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${filename}`
+    );
+
+    res.send(buffer);
+  } catch (error) {
+    console.error("Error in exportMessAttendance:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

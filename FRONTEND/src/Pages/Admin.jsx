@@ -53,6 +53,11 @@ export default function Admin() {
   const [confirmActionType, setConfirmActionType] = useState(null);
   const [nfcScanning, setNfcScanning] = useState(false);
   const [nfcSupported, setNfcSupported] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportDateRange, setExportDateRange] = useState({
+    startDate: "",
+    endDate: "",
+  });
   const [noticeForm, setNoticeForm] = useState({
     title: "",
     description: "",
@@ -668,6 +673,33 @@ export default function Admin() {
     }
   };
 
+  const handleMarkMessAttendance = async (rollNumber) => {
+    if (!rollNumber) {
+      toast.error("Please scan a student first");
+      return;
+    }
+
+    setLocalIsLoading(true);
+    try {
+      const response = await axiosInstance.post(
+        API_PATHS.MARK_MESS_ATTENDANCE(rollNumber)
+      );
+      toast.success(response.data.message);
+      
+      // Show which meal was marked
+      const markedMeal = response.data.markedMeal;
+      if (markedMeal) {
+        toast.info(`${markedMeal.charAt(0).toUpperCase() + markedMeal.slice(1)} attendance marked!`);
+      }
+    } catch (error) {
+      console.error("Error marking mess attendance:", error);
+      const errorMessage = error.response?.data?.message || "Error marking mess attendance";
+      toast.error(errorMessage);
+    } finally {
+      setLocalIsLoading(false);
+    }
+  };
+
   const handleToggleSnacksStatus = async (rollNumber) => {
     setLocalIsLoading(true);
     try {
@@ -686,6 +718,71 @@ export default function Admin() {
     } catch (error) {
       console.error("Error toggling snacks status:", error);
       toast.error("Error updating snacks status");
+    } finally {
+      setLocalIsLoading(false);
+    }
+  };
+
+  const handleExportAttendance = async () => {
+    if (!exportDateRange.startDate || !exportDateRange.endDate) {
+      toast.error("Please select both start and end dates");
+      return;
+    }
+
+    const startDate = new Date(exportDateRange.startDate);
+    const endDate = new Date(exportDateRange.endDate);
+
+    if (startDate > endDate) {
+      toast.error("Start date cannot be after end date");
+      return;
+    }
+
+    setLocalIsLoading(true);
+    try {
+      // Build params object
+      const params = {
+        startDate: exportDateRange.startDate,
+        endDate: exportDateRange.endDate,
+      };
+
+      // If a student is searched, add their roll number
+      if (studentDetails && studentDetails.roll) {
+        params.roll = studentDetails.roll;
+      }
+
+      const response = await axiosInstance.get(
+        API_PATHS.EXPORT_MESS_ATTENDANCE,
+        {
+          params,
+          responseType: 'blob', // Important for file download
+        }
+      );
+
+      // Create a blob URL and trigger download
+      const blob = new Blob([response.data], { 
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // Generate filename based on whether specific student or all students
+      const filename = studentDetails && studentDetails.roll
+        ? `mess_attendance_${studentDetails.roll}_${exportDateRange.startDate}_to_${exportDateRange.endDate}.xlsx`
+        : `mess_attendance_all_students_${exportDateRange.startDate}_to_${exportDateRange.endDate}.xlsx`;
+      
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Attendance exported successfully!");
+      setShowExportModal(false);
+      setExportDateRange({ startDate: "", endDate: "" });
+    } catch (error) {
+      console.error("Error exporting attendance:", error);
+      toast.error(error.response?.data?.message || "Failed to export attendance");
     } finally {
       setLocalIsLoading(false);
     }
@@ -3478,11 +3575,14 @@ export default function Admin() {
                                       <span
                                         className={`inline-flex items-center px-2.5 py-1 rounded-full !text-xs !font-medium ${
                                           outpass.status === "pending"
-                                            ? "bg-gray-100 text-gray-700 border border-gray-300"
+                                            ? "bg-yellow-100 text-yellow-700 border border-yellow-300"
                                             : outpass.status === "approved"
-                                            ? "bg-gray-900 text-white border border-gray-900"
+                                            ? "bg-green-100 text-green-700 border border-green-300"
+                                            : outpass.status === "rejected"
+                                            ? "bg-red-100 text-red-700 border border-red-300"
+                                            : outpass.status === "expired"
+                                            ? "bg-gray-100 text-gray-700 border border-gray-300"
                                             : "bg-gray-200 text-gray-800 border border-gray-400"
-
                                         }`}
                                       >
                                         {outpass.status.charAt(0).toUpperCase() + outpass.status.slice(1)}
@@ -3890,12 +3990,14 @@ export default function Admin() {
                                     <span
                                       className={`inline-flex items-center px-3 py-1 rounded !text-xs !font-medium ${
                                         selectedOutpass.status === "pending"
+                                          ? "bg-yellow-100 text-yellow-700 border border-yellow-300"
+                                          : selectedOutpass.status === "approved"
+                                          ? "bg-green-100 text-green-700 border border-green-300"
+                                          : selectedOutpass.status === "rejected"
+                                          ? "bg-red-100 text-red-700 border border-red-300"
+                                          : selectedOutpass.status === "expired"
                                           ? "bg-gray-100 text-gray-700 border border-gray-300"
-                                          : selectedOutpass.status ===
-                                            "approved"
-                                          ? "bg-gray-900 text-white border border-gray-900"
                                           : "bg-gray-200 text-gray-800 border border-gray-400"
-
                                       }`}
                                     >
                                       {selectedOutpass.status.charAt(0).toUpperCase() + selectedOutpass.status.slice(1)}
@@ -3984,16 +4086,7 @@ export default function Admin() {
                         </div>
 
                         <button
-                          onClick={() => {
-                            const today = new Date().toLocaleDateString(
-                              "en-GB"
-                            );
-                            console.log(
-                              "Exporting today's entry log for:",
-                              today
-                            );
-                            toast.success("Exporting attendance log...");
-                          }}
+                          onClick={() => setShowExportModal(true)}
                           className="group relative overflow-hidden flex items-center gap-3 px-6 py-3 bg-white hover:bg-gray-50 border-2 border-gray-300 hover:border-gray-900 text-gray-900 font-bold rounded-xl transition-all duration-300 shadow-sm hover:shadow-lg hover:scale-[1.02] active:scale-95 cursor-pointer"
                         >
                           <div className="absolute inset-0 bg-gradient-to-br from-gray-100/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -4251,7 +4344,10 @@ export default function Admin() {
                                 </div>
 
                                 <div className="!grid !grid-cols-2 !gap-2 sm:!gap-3">
-                                  <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2 sm:!space-y-2.5 !px-3 sm:!px-4 !py-4 sm:!py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
+                                  <button 
+                                    onClick={() => handleMarkMessAttendance(studentDetails?.roll)}
+                                    disabled={!studentDetails || localIsLoading}
+                                    className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2 sm:!space-y-2.5 !px-3 sm:!px-4 !py-4 sm:!py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95 disabled:!opacity-50 disabled:!cursor-not-allowed disabled:hover:!scale-100">
                                     <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 group-hover/btn:!opacity-100 !transition-opacity !duration-300"></div>
                                     <div className="!relative !w-10 !h-10 sm:!w-11 sm:!h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
                                       <svg
@@ -4269,7 +4365,7 @@ export default function Admin() {
                                       </svg>
                                     </div>
                                     <span className="!relative !text-xs sm:!text-sm !font-bold !tracking-wide">
-                                      Mess In
+                                      {localIsLoading ? "Processing..." : "Mess In"}
                                     </span>
                                   </button>
 
@@ -4923,6 +5019,194 @@ export default function Admin() {
           </div>
         </div>
       )}
+
+      {/* Export Attendance Modal */}
+      {showExportModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-bold text-gray-900">
+                Export Mess Attendance
+              </h3>
+              <button
+                onClick={() => {
+                  setShowExportModal(false);
+                  setExportDateRange({ startDate: "", endDate: "" });
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {studentDetails && studentDetails.roll ? (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <svg
+                      className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                    <div>
+                      <p className="text-sm font-semibold text-green-800 mb-1">
+                        Exporting for: {studentDetails.name}
+                      </p>
+                      <p className="text-xs text-green-700">
+                        Roll: {studentDetails.roll} • Room: {studentDetails.room || "N/A"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <svg
+                      className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                      />
+                    </svg>
+                    <div>
+                      <p className="text-sm font-semibold text-blue-800 mb-1">
+                        Exporting for: All Students
+                      </p>
+                      <p className="text-xs text-blue-700">
+                        Complete attendance records for all students in the selected date range.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  value={exportDateRange.startDate}
+                  onChange={(e) =>
+                    setExportDateRange((prev) => ({
+                      ...prev,
+                      startDate: e.target.value,
+                    }))
+                  }
+                  max={new Date().toISOString().split("T")[0]}
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  value={exportDateRange.endDate}
+                  onChange={(e) =>
+                    setExportDateRange((prev) => ({
+                      ...prev,
+                      endDate: e.target.value,
+                    }))
+                  }
+                  max={new Date().toISOString().split("T")[0]}
+                  min={exportDateRange.startDate}
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <button
+                onClick={() => {
+                  setShowExportModal(false);
+                  setExportDateRange({ startDate: "", endDate: "" });
+                }}
+                className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleExportAttendance}
+                disabled={localIsLoading || !exportDateRange.startDate || !exportDateRange.endDate}
+                className="flex-1 px-6 py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {localIsLoading ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    <span>Exporting...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                    <span>Export</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer></Footer>
     </>
   );

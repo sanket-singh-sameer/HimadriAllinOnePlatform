@@ -53,7 +53,7 @@ const outpassSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "approved", "rejected"],
+      enum: ["pending", "approved", "rejected", "expired"],
       default: "pending",
     },
     approvedBy: {
@@ -82,6 +82,86 @@ const outpassSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Pre-save middleware to check and update expired status
+outpassSchema.pre("save", function (next) {
+  if (this.isNew) {
+    // For new outpass requests, don't set expired on creation
+    return next();
+  }
+  
+  const now = new Date();
+  
+  // Check if pending request has expired (2 hours after creation)
+  if (this.status === "pending") {
+    const createdTime = this.createdAt;
+    const twoHoursLater = new Date(createdTime.getTime() + 2 * 60 * 60 * 1000);
+    
+    if (now >= twoHoursLater) {
+      this.status = "expired";
+    }
+  }
+  
+  // Check if approved request has expired (16 hours after approval)
+  if (this.status === "approved" && this.approvedAt) {
+    const approvedTime = this.approvedAt;
+    const sixteenHoursLater = new Date(approvedTime.getTime() + 16 * 60 * 60 * 1000);
+    
+    if (now >= sixteenHoursLater) {
+      this.status = "expired";
+    }
+  }
+  
+  next();
+});
+
+// Static method to check and update expired outpasses
+outpassSchema.statics.updateExpiredOutpasses = async function () {
+  const now = new Date();
+  
+  // Expire pending requests that are older than 2 hours
+  const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
+  await this.updateMany(
+    {
+      status: "pending",
+      createdAt: { $lte: twoHoursAgo },
+    },
+    {
+      $set: { status: "expired" },
+    }
+  );
+  
+  // Expire approved requests that are older than 16 hours from approval time
+  const sixteenHoursAgo = new Date(now.getTime() - 16 * 60 * 60 * 1000);
+  await this.updateMany(
+    {
+      status: "approved",
+      approvedAt: { $lte: sixteenHoursAgo },
+    },
+    {
+      $set: { status: "expired" },
+    }
+  );
+};
+
+// Virtual to check if outpass is expired
+outpassSchema.virtual("isExpired").get(function () {
+  if (this.status === "expired") return true;
+  
+  const now = new Date();
+  
+  if (this.status === "pending") {
+    const twoHoursLater = new Date(this.createdAt.getTime() + 2 * 60 * 60 * 1000);
+    return now >= twoHoursLater;
+  }
+  
+  if (this.status === "approved" && this.approvedAt) {
+    const sixteenHoursLater = new Date(this.approvedAt.getTime() + 16 * 60 * 60 * 1000);
+    return now >= sixteenHoursLater;
+  }
+  
+  return false;
+});
 
 const Outpass = mongoose.model("Outpass", outpassSchema);
 
