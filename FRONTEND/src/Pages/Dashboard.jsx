@@ -2119,77 +2119,141 @@ const Dashboard = () => {
                   )}
 
                   {activeFeature === "mess" && (
-                    <div className="w-full bg-white rounded-lg sm:rounded-xl lg:rounded-2xl xl:rounded-3xl shadow-md border border-gray-100 p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 max-w-4xl mx-auto">
-                      <h3 className="!text-xl sm:!text-2xl lg:!text-3xl xl:!text-4xl !font-semibold text-gray-900 text-center">
-                        Mess Menu
-                      </h3>
-                      <p className="!text-center !text-gray-900 mt-2 !text-base sm:!text-lg lg:!text-xl !opacity-100 uppercase !italic">
-                        [{todaysMenu ? todaysMenu?.day : "Not Available"}]
-                      </p>
-
-                      <div className="mt-4 sm:mt-6 lg:mt-8 xl:mt-10 divide-y divide-gray-200">
-                        <div className="py-4 sm:py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                          <p className="!text-base sm:!text-lg !font-semibold !text-gray-900 mb-2 sm:mb-0">
-                            Breakfast
-                          </p>
-                          <span className="text-gray-600 text-sm sm:text-base max-w-xs leading-relaxed !text-left sm:!text-right">
-                            {todaysMenu?.breakfast || "N/A"}
-                          </span>
-                        </div>
-
-                        <div className="py-4 sm:py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                          <p className="!text-base sm:!text-lg !font-semibold !text-gray-900 mb-2 sm:mb-0">
-                            Lunch
-                          </p>
-                          <span className="text-gray-600 text-sm sm:text-base max-w-xs leading-relaxed !text-left sm:!text-right">
-                            {todaysMenu?.lunch || "N/A"}
-                          </span>
-                        </div>
-
-                        <div className="py-4 sm:py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                          <p className="!text-base sm:!text-lg !font-semibold !text-gray-900 mb-2 sm:mb-0">
-                            Snacks
-                          </p>
-                          <span className="text-gray-600 text-sm sm:text-base max-w-xs !text-left sm:!text-right leading-relaxed">
-                            {todaysMenu?.snacks || "N/A"}
-                          </span>
-                        </div>
-
-                        <div className="py-4 sm:py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                          <p className="!text-base sm:!text-lg !font-semibold !text-gray-900 mb-2 sm:mb-0">
-                            Dinner
-                          </p>
-                          <span className="text-gray-600 text-sm sm:text-base max-w-xs !text-left sm:!text-right leading-relaxed">
-                            {todaysMenu?.dinner || "N/A"}
-                          </span>
+                    <div className="w-full space-y-6 max-w-6xl mx-auto">
+                      {/* Header Section */}
+                      <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl shadow-2xl border-2 border-gray-700 p-8 sm:p-10">
+                        <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+                          <div className="text-center lg:text-left">
+                            <h2 className="!text-3xl sm:!text-4xl lg:!text-5xl !font-extrabold !text-white !mb-3">
+                              Today's Mess Menu
+                            </h2>
+                            <p className="!text-base sm:!text-lg !text-gray-300 !font-medium">
+                              Daily meal schedule for hostel residents
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="h-16 w-1 bg-gray-600 hidden lg:block"></div>
+                            <div className="bg-white rounded-xl px-8 py-4 shadow-lg border-2 border-gray-200">
+                              <p className="!text-xs !font-bold !text-gray-500 uppercase tracking-widest !mb-1">
+                                Current Day
+                              </p>
+                              <p className="!text-2xl sm:!text-3xl !font-black !text-gray-900">
+                                {todaysMenu?.day || "N/A"}
+                              </p>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
-                      <div className="mt-6 sm:mt-8 lg:mt-10 text-center">
-                        <button
-                          className="w-full sm:w-auto cursor-pointer !bg-gray-900 !text-white hover:!text-white hover:!bg-gray-700 px-4 sm:px-6 md:px-8 lg:px-10 py-3 sm:py-4 rounded-xl transition-all duration-300 !font-bold tracking-wide border-2 border-gray-900 hover:border-white flex items-center justify-center gap-2 sm:gap-3 mx-auto min-w-0 max-w-xs sm:max-w-sm md:max-w-md"
-                          onClick={openImage}
-                        >
-                          <svg
-                            className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.168 18.477 18.582 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                            />
-                          </svg>
-                          <span className="!text-sm sm:!text-base lg:!text-lg truncate">
-                            View Complete Menu
-                          </span>
-                        </button>
+                      {/* Mess Menu Table */}
+                      <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 overflow-hidden">
+                        {/* Desktop Table View */}
+                        <div className="hidden md:block overflow-x-auto">
+                          <table className="w-full">
+                            <thead>
+                              <tr className="bg-gray-900">
+                                <th className="px-6 py-4 text-left !text-sm !font-bold !text-white uppercase tracking-wider w-1/4 border-r border-gray-700">
+                                  Meal Time
+                                </th>
+                                <th className="px-6 py-4 text-left !text-sm !font-bold !text-white uppercase tracking-wider">
+                                  Menu Items
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                              <tr className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-5 !text-base !font-bold !text-gray-900 bg-gray-50 border-r border-gray-200">
+                                  Breakfast
+                                </td>
+                                <td className="px-6 py-5 !text-base !text-gray-700 leading-relaxed">
+                                  {todaysMenu?.breakfast || "N/A"}
+                                </td>
+                              </tr>
+                              <tr className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-5 !text-base !font-bold !text-gray-900 bg-gray-50 border-r border-gray-200">
+                                  Lunch
+                                </td>
+                                <td className="px-6 py-5 !text-base !text-gray-700 leading-relaxed">
+                                  {todaysMenu?.lunch || "N/A"}
+                                </td>
+                              </tr>
+                              <tr className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-5 !text-base !font-bold !text-gray-900 bg-gray-50 border-r border-gray-200">
+                                  Snacks
+                                </td>
+                                <td className="px-6 py-5 !text-base !text-gray-700 leading-relaxed">
+                                  {todaysMenu?.snacks || "N/A"}
+                                </td>
+                              </tr>
+                              <tr className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-5 !text-base !font-bold !text-gray-900 bg-gray-50 border-r border-gray-200">
+                                  Dinner
+                                </td>
+                                <td className="px-6 py-5 !text-base !text-gray-700 leading-relaxed">
+                                  {todaysMenu?.dinner || "N/A"}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
 
-                        <p className="!text-xs sm:!text-sm !text-gray-500 mt-3 sm:mt-4 !font-medium px-4 sm:px-0">
-                          Access weekly menu!
+                        {/* Mobile Card View */}
+                        <div className="md:hidden divide-y divide-gray-200">
+                          <div className="p-5 bg-gray-50">
+                            <div className="flex justify-between items-start mb-3">
+                              <h3 className="!text-lg !font-bold !text-gray-900">
+                                Breakfast
+                              </h3>
+                            </div>
+                            <p className="!text-sm !text-gray-700 leading-relaxed">
+                              {todaysMenu?.breakfast || "N/A"}
+                            </p>
+                          </div>
+
+                          <div className="p-5">
+                            <div className="flex justify-between items-start mb-3">
+                              <h3 className="!text-lg !font-bold !text-gray-900">
+                                Lunch
+                              </h3>
+                            </div>
+                            <p className="!text-sm !text-gray-700 leading-relaxed">
+                              {todaysMenu?.lunch || "N/A"}
+                            </p>
+                          </div>
+
+                          <div className="p-5 bg-gray-50">
+                            <div className="flex justify-between items-start mb-3">
+                              <h3 className="!text-lg !font-bold !text-gray-900">
+                                Snacks
+                              </h3>
+                            </div>
+                            <p className="!text-sm !text-gray-700 leading-relaxed">
+                              {todaysMenu?.snacks || "N/A"}
+                            </p>
+                          </div>
+
+                          <div className="p-5">
+                            <div className="flex justify-between items-start mb-3">
+                              <h3 className="!text-lg !font-bold !text-gray-900">
+                                Dinner
+                              </h3>
+                            </div>
+                            <p className="!text-sm !text-gray-700 leading-relaxed">
+                              {todaysMenu?.dinner || "N/A"}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Info Footer */}
+                      <div className="bg-gray-50 rounded-xl border-2 border-gray-200 p-5 sm:p-6">
+                        <p className="!text-sm !font-semibold !text-gray-900 mb-2">
+                          Important Information
+                        </p>
+                        <p className="!text-xs sm:!text-sm !text-gray-600 leading-relaxed">
+                          The menu is subject to change based on availability.
+                          For any dietary concerns or special requests, please
+                          contact the mess committee.
                         </p>
                       </div>
                     </div>
@@ -2208,10 +2272,10 @@ const Dashboard = () => {
                         onSubmit={handleSubmitOutpass}
                         className="space-y-5 sm:space-y-6 lg:space-y-8"
                       >
-                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:p-6 border border-gray-200">
+                        <div className="bg-gray-50 rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:p-6 border border-gray-200">
                           <h6 className="!text-base sm:!text-lg lg:!text-xl !font-bold !text-gray-900 mb-4 sm:mb-5 flex items-center gap-2">
                             <svg
-                              className="w-5 h-5 text-blue-600"
+                              className="w-5 h-5 text-gray-900"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -2230,7 +2294,7 @@ const Dashboard = () => {
                             <div>
                               <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2">
                                 Full Name{" "}
-                                <span className="text-red-500">*</span>
+                                <span className="text-gray-900">*</span>
                               </label>
                               <input
                                 type="text"
@@ -2239,14 +2303,14 @@ const Dashboard = () => {
                                 onChange={handleOutpassFormChange}
                                 required
                                 readOnly
-                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base bg-gray-50"
+                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base bg-gray-50"
                                 placeholder="Enter your full name"
                               />
                             </div>
                             <div>
                               <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2">
                                 Email
-                                <span className="text-red-500">*</span>
+                                <span className="text-gray-900">*</span>
                               </label>
                               <input
                                 type="text"
@@ -2255,7 +2319,7 @@ const Dashboard = () => {
                                 onChange={handleOutpassFormChange}
                                 required
                                 readOnly
-                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base bg-gray-50"
+                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base bg-gray-50"
                                 placeholder="Enter your full name"
                               />
                             </div>
@@ -2263,7 +2327,7 @@ const Dashboard = () => {
                             <div>
                               <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2">
                                 Roll Number{" "}
-                                <span className="text-red-500">*</span>
+                                <span className="text-gray-900">*</span>
                               </label>
                               <input
                                 type="text"
@@ -2272,21 +2336,22 @@ const Dashboard = () => {
                                 onChange={handleOutpassFormChange}
                                 required
                                 readOnly
-                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base bg-gray-50"
+                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base bg-gray-50"
                                 placeholder="Enter your roll number"
                               />
                             </div>
 
                             <div>
                               <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2">
-                                Semester <span className="text-red-500">*</span>
+                                Semester{" "}
+                                <span className="text-gray-900">*</span>
                               </label>
                               <select
                                 name="semester"
                                 value={outpassForm.semester}
                                 onChange={handleOutpassFormChange}
                                 required
-                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
+                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
                               >
                                 <option value="">Select Semester</option>
                                 <option value="1">1st Semester</option>
@@ -2303,7 +2368,7 @@ const Dashboard = () => {
                             <div>
                               <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2">
                                 Room Number{" "}
-                                <span className="text-red-500">*</span>
+                                <span className="text-gray-900">*</span>
                               </label>
                               <input
                                 type="text"
@@ -2311,17 +2376,17 @@ const Dashboard = () => {
                                 value={outpassForm.roomNumber}
                                 onChange={handleOutpassFormChange}
                                 required
-                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
+                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
                                 placeholder="Enter room number"
                               />
                             </div>
                           </div>
                         </div>
 
-                        <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:p-6 border border-purple-200">
+                        <div className="bg-gray-50 rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:p-6 border border-gray-200">
                           <h6 className="!text-base sm:!text-lg lg:!text-xl !font-bold !text-gray-900 mb-4 sm:mb-5 flex items-center gap-2">
                             <svg
-                              className="w-5 h-5 text-purple-600"
+                              className="w-5 h-5 text-gray-900"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -2346,7 +2411,7 @@ const Dashboard = () => {
                             <div className="md:col-span-2">
                               <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2">
                                 Place of Visit{" "}
-                                <span className="text-red-500">*</span>
+                                <span className="text-gray-900">*</span>
                               </label>
                               <input
                                 type="text"
@@ -2354,14 +2419,15 @@ const Dashboard = () => {
                                 value={outpassForm.placeOfVisit}
                                 onChange={handleOutpassFormChange}
                                 required
-                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
+                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
                                 placeholder="Enter destination (e.g., Market)"
                               />
                             </div>
 
                             <div>
                               <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2">
-                                Out Date <span className="text-red-500">*</span>
+                                Out Date{" "}
+                                <span className="text-gray-900">*</span>
                               </label>
                               <input
                                 type="date"
@@ -2370,13 +2436,14 @@ const Dashboard = () => {
                                 onChange={handleOutpassFormChange}
                                 required
                                 min={new Date().toISOString().split("T")[0]}
-                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
+                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
                               />
                             </div>
 
                             <div>
                               <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2">
-                                Out Time <span className="text-red-500">*</span>
+                                Out Time{" "}
+                                <span className="text-gray-900">*</span>
                               </label>
                               <input
                                 type="time"
@@ -2384,14 +2451,14 @@ const Dashboard = () => {
                                 value={outpassForm.outTime}
                                 onChange={handleOutpassFormChange}
                                 required
-                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
+                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
                               />
                             </div>
 
                             <div>
                               <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2">
                                 Expected Return Time{" "}
-                                <span className="text-red-500">*</span>
+                                <span className="text-gray-900">*</span>
                               </label>
                               <input
                                 type="time"
@@ -2399,16 +2466,16 @@ const Dashboard = () => {
                                 value={outpassForm.expectedReturnTime}
                                 onChange={handleOutpassFormChange}
                                 required
-                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
+                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
                               />
                             </div>
                           </div>
                         </div>
 
-                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:p-6 border border-green-200">
+                        <div className="bg-gray-50 rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:p-6 border border-gray-200">
                           <h6 className="!text-base sm:!text-lg lg:!text-xl !font-bold !text-gray-900 mb-4 sm:mb-5 flex items-center gap-2">
                             <svg
-                              className="w-5 h-5 text-green-600"
+                              className="w-5 h-5 text-gray-900"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -2427,7 +2494,7 @@ const Dashboard = () => {
                             <div>
                               <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2">
                                 Student Contact Number{" "}
-                                <span className="text-red-500">*</span>
+                                <span className="text-gray-900">*</span>
                               </label>
                               <input
                                 type="tel"
@@ -2437,7 +2504,7 @@ const Dashboard = () => {
                                 required
                                 pattern="[0-9]{10}"
                                 maxLength="10"
-                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
+                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
                                 placeholder="Enter 10-digit mobile number"
                               />
                             </div>
@@ -2445,7 +2512,7 @@ const Dashboard = () => {
                             <div>
                               <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2">
                                 Parent's/Emergency Contact Number{" "}
-                                <span className="text-red-500">*</span>
+                                <span className="text-gray-900">*</span>
                               </label>
                               <input
                                 type="tel"
@@ -2455,15 +2522,12 @@ const Dashboard = () => {
                                 required
                                 pattern="[0-9]{10}"
                                 maxLength="10"
-                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
+                                className="w-full border-2 border-gray-300 rounded-lg lg:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
                                 placeholder="Enter emergency contact number"
                               />
                             </div>
                           </div>
                         </div>
-
-                        
-                            
 
                         <div className="pt-2 sm:pt-4">
                           <button

@@ -860,7 +860,6 @@ export default function Admin() {
       <div className="min-h-screen flex bg-gradient-to-br from-[#f8f8f8] to-[#eaeaea]">
         <main className="flex-1 flex flex-col">
           <nav className="sticky top-0 z-20 flex justify-between items-center px-4 sm:px-8 lg:px-16 py-4 sm:py-6 lg:py-8 backdrop-blur-sm bg-white/90 border-b border-gray-200/50 w-full shadow-sm">
-            {/* Logo and Brand */}
             <div className="flex items-center space-x-3 sm:space-x-6">
               <div className="relative group cursor-pointer">
                 <div className="flex items-center space-x-1">
@@ -1761,61 +1760,260 @@ export default function Admin() {
 
                 <div className="lg:col-span-3 bg-gray-50 rounded-2xl border border-gray-100 p-3 sm:p-4 md:p-5 lg:p-6 shadow-inner">
                   {activeFeature === "statistics" && (
-                    <div className="w-full bg-white rounded-3xl shadow-lg border border-gray-100 p-4 sm:p-6 md:p-8 lg:p-10 max-w-5xl mx-auto">
-                      <h3 className="!text-3xl sm:!text-4xl !font-semibold text-gray-900 text-center mb-8 sm:mb-12">
-                        Statistics
-                      </h3>
-
-                      <div className="bg-gray-50 rounded-2xl border border-gray-200 p-6 sm:p-10 shadow-sm transition-all duration-300 text-center mb-8 sm:mb-10">
-                        <h3 className="!text-lg sm:!text-xl font-semibold text-gray-800 mb-4 sm:mb-6 text-center">
-                          Total Students
+                    <div className="!w-full !bg-white !rounded-3xl !shadow-lg !border !border-gray-200 !p-6 sm:!p-8 md:!p-10 !max-w-6xl !mx-auto !space-y-6">
+                      <div className="!text-center !pb-6 !border-b-2 !border-gray-900">
+                        <h3 className="!text-3xl sm:!text-4xl !font-black !text-gray-900 !tracking-tight">
+                          Statistics Dashboard
                         </h3>
-                        <p className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
-                          {websiteStats?.totalStudents}
+                        <p className="!text-sm !text-gray-500 !font-medium !mt-2">
+                          System Overview & Analytics
                         </p>
                       </div>
 
-                      <div className="bg-gray-50 rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-sm">
-                        <h3 className="!text-lg sm:!text-xl font-semibold text-gray-800 mb-4 sm:mb-6 text-center">
-                          Complaints Overview
-                        </h3>
+                      <div className="!bg-white !border-2 !border-gray-200 !rounded-2xl !overflow-hidden !shadow-sm">
+                        <div className="!bg-gray-900 !px-6 !py-4">
+                          <h6 className="!text-lg !font-bold !text-white !uppercase !tracking-wide">
+                            System Overview
+                          </h6>
+                        </div>
+                        <div className="!overflow-x-auto">
+                          <table className="!w-full">
+                            <thead className="!bg-gray-50 !border-b-2 !border-gray-200">
+                              <tr>
+                                <th className="!px-6 !py-4 !text-left !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider">
+                                  Metric
+                                </th>
+                                <th className="!px-6 !py-4 !text-right !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider">
+                                  Count
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody className="!divide-y !divide-gray-200">
+                              <tr className="hover:!bg-gray-50 !transition-colors">
+                                <td className="!px-6 !py-4">
+                                  <div className="!flex !items-center !gap-3">
+                                    <div className="!w-10 !h-10 !bg-gray-900 !rounded-lg !flex !items-center !justify-center !flex-shrink-0">
+                                      <svg
+                                        className="!w-5 !h-5 !text-white"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <span className="!text-sm !font-semibold !text-gray-900">
+                                      Total Students
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="!px-6 !py-4 !text-right">
+                                  <span className="!text-2xl !font-black !text-gray-900">
+                                    {websiteStats?.totalStudents || 0}
+                                  </span>
+                                </td>
+                              </tr>
+                              <tr className="hover:!bg-gray-50 !transition-colors">
+                                <td className="!px-6 !py-4">
+                                  <div className="!flex !items-center !gap-3">
+                                    <div className="!w-10 !h-10 !bg-gray-900 !rounded-lg !flex !items-center !justify-center !flex-shrink-0">
+                                      <svg
+                                        className="!w-5 !h-5 !text-white"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <span className="!text-sm !font-semibold !text-gray-900">
+                                      Total Complaints
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="!px-6 !py-4 !text-right">
+                                  <span className="!text-2xl !font-black !text-gray-900">
+                                    {websiteStats?.totalComplaints || 0}
+                                  </span>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-200">
-                          <div className="p-4 sm:p-6 text-center">
-                            <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1 sm:mb-2">
-                              Total
-                            </p>
-                            <p className="text-2xl sm:text-3xl font-bold text-gray-900">
-                              {websiteStats?.totalComplaints}
-                            </p>
-                          </div>
-
-                          <div className="p-4 sm:p-6 text-center">
-                            <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1 sm:mb-2">
-                              Resolved
-                            </p>
-                            <p className="text-2xl sm:text-3xl font-bold text-gray-900">
-                              {websiteStats?.resolvedComplaints}
-                            </p>
-                          </div>
-
-                          <div className="p-4 sm:p-6 text-center">
-                            <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1 sm:mb-2">
-                              Pending
-                            </p>
-                            <p className="text-2xl sm:text-3xl font-bold text-gray-900">
-                              {websiteStats?.pendingComplaints}
-                            </p>
-                          </div>
-
-                          <div className="p-4 sm:p-6 text-center">
-                            <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1 sm:mb-2">
-                              Rejected
-                            </p>
-                            <p className="text-2xl sm:text-3xl font-bold text-gray-900">
-                              {websiteStats?.rejectedComplaints}
-                            </p>
-                          </div>
+                      <div className="!bg-white !border-2 !border-gray-200 !rounded-2xl !overflow-hidden !shadow-sm">
+                        <div className="!bg-gray-900 !px-6 !py-4">
+                          <h6 className="!text-lg !font-bold !text-white !uppercase !tracking-wide">
+                            Complaint Status Breakdown
+                          </h6>
+                        </div>
+                        <div className="!overflow-x-auto">
+                          <table className="!w-full">
+                            <thead className="!bg-gray-50 !border-b-2 !border-gray-200">
+                              <tr>
+                                <th className="!px-6 !py-4 !text-left !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider">
+                                  Status
+                                </th>
+                                <th className="!px-6 !py-4 !text-right !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider">
+                                  Count
+                                </th>
+                                <th className="!px-6 !py-4 !text-right !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider">
+                                  Percentage
+                                </th>
+                                <th className="!px-6 !py-4 !text-left !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider">
+                                  Progress
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody className="!divide-y !divide-gray-200">
+                              <tr className="hover:!bg-gray-50 !transition-colors">
+                                <td className="!px-6 !py-4">
+                                  <div className="!flex !items-center !gap-3">
+                                    <div className="!w-3 !h-3 !bg-gray-900 !rounded-full"></div>
+                                    <span className="!text-sm !font-semibold !text-gray-900">
+                                      Resolved
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="!px-6 !py-4 !text-right">
+                                  <span className="!text-2xl !font-black !text-gray-900">
+                                    {websiteStats?.resolvedComplaints || 0}
+                                  </span>
+                                </td>
+                                <td className="!px-6 !py-4 !text-right">
+                                  <span className="!text-lg !font-bold !text-gray-700">
+                                    {websiteStats?.totalComplaints
+                                      ? Math.round(
+                                          (websiteStats.resolvedComplaints /
+                                            websiteStats.totalComplaints) *
+                                            100
+                                        )
+                                      : 0}
+                                    %
+                                  </span>
+                                </td>
+                                <td className="!px-6 !py-4">
+                                  <div className="!w-full !max-w-xs !bg-gray-200 !rounded-full !h-3">
+                                    <div
+                                      className="!bg-gray-900 !h-3 !rounded-full !transition-all !duration-500"
+                                      style={{
+                                        width: `${
+                                          websiteStats?.totalComplaints
+                                            ? Math.round(
+                                                (websiteStats.resolvedComplaints /
+                                                  websiteStats.totalComplaints) *
+                                                  100
+                                              )
+                                            : 0
+                                        }%`,
+                                      }}
+                                    ></div>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr className="hover:!bg-gray-50 !transition-colors">
+                                <td className="!px-6 !py-4">
+                                  <div className="!flex !items-center !gap-3">
+                                    <div className="!w-3 !h-3 !bg-gray-600 !rounded-full"></div>
+                                    <span className="!text-sm !font-semibold !text-gray-900">
+                                      Pending
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="!px-6 !py-4 !text-right">
+                                  <span className="!text-2xl !font-black !text-gray-900">
+                                    {websiteStats?.pendingComplaints || 0}
+                                  </span>
+                                </td>
+                                <td className="!px-6 !py-4 !text-right">
+                                  <span className="!text-lg !font-bold !text-gray-700">
+                                    {websiteStats?.totalComplaints
+                                      ? Math.round(
+                                          (websiteStats.pendingComplaints /
+                                            websiteStats.totalComplaints) *
+                                            100
+                                        )
+                                      : 0}
+                                    %
+                                  </span>
+                                </td>
+                                <td className="!px-6 !py-4">
+                                  <div className="!w-full !max-w-xs !bg-gray-200 !rounded-full !h-3">
+                                    <div
+                                      className="!bg-gray-600 !h-3 !rounded-full !transition-all !duration-500"
+                                      style={{
+                                        width: `${
+                                          websiteStats?.totalComplaints
+                                            ? Math.round(
+                                                (websiteStats.pendingComplaints /
+                                                  websiteStats.totalComplaints) *
+                                                  100
+                                              )
+                                            : 0
+                                        }%`,
+                                      }}
+                                    ></div>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr className="hover:!bg-gray-50 !transition-colors">
+                                <td className="!px-6 !py-4">
+                                  <div className="!flex !items-center !gap-3">
+                                    <div className="!w-3 !h-3 !bg-gray-400 !rounded-full"></div>
+                                    <span className="!text-sm !font-semibold !text-gray-900">
+                                      Rejected
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="!px-6 !py-4 !text-right">
+                                  <span className="!text-2xl !font-black !text-gray-900">
+                                    {websiteStats?.rejectedComplaints || 0}
+                                  </span>
+                                </td>
+                                <td className="!px-6 !py-4 !text-right">
+                                  <span className="!text-lg !font-bold !text-gray-700">
+                                    {websiteStats?.totalComplaints
+                                      ? Math.round(
+                                          (websiteStats.rejectedComplaints /
+                                            websiteStats.totalComplaints) *
+                                            100
+                                        )
+                                      : 0}
+                                    %
+                                  </span>
+                                </td>
+                                <td className="!px-6 !py-4">
+                                  <div className="!w-full !max-w-xs !bg-gray-200 !rounded-full !h-3">
+                                    <div
+                                      className="!bg-gray-400 !h-3 !rounded-full !transition-all !duration-500"
+                                      style={{
+                                        width: `${
+                                          websiteStats?.totalComplaints
+                                            ? Math.round(
+                                                (websiteStats.rejectedComplaints /
+                                                  websiteStats.totalComplaints) *
+                                                  100
+                                              )
+                                            : 0
+                                        }%`,
+                                      }}
+                                    ></div>
+                                  </div>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
                         </div>
                       </div>
                     </div>
@@ -1823,10 +2021,15 @@ export default function Admin() {
 
                   {activeFeature === "complaints" && (
                     <div className="w-full bg-white rounded-3xl shadow-md border border-gray-100 p-4 sm:p-6 md:p-8 lg:p-10 max-w-4xl mx-auto">
-                      <h3 className="!text-3xl sm:!text-4xl !font-semibold text-gray-900 text-center mb-8">
-                        Complaint Register
-                      </h3>
-                      <div className="mb-6 flex flex-col gap-4 sm:gap-6">
+                     <div className="!text-center !pb-6 !border-b-2 !border-gray-900">
+                        <h3 className="!text-3xl sm:!text-4xl !font-black !text-gray-900 !tracking-tight">
+                          Complaint Register
+                        </h3>
+                        <p className="!text-sm !text-gray-500 !font-medium !mt-2">
+                          Centralized Overview of Complaints & Status
+                        </p>
+                      </div>
+                      <div className="my-6 flex flex-col gap-4 sm:gap-6">
                         <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4">
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                             <label
@@ -2278,12 +2481,13 @@ export default function Admin() {
 
                   {activeFeature === "searchStudent" && (
                     <div className="w-full bg-white rounded-3xl shadow-md border border-gray-100 p-4 sm:p-6 md:p-8 lg:p-10 max-w-4xl mx-auto space-y-6 sm:space-y-8">
-                      <div className="text-center space-y-4">
-                        <div className="flex items-center justify-center space-x-3">
-                          <h3 className="!text-2xl sm:!text-4xl !font-semibold text-gray-900">
-                            Student Records
-                          </h3>
-                        </div>
+                      <div className="!text-center !pb-6 !border-b-2 !border-gray-900">
+                        <h3 className="!text-3xl sm:!text-4xl !font-black !text-gray-900 !tracking-tight">
+                          Search A Student
+                        </h3>
+                        <p className="!text-sm !text-gray-500 !font-medium !mt-2">
+                          Academic Student Data Search
+                        </p>
                       </div>
 
                       <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
@@ -2348,11 +2552,11 @@ export default function Admin() {
                           <div className="overflow-x-auto">
                             <table className="w-full">
                               <thead>
-                                <tr className="bg-gradient-to-r from-gray-900 to-gray-800 text-white">
-                                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
-                                    <div className="flex items-center space-x-2">
+                                <tr className="bg-gray-900 text-white border-b-2 border-gray-700">
+                                  <th className="!px-6 !py-4 !text-left !text-xs !font-bold !uppercase !tracking-wider">
+                                    <div className="flex items-center justify-center space-x-2">
                                       <svg
-                                        className="w-4 h-4"
+                                        className="!w-4 !h-4"
                                         fill="none"
                                         stroke="currentColor"
                                         viewBox="0 0 24 24"
@@ -2367,10 +2571,10 @@ export default function Admin() {
                                       <span>Student Info</span>
                                     </div>
                                   </th>
-                                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
-                                    <div className="flex items-center space-x-2">
+                                  <th className="!px-6 !py-4 !text-left !text-xs !font-bold !uppercase !tracking-wider">
+                                    <div className="flex items-center justify-center space-x-2">
                                       <svg
-                                        className="w-4 h-4"
+                                        className="!w-4 !h-4"
                                         fill="none"
                                         stroke="currentColor"
                                         viewBox="0 0 24 24"
@@ -2379,22 +2583,16 @@ export default function Admin() {
                                           strokeLinecap="round"
                                           strokeLinejoin="round"
                                           strokeWidth={2}
-                                          d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
-                                        />
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth={2}
-                                          d="M8 5v6l3-3 3 3V5"
+                                          d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
                                         />
                                       </svg>
                                       <span>Academic</span>
                                     </div>
                                   </th>
-                                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
-                                    <div className="flex items-center space-x-2">
+                                  <th className="!px-6 !py-4 !text-left !text-xs !font-bold !uppercase !tracking-wider">
+                                    <div className="flex items-center justify-center space-x-2">
                                       <svg
-                                        className="w-4 h-4"
+                                        className="!w-4 !h-4"
                                         fill="none"
                                         stroke="currentColor"
                                         viewBox="0 0 24 24"
@@ -2403,13 +2601,7 @@ export default function Admin() {
                                           strokeLinecap="round"
                                           strokeLinejoin="round"
                                           strokeWidth={2}
-                                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                        />
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth={2}
-                                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                                         />
                                       </svg>
                                       <span>Contact & Housing</span>
@@ -2418,151 +2610,180 @@ export default function Admin() {
                                 </tr>
                               </thead>
 
-                              <tbody>
+                              <tbody className="divide-y divide-gray-200">
                                 {studentDetails ? (
-                                  <tr className="hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100">
-                                    <td className="px-8 py-6">
-                                      <div className="flex items-center gap-6">
-                                        <div className="w-14 h-14 bg-gradient-to-br from-gray-700 to-gray-900 rounded-full flex items-center justify-center text-white font-semibold text-xl shadow-md">
-                                          {studentDetails.name?.charAt(0) ||
-                                            "S"}
+                                  <tr className="hover:!bg-gray-50 !transition-all !duration-200">
+                                    <td className="!px-6 !py-6 align-top">
+                                      <div className="space-y-3">
+                                        <div className="flex items-center gap-4 !pb-3 border-b border-gray-100">
+                                          <div className="!w-12 !h-12 !bg-gray-900 !rounded-xl flex items-center justify-center !text-white !font-bold !text-lg !shadow-md !flex-shrink-0">
+                                            {studentDetails.name?.charAt(0) ||
+                                              "S"}
+                                          </div>
+                                          <div className="flex-1">
+                                            <div className="!text-base !font-bold !text-gray-900 !mb-1">
+                                              {studentDetails.name || "N/A"}
+                                            </div>
+                                          </div>
                                         </div>
 
-                                        <div className="flex flex-col gap-1">
-                                          <div className="text-lg font-semibold text-gray-900 leading-tight">
-                                            {studentDetails.name || "N/A"}
+                                        <div className="space-y-2">
+                                          <div className="flex items-start justify-between !py-2">
+                                            <span className="!text-xs !font-medium !text-gray-500 !uppercase !tracking-wide">
+                                              Roll Number
+                                            </span>
+                                            <span className="!text-sm !font-semibold !text-gray-900">
+                                              {studentDetails.roll || "N/A"}
+                                            </span>
                                           </div>
-                                          <div className="text-sm text-gray-700 font-medium">
-                                            Roll: {studentDetails.roll || "N/A"}
-                                          </div>
-                                          <div className="text-sm text-gray-500">
-                                            Father:{" "}
-                                            {studentDetails.fatherName || "N/A"}
+                                          <div className="flex items-start justify-between !py-2 !border-t !border-gray-100">
+                                            <span className="!text-xs !font-medium !text-gray-500 !uppercase !tracking-wide">
+                                              Father's Name
+                                            </span>
+                                            <span className="!text-sm !font-semibold !text-gray-900 !text-right !max-w-[180px]">
+                                              {studentDetails.fatherName ||
+                                                "N/A"}
+                                            </span>
                                           </div>
                                         </div>
                                       </div>
                                     </td>
 
-                                    <td className="px-6 py-6">
+                                    <td className="!px-6 !py-6 align-top">
                                       <div className="space-y-3">
-                                        <div className="flex items-center space-x-3">
-                                          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                        <div className="flex items-center gap-4 !pb-3 border-b border-gray-100">
+                                          <div className="!w-16 !h-16 !bg-gray-900 !rounded-xl flex items-center justify-center !text-white !font-black !text-2xl !shadow-lg !flex-shrink-0">
                                             {studentDetails.cgpi || "N/A"}
                                           </div>
                                           <div>
-                                            <div className="text-sm font-medium text-gray-700">
+                                            <div className="!text-xs !font-bold !text-gray-900 !uppercase !tracking-wide">
                                               CGPA Score
                                             </div>
-                                            <div className="text-xs text-gray-500">
+                                            <div className="!text-xs !text-gray-500 !mt-0.5">
                                               Current Performance
                                             </div>
                                           </div>
                                         </div>
-                                        <div className="flex items-center space-x-2">
-                                          <div
-                                            className={`w-3 h-3 rounded-full ${
-                                              parseFloat(studentDetails.cgpi) >=
-                                              8.5
-                                                ? "bg-green-500"
-                                                : parseFloat(
+
+                                        <div className="space-y-2">
+                                          <div className="flex items-center justify-between !py-2">
+                                            <span className="!text-xs !font-medium !text-gray-500 !uppercase !tracking-wide">
+                                              Performance
+                                            </span>
+                                            <div className="flex items-center gap-2">
+                                              <div
+                                                className={`!w-2.5 !h-2.5 !rounded-full ${
+                                                  parseFloat(
                                                     studentDetails.cgpi
-                                                  ) >= 7.0
-                                                ? "bg-yellow-500"
-                                                : "bg-red-500"
-                                            }`}
-                                          ></div>
-                                          <span className="text-xs font-medium text-gray-600">
-                                            {parseFloat(studentDetails.cgpi) >=
-                                            8.5
-                                              ? "Excellent"
-                                              : parseFloat(
+                                                  ) >= 8.5
+                                                    ? "!bg-gray-900"
+                                                    : parseFloat(
+                                                        studentDetails.cgpi
+                                                      ) >= 7.0
+                                                    ? "!bg-gray-600"
+                                                    : "!bg-gray-400"
+                                                }`}
+                                              ></div>
+                                              <span className="!text-sm !font-semibold !text-gray-900">
+                                                {parseFloat(
                                                   studentDetails.cgpi
-                                                ) >= 7.0
-                                              ? "Good"
-                                              : "Needs Improvement"}
-                                          </span>
+                                                ) >= 8.5
+                                                  ? "Excellent"
+                                                  : parseFloat(
+                                                      studentDetails.cgpi
+                                                    ) >= 7.0
+                                                  ? "Good"
+                                                  : "Average"}
+                                              </span>
+                                            </div>
+                                          </div>
                                         </div>
                                       </div>
                                     </td>
 
-                                    <td className="px-6 py-6">
-                                      <div className="space-y-4">
-                                        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
-                                          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                                            <svg
-                                              className="w-4 h-4 text-green-600"
-                                              fill="none"
-                                              stroke="currentColor"
-                                              viewBox="0 0 24 24"
-                                            >
-                                              <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                                              />
-                                            </svg>
-                                          </div>
-                                          <div>
-                                            <div className="text-sm font-semibold text-gray-900">
-                                              Room{" "}
-                                              {studentDetails?.room || "N/A"}
+                                    <td className="!px-6 !py-6 align-top">
+                                      <div className="space-y-3">
+                                        <div className="flex items-start justify-between !py-2.5 !px-3 !bg-gray-50 !rounded-lg !border !border-gray-200">
+                                          <div className="flex items-center gap-2">
+                                            <div className="!w-7 !h-7 !bg-gray-900 !rounded-lg flex items-center justify-center !flex-shrink-0">
+                                              <svg
+                                                className="!w-3.5 !h-3.5 !text-white"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                              >
+                                                <path
+                                                  strokeLinecap="round"
+                                                  strokeLinejoin="round"
+                                                  strokeWidth={2}
+                                                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                                                />
+                                              </svg>
                                             </div>
-                                            <div className="text-xs text-gray-500">
-                                              Hostel Accommodation
-                                            </div>
-                                          </div>
-                                        </div>
-
-                                        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
-                                          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                                            <svg
-                                              className="w-4 h-4 text-blue-600"
-                                              fill="none"
-                                              stroke="currentColor"
-                                              viewBox="0 0 24 24"
-                                            >
-                                              <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                                              />
-                                            </svg>
-                                          </div>
-                                          <div>
-                                            <div className="text-sm font-semibold text-gray-900">
-                                              {`${studentDetails.roll}@nith.ac.in` ||
-                                                "N/A"}
-                                            </div>
-                                            <div className="text-xs text-gray-500">
-                                              Email Address
+                                            <div>
+                                              <div className="!text-xs !font-medium !text-gray-500 !uppercase">
+                                                Room Number
+                                              </div>
+                                              <div className="!text-sm !font-bold !text-gray-900">
+                                                {studentDetails?.room || "N/A"}
+                                              </div>
                                             </div>
                                           </div>
                                         </div>
 
-                                        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
-                                          <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                                            <svg
-                                              className="w-4 h-4 text-purple-600"
-                                              fill="none"
-                                              stroke="currentColor"
-                                              viewBox="0 0 24 24"
-                                            >
-                                              <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                                              />
-                                            </svg>
-                                          </div>
-                                          <div>
-                                            <div className="text-sm font-semibold text-gray-900">
-                                              {studentDetails?.phone || "N/A"}
+                                        <div className="flex items-start justify-between !py-2.5 !px-3 !bg-gray-50 !rounded-lg !border !border-gray-200">
+                                          <div className="flex items-center gap-2">
+                                            <div className="!w-7 !h-7 !bg-gray-900 !rounded-lg flex items-center justify-center !flex-shrink-0">
+                                              <svg
+                                                className="!w-3.5 !h-3.5 !text-white"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                              >
+                                                <path
+                                                  strokeLinecap="round"
+                                                  strokeLinejoin="round"
+                                                  strokeWidth={2}
+                                                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                                />
+                                              </svg>
                                             </div>
-                                            <div className="text-xs text-gray-500">
-                                              Phone Number
+                                            <div className="flex-1 min-w-0">
+                                              <div className="!text-xs !font-medium !text-gray-500 !uppercase">
+                                                Email Address
+                                              </div>
+                                              <div className="!text-sm !font-bold !text-gray-900 !truncate">
+                                                {`${studentDetails.roll}@nith.ac.in` ||
+                                                  "N/A"}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="flex items-start justify-between !py-2.5 !px-3 !bg-gray-50 !rounded-lg !border !border-gray-200">
+                                          <div className="flex items-center gap-2">
+                                            <div className="!w-7 !h-7 !bg-gray-900 !rounded-lg flex items-center justify-center !flex-shrink-0">
+                                              <svg
+                                                className="!w-3.5 !h-3.5 !text-white"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                              >
+                                                <path
+                                                  strokeLinecap="round"
+                                                  strokeLinejoin="round"
+                                                  strokeWidth={2}
+                                                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                                                />
+                                              </svg>
+                                            </div>
+                                            <div>
+                                              <div className="!text-xs !font-medium !text-gray-500 !uppercase">
+                                                Phone Number
+                                              </div>
+                                              <div className="!text-sm !font-bold !text-gray-900">
+                                                {studentDetails?.phone || "N/A"}
+                                              </div>
                                             </div>
                                           </div>
                                         </div>
@@ -2573,12 +2794,12 @@ export default function Admin() {
                                   <tr>
                                     <td
                                       colSpan="3"
-                                      className="px-6 py-12 text-center"
+                                      className="!px-6 !py-12 !text-center"
                                     >
                                       <div className="flex flex-col items-center space-y-4">
-                                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center">
+                                        <div className="!w-20 !h-20 !bg-gray-100 !rounded-full flex items-center justify-center">
                                           <svg
-                                            className="w-10 h-10 text-gray-400"
+                                            className="!w-10 !h-10 !text-gray-400"
                                             fill="none"
                                             stroke="currentColor"
                                             viewBox="0 0 24 24"
@@ -2592,10 +2813,10 @@ export default function Admin() {
                                           </svg>
                                         </div>
                                         <div className="text-center">
-                                          <h3 className="!text-lg !font-medium !text-gray-900 mb-2">
+                                          <h3 className="!text-lg !font-bold !text-gray-900 !mb-2">
                                             No Student Found
                                           </h3>
-                                          <p className="!text-gray-500 !text-sm !max-w-md opacity-100">
+                                          <p className="!text-gray-500 !text-sm !max-w-md">
                                             {searchRollNumber
                                               ? "No student record found for the entered roll number. Please verify and try again."
                                               : "Enter a roll number in the search field above to find student details."}
@@ -2902,50 +3123,142 @@ export default function Admin() {
                   )}
 
                   {activeFeature === "mess" && (
-                    <div className="w-full bg-white rounded-3xl shadow-md border border-gray-100 p-4 sm:p-6 md:p-8 lg:p-10 max-w-4xl mx-auto">
-                      <h3 className="!text-4xl !font-semibold text-gray-900 text-center">
-                        Mess Menu
-                      </h3>
-                      <p className="!text-center !text-gray-900 mt-2 !text-xl !opacity-100 uppercase !italic">
-                        [{todaysMenu ? todaysMenu?.day : "Not Available"}]
-                      </p>
+                    <div className="w-full space-y-6 max-w-6xl mx-auto">
+                      {/* Header Section */}
+                      <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl shadow-2xl border-2 border-gray-700 p-8 sm:p-10">
+                        <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+                          <div className="text-center lg:text-left">
+                            <h2 className="!text-3xl sm:!text-4xl lg:!text-5xl !font-extrabold !text-white !mb-3">
+                              Today's Mess Menu
+                            </h2>
+                            <p className="!text-base sm:!text-lg !text-gray-300 !font-medium">
+                              Daily meal schedule for hostel residents
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="h-16 w-1 bg-gray-600 hidden lg:block"></div>
+                            <div className="bg-white rounded-xl px-8 py-4 shadow-lg border-2 border-gray-200">
+                              <p className="!text-xs !font-bold !text-gray-500 uppercase tracking-widest !mb-1">
+                                Current Day
+                              </p>
+                              <p className="!text-2xl sm:!text-3xl !font-black !text-gray-900">
+                                {todaysMenu?.day || "N/A"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
 
-                      <div className="mt-10 divide-y divide-gray-200">
-                        <div className="py-5 flex flex-col md:flex-row justify-between items-center">
-                          <p className="!text-lg !font-semibold !text-gray-900 ">
-                            Breakfast
-                          </p>
-                          <span className="text-gray-600 text-base max-w-xs leading-relaxed !text-center md:!text-right">
-                            {todaysMenu?.breakfast || "N/A"}
-                          </span>
+                      {/* Mess Menu Table */}
+                      <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 overflow-hidden">
+                        {/* Desktop Table View */}
+                        <div className="hidden md:block overflow-x-auto">
+                          <table className="w-full">
+                            <thead>
+                              <tr className="bg-gray-900">
+                                <th className="px-6 py-4 text-left !text-sm !font-bold !text-white uppercase tracking-wider w-1/4 border-r border-gray-700">
+                                  Meal Time
+                                </th>
+                                <th className="px-6 py-4 text-left !text-sm !font-bold !text-white uppercase tracking-wider">
+                                  Menu Items
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                              <tr className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-5 !text-base !font-bold !text-gray-900 bg-gray-50 border-r border-gray-200">
+                                  Breakfast
+                                </td>
+                                <td className="px-6 py-5 !text-base !text-gray-700 leading-relaxed">
+                                  {todaysMenu?.breakfast || "N/A"}
+                                </td>
+                              </tr>
+                              <tr className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-5 !text-base !font-bold !text-gray-900 bg-gray-50 border-r border-gray-200">
+                                  Lunch
+                                </td>
+                                <td className="px-6 py-5 !text-base !text-gray-700 leading-relaxed">
+                                  {todaysMenu?.lunch || "N/A"}
+                                </td>
+                              </tr>
+                              <tr className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-5 !text-base !font-bold !text-gray-900 bg-gray-50 border-r border-gray-200">
+                                  Snacks
+                                </td>
+                                <td className="px-6 py-5 !text-base !text-gray-700 leading-relaxed">
+                                  {todaysMenu?.snacks || "N/A"}
+                                </td>
+                              </tr>
+                              <tr className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-5 !text-base !font-bold !text-gray-900 bg-gray-50 border-r border-gray-200">
+                                  Dinner
+                                </td>
+                                <td className="px-6 py-5 !text-base !text-gray-700 leading-relaxed">
+                                  {todaysMenu?.dinner || "N/A"}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
                         </div>
 
-                        <div className="py-5 flex flex-col md:flex-row justify-between items-center">
-                          <p className="!text-lg !font-semibold !text-gray-900">
-                            Lunch
-                          </p>
-                          <span className="text-gray-600 text-base max-w-xs leading-relaxed !text-center md:!text-right">
-                            {todaysMenu?.lunch || "N/A"}
-                          </span>
-                        </div>
+                        {/* Mobile Card View */}
+                        <div className="md:hidden divide-y divide-gray-200">
+                          <div className="p-5 bg-gray-50">
+                            <div className="flex justify-between items-start mb-3">
+                              <h3 className="!text-lg !font-bold !text-gray-900">
+                                Breakfast
+                              </h3>
+                            </div>
+                            <p className="!text-sm !text-gray-700 leading-relaxed">
+                              {todaysMenu?.breakfast || "N/A"}
+                            </p>
+                          </div>
 
-                        <div className="py-5 flex flex-col md:flex-row justify-between items-center">
-                          <p className="!text-lg !font-semibold !text-gray-900">
-                            Snacks
-                          </p>
-                          <span className="text-gray-600 text-base max-w-xs !text-center md:!text-right leading-relaxed">
-                            {todaysMenu?.snacks || "N/A"}
-                          </span>
-                        </div>
+                          <div className="p-5">
+                            <div className="flex justify-between items-start mb-3">
+                              <h3 className="!text-lg !font-bold !text-gray-900">
+                                Lunch
+                              </h3>
+                            </div>
+                            <p className="!text-sm !text-gray-700 leading-relaxed">
+                              {todaysMenu?.lunch || "N/A"}
+                            </p>
+                          </div>
 
-                        <div className="py-5 flex flex-col md:flex-row justify-between items-center">
-                          <p className="!text-lg !font-semibold !text-gray-900">
-                            Dinner
-                          </p>
-                          <span className="text-gray-600 text-base max-w-xs !text-center md:!text-right leading-relaxed">
-                            {todaysMenu?.dinner || "N/A"}
-                          </span>
+                          <div className="p-5 bg-gray-50">
+                            <div className="flex justify-between items-start mb-3">
+                              <h3 className="!text-lg !font-bold !text-gray-900">
+                                Snacks
+                              </h3>
+                            </div>
+                            <p className="!text-sm !text-gray-700 leading-relaxed">
+                              {todaysMenu?.snacks || "N/A"}
+                            </p>
+                          </div>
+
+                          <div className="p-5">
+                            <div className="flex justify-between items-start mb-3">
+                              <h3 className="!text-lg !font-bold !text-gray-900">
+                                Dinner
+                              </h3>
+                            </div>
+                            <p className="!text-sm !text-gray-700 leading-relaxed">
+                              {todaysMenu?.dinner || "N/A"}
+                            </p>
+                          </div>
                         </div>
+                      </div>
+
+                      {/* Info Footer */}
+                      <div className="bg-gray-50 rounded-xl border-2 border-gray-200 p-5 sm:p-6">
+                        <p className="!text-sm !font-semibold !text-gray-900 mb-2">
+                          Important Information
+                        </p>
+                        <p className="!text-xs sm:!text-sm !text-gray-600 leading-relaxed">
+                          The menu is subject to change based on availability.
+                          For any dietary concerns or special requests, please
+                          contact the mess committee.
+                        </p>
                       </div>
                     </div>
                   )}
@@ -2968,7 +3281,7 @@ export default function Admin() {
                               onChange={(e) =>
                                 setOutpassSearchTerm(e.target.value)
                               }
-                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                             />
                           </div>
                           <div>
@@ -2977,7 +3290,7 @@ export default function Admin() {
                               onChange={(e) =>
                                 setOutpassStatusFilter(e.target.value)
                               }
-                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                             >
                               <option value="">All Status</option>
                               <option value="Pending">Pending</option>
@@ -2992,7 +3305,7 @@ export default function Admin() {
                               onChange={(e) =>
                                 setOutpassDateFilter(e.target.value)
                               }
-                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                             />
                           </div>
                         </div>
@@ -3011,10 +3324,8 @@ export default function Admin() {
                       <div className="hidden md:block bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
                         <div className="overflow-x-auto">
                           <table className="w-full">
-                            {/* Table Header */}
                             <thead className="bg-gray-50 border-b border-gray-200">
                               <tr>
-                                {/* Checkbox Column */}
                                 <th className="w-12 px-4 py-3.5 text-left">
                                   <input
                                     type="checkbox"
@@ -3025,49 +3336,41 @@ export default function Admin() {
                                       )
                                     }
                                     onChange={handleSelectAllOutpasses}
-                                    className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
+                                    className="w-4 h-4 text-gray-900 rounded border-gray-300 focus:ring-2 focus:ring-gray-900 focus:ring-offset-0 cursor-pointer"
                                     aria-label="Select all outpasses"
                                   />
                                 </th>
 
-                                {/* Student Column */}
                                 <th className="px-6 py-3.5 text-left !text-xs !font-semibold !text-gray-600 uppercase tracking-wider">
                                   Student
                                 </th>
 
-                                {/* Room Column */}
                                 <th className="px-6 py-3.5 text-left !text-xs !font-semibold !text-gray-600 uppercase tracking-wider">
                                   Room
                                 </th>
 
-                                {/* Destination Column */}
                                 <th className="px-6 py-3.5 text-left !text-xs !font-semibold !text-gray-600 uppercase tracking-wider">
                                   Destination
                                 </th>
 
-                                {/* Out Time Column */}
                                 <th className="px-6 py-3.5 text-left !text-xs !font-semibold !text-gray-600 uppercase tracking-wider">
                                   Out Time
                                 </th>
 
-                                {/* Return Time Column */}
                                 <th className="px-6 py-3.5 text-left !text-xs !font-semibold !text-gray-600 uppercase tracking-wider">
                                   Return Time
                                 </th>
 
-                                {/* Status Column */}
                                 <th className="px-6 py-3.5 text-left !text-xs !font-semibold !text-gray-600 uppercase tracking-wider">
                                   Status
                                 </th>
 
-                                {/* Actions Column */}
                                 <th className="px-6 py-3.5 text-left !text-xs !font-semibold !text-gray-600 uppercase tracking-wider">
                                   Actions
                                 </th>
                               </tr>
                             </thead>
 
-                            {/* Table Body */}
                             <tbody className="bg-white divide-y divide-gray-200">
                               {paginatedOutpasses.length === 0 ? (
                                 // Empty State
@@ -3094,7 +3397,6 @@ export default function Admin() {
                                     key={outpass.id}
                                     className="hover:bg-gray-50 transition-colors duration-150"
                                   >
-                                    {/* Checkbox Cell */}
                                     <td className="w-12 px-4 py-4">
                                       <input
                                         type="checkbox"
@@ -3104,12 +3406,12 @@ export default function Admin() {
                                         onChange={() =>
                                           handleSelectOutpass(outpass._id)
                                         }
-                                        className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
+                                        className="w-4 h-4 text-gray-900 rounded border-gray-300 focus:ring-2 focus:ring-gray-900 focus:ring-offset-0 cursor-pointer"
                                         aria-label={`Select ${outpass.fullName}`}
+
                                       />
                                     </td>
 
-                                    {/* Student Info Cell */}
                                     <td className="px-6 py-4">
                                       <div className="flex flex-col">
                                         <span className="!text-sm !font-medium !text-gray-900">
@@ -3121,7 +3423,6 @@ export default function Admin() {
                                       </div>
                                     </td>
 
-                                    {/* Room Info Cell */}
                                     <td className="px-6 py-4">
                                       <div className="flex flex-col">
                                         <span className="!text-sm !font-medium !text-gray-900">
@@ -3133,14 +3434,12 @@ export default function Admin() {
                                       </div>
                                     </td>
 
-                                    {/* Destination Cell */}
                                     <td className="px-6 py-4">
                                       <span className="!text-sm !text-gray-900">
                                         {outpass.placeOfVisit}
                                       </span>
                                     </td>
 
-                                    {/* Out Time Cell */}
                                     <td className="px-6 py-4">
                                       <div className="flex flex-col">
                                         <span className="!text-sm !font-medium !text-gray-900">
@@ -3158,7 +3457,6 @@ export default function Admin() {
                                       </div>
                                     </td>
 
-                                    {/* Return Time Cell */}
                                     <td className="px-6 py-4">
                                       <div className="flex flex-col">
                                         <span className="!text-sm !font-medium !text-gray-900">
@@ -3176,29 +3474,28 @@ export default function Admin() {
                                       </div>
                                     </td>
 
-                                    {/* Status Cell */}
                                     <td className="px-6 py-4">
                                       <span
                                         className={`inline-flex items-center px-2.5 py-1 rounded-full !text-xs !font-medium ${
                                           outpass.status === "pending"
-                                            ? "bg-amber-50 text-amber-700 border border-amber-200"
+                                            ? "bg-gray-100 text-gray-700 border border-gray-300"
                                             : outpass.status === "approved"
-                                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                                            : "bg-rose-50 text-rose-700 border border-rose-200"
+                                            ? "bg-gray-900 text-white border border-gray-900"
+                                            : "bg-gray-200 text-gray-800 border border-gray-400"
+
                                         }`}
                                       >
                                         {outpass.status.charAt(0).toUpperCase() + outpass.status.slice(1)}
                                       </span>
                                     </td>
 
-                                    {/* Actions Cell */}
                                     <td className="px-6 py-4">
                                       <button
                                         onClick={() => {
                                           setSelectedOutpass(outpass);
                                           setShowOutpassModal(true);
                                         }}
-                                        className="px-3 py-1.5 !text-sm !font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-all duration-150 border border-transparent hover:border-blue-200"
+                                        className="px-3 py-1.5 !text-sm !font-medium text-gray-900 hover:text-white hover:bg-gray-900 rounded-md transition-all duration-150 border border-gray-300 hover:border-gray-900"
                                       >
                                         View Details
                                       </button>
@@ -3210,11 +3507,9 @@ export default function Admin() {
                           </table>
                         </div>
 
-                        {/* Pagination Controls */}
                         {totalPages > 1 && (
                           <div className="px-6 py-4 border-t border-gray-200 bg-white">
                             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                              {/* Results Summary */}
                               <div className="!text-sm !text-gray-600">
                                 Showing{" "}
                                 <span className="!font-medium !text-gray-900">
@@ -3234,9 +3529,7 @@ export default function Admin() {
                                 requests
                               </div>
 
-                              {/* Pagination Buttons */}
                               <div className="flex items-center gap-1">
-                                {/* Previous Button */}
                                 <button
                                   onClick={() =>
                                     handlePageChange(currentPage - 1)
@@ -3248,7 +3541,6 @@ export default function Admin() {
                                   Previous
                                 </button>
 
-                                {/* Page Numbers */}
                                 <div className="hidden sm:flex items-center gap-1 mx-2">
                                   {[...Array(totalPages)].map((_, i) => {
                                     const pageNumber = i + 1;
@@ -3263,7 +3555,7 @@ export default function Admin() {
                                         }
                                         className={`min-w-[36px] px-3 py-1.5 !text-sm !font-medium rounded-md transition-all duration-150 ${
                                           isCurrentPage
-                                            ? "bg-blue-600 text-white shadow-sm"
+                                            ? "bg-gray-900 text-white shadow-sm"
                                             : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 hover:border-gray-400"
                                         }`}
                                         aria-label={`Page ${pageNumber}`}
@@ -3277,12 +3569,10 @@ export default function Admin() {
                                   })}
                                 </div>
 
-                                {/* Mobile Page Indicator */}
                                 <div className="sm:hidden px-3 py-1.5 !text-sm !font-medium text-gray-700">
                                   Page {currentPage} of {totalPages}
                                 </div>
 
-                                {/* Next Button */}
                                 <button
                                   onClick={() =>
                                     handlePageChange(currentPage + 1)
@@ -3325,7 +3615,7 @@ export default function Admin() {
                                     onChange={() =>
                                       handleSelectOutpass(outpass.id)
                                     }
-                                    className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                    className="mt-1 w-4 h-4 text-gray-900 rounded focus:ring-gray-900"
                                   />
                                   <div>
                                     <h3 className="!text-lg !font-semibold !text-gray-900">
@@ -3339,10 +3629,10 @@ export default function Admin() {
                                 <span
                                   className={`inline-flex items-center px-3 py-1 rounded-full !text-xs !font-semibold ${
                                     outpass.status === "Pending"
-                                      ? "bg-yellow-100 text-yellow-800"
+                                      ? "bg-gray-100 text-gray-700 border border-gray-300"
                                       : outpass.status === "Approved"
-                                      ? "bg-green-100 text-green-800"
-                                      : "bg-red-100 text-red-800"
+                                      ? "bg-gray-900 text-white border border-gray-900"
+                                      : "bg-gray-200 text-gray-800 border border-gray-400"
                                   }`}
                                 >
                                   {outpass.status}
@@ -3395,7 +3685,7 @@ export default function Admin() {
                                   setSelectedOutpass(outpass);
                                   setShowOutpassModal(true);
                                 }}
-                                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors !text-sm !font-medium"
+                                className="w-full px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors !text-sm !font-medium"
                               >
                                 View Details
                               </button>
@@ -3437,7 +3727,6 @@ export default function Admin() {
                       {showOutpassModal && selectedOutpass && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm animate-fadeIn">
                           <div className="bg-white rounded-lg shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto animate-slideUp">
-                            {/* Header */}
                             <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-5 flex items-center justify-between z-10">
                               <h3 className="!text-2xl !font-semibold !text-gray-900 text-center flex-1">
                                 Outpass Details
@@ -3455,7 +3744,6 @@ export default function Admin() {
                             </div>
 
                             <div className="p-8 space-y-8">
-                              {/* Student Information Section */}
                               <div className="bg-white border border-gray-200 rounded-lg p-6">
                                 <h6 className="!text-base !font-semibold !text-gray-900 !mb-5 pb-2 border-b border-gray-100">
                                   Student Information
@@ -3520,7 +3808,6 @@ export default function Admin() {
                                 </div>
                               </div>
 
-                              {/* Visit Information Section */}
                               <div className="bg-white border border-gray-200 rounded-lg p-6">
                                 <h6 className="!text-base !font-semibold !text-gray-900 !mb-5 pb-2 border-b border-gray-100">
                                   Visit Information
@@ -3573,7 +3860,6 @@ export default function Admin() {
                                 </div>
                               </div>
 
-                              {/* Request Information Section */}
                               <div className="bg-white border border-gray-200 rounded-lg p-6">
                                 <h6 className="!text-base !font-semibold !text-gray-900 !mb-5 pb-2 border-b border-gray-100">
                                   Request Information
@@ -3604,10 +3890,12 @@ export default function Admin() {
                                     <span
                                       className={`inline-flex items-center px-3 py-1 rounded !text-xs !font-medium ${
                                         selectedOutpass.status === "pending"
-                                          ? "bg-amber-50 text-amber-700 border border-amber-200"
-                                          : selectedOutpass.status === "approved"
-                                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                                          : "bg-rose-50 text-rose-700 border border-rose-200"
+                                          ? "bg-gray-100 text-gray-700 border border-gray-300"
+                                          : selectedOutpass.status ===
+                                            "approved"
+                                          ? "bg-gray-900 text-white border border-gray-900"
+                                          : "bg-gray-200 text-gray-800 border border-gray-400"
+
                                       }`}
                                     >
                                       {selectedOutpass.status.charAt(0).toUpperCase() + selectedOutpass.status.slice(1)}
@@ -3616,8 +3904,8 @@ export default function Admin() {
                                 </div>
                               </div>
 
-                              {/* Action Section */}
                               {selectedOutpass.status === "pending" && (
+
                                 <div className="pt-2">
                                   {!showConfirmAction ? (
                                     <div className="flex gap-3">
@@ -3626,7 +3914,8 @@ export default function Admin() {
                                           setConfirmActionType("approve");
                                           setShowConfirmAction(true);
                                         }}
-                                        className="flex-1 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all duration-200 !text-sm !font-medium shadow-sm hover:shadow cursor-pointer"
+                                        className="flex-1 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 !text-sm !font-medium shadow-sm hover:shadow"
+
                                       >
                                         Approve
                                       </button>
@@ -3635,7 +3924,7 @@ export default function Admin() {
                                           setConfirmActionType("reject");
                                           setShowConfirmAction(true);
                                         }}
-                                        className="flex-1 px-6 py-3 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-all duration-200 !text-sm !font-medium shadow-sm hover:shadow cursor-pointer"
+                                        className="flex-1 px-6 py-3 bg-white text-gray-900 border-2 border-gray-900 rounded-lg hover:bg-gray-900 hover:text-white transition-all duration-200 !text-sm !font-medium shadow-sm hover:shadow"
                                       >
                                         Reject
                                       </button>
@@ -3687,16 +3976,51 @@ export default function Admin() {
 
                   {activeFeature === "attendance" && (
                     <div className="w-full bg-white rounded-3xl shadow-md border border-gray-100 p-4 sm:p-6 md:p-8 lg:p-10 max-w-7xl mx-auto space-y-6 sm:space-y-8">
-                      {/* Header Section */}
-                      <div className="text-center space-y-4">
-                        <div className="flex items-center justify-center space-x-3">
+                      <div className="flex items-center justify-between flex-col gap-4 lg:flex-row">
+                        <div className="flex-1 text-center sm:text-left">
                           <h3 className="!text-2xl sm:!text-4xl !font-black text-gray-900 tracking-tight">
                             Attendance Manager
                           </h3>
                         </div>
+
+                        <button
+                          onClick={() => {
+                            const today = new Date().toLocaleDateString(
+                              "en-GB"
+                            );
+                            console.log(
+                              "Exporting today's entry log for:",
+                              today
+                            );
+                            toast.success("Exporting attendance log...");
+                          }}
+                          className="group relative overflow-hidden flex items-center gap-3 px-6 py-3 bg-white hover:bg-gray-50 border-2 border-gray-300 hover:border-gray-900 text-gray-900 font-bold rounded-xl transition-all duration-300 shadow-sm hover:shadow-lg hover:scale-[1.02] active:scale-95 cursor-pointer"
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-br from-gray-100/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                          <div className="relative w-5 h-5 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-900 group-hover:scale-110 transition-all duration-300">
+                            <svg
+                              className="w-3.5 h-3.5 text-gray-700 group-hover:text-white transition-colors duration-300"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                              />
+                            </svg>
+                          </div>
+                          <span className="relative text-sm tracking-wide hidden sm:inline">
+                            Export Log
+                          </span>
+                          <span className="relative text-sm tracking-wide sm:hidden">
+                            Export
+                          </span>
+                        </button>
                       </div>
 
-                      {/* Search Section with NFC Support */}
                       <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl p-6 border border-gray-200 shadow-sm">
                         <div className="flex flex-col sm:flex-row items-center gap-4">
                           <div className="relative w-full sm:flex-1">
@@ -3778,10 +4102,8 @@ export default function Admin() {
                         </div>
                       </div>
 
-                      {/* Student Details Card - Only shown when a student is found */}
                       {studentDetails && (
                         <div className="!bg-white !rounded-3xl !border !border-gray-200 !shadow-2xl !overflow-hidden !max-w-4xl !mx-auto">
-                          {/* Student Info Header */}
                           <div className="!bg-gradient-to-r !from-gray-900 !via-gray-800 !to-gray-900 !px-8 !py-6">
                             <div className="!flex !items-center !justify-between">
                               <div className="!flex-1">
@@ -3831,16 +4153,13 @@ export default function Admin() {
                             </div>
                           </div>
 
-                          {/* Action Panels */}
-                          <div className="!p-8 !space-y-6 !bg-gray-50">
-                            {/* Attendance Grid - Combined */}
-                            <div className="!grid !grid-cols-1 lg:!grid-cols-2 !gap-6">
-                              {/* Hostel Attendance Section */}
-                              <div className="group !bg-white !rounded-2xl !p-6 !border !border-gray-200 hover:!border-gray-300 !transition-all !duration-300 !shadow-sm hover:!shadow-lg">
-                                <div className="!flex !items-center !gap-3 !mb-6">
-                                  <div className="!w-11 !h-11 !bg-gray-900 !rounded-xl !flex !items-center !justify-center !shadow-md">
+                          <div className="!p-4 sm:!p-6 md:!p-8 !space-y-4 sm:!space-y-6 !bg-gray-50">
+                            <div className="!grid !grid-cols-1 md:!grid-cols-2 !gap-4 sm:!gap-6">
+                              <div className="group !bg-white !rounded-2xl !p-4 sm:!p-6 !border !border-gray-200 hover:!border-gray-300 !transition-all !duration-300 !shadow-sm hover:!shadow-lg">
+                                <div className="!flex !items-center !gap-2 sm:!gap-3 !mb-4 sm:!mb-6">
+                                  <div className="!w-10 !h-10 sm:!w-11 sm:!h-11 !bg-gray-900 !rounded-xl !flex !items-center !justify-center !shadow-md !flex-shrink-0">
                                     <svg
-                                      className="!w-6 !h-6 !text-white"
+                                      className="!w-5 !h-5 sm:!w-6 sm:!h-6 !text-white"
                                       fill="none"
                                       stroke="currentColor"
                                       viewBox="0 0 24 24"
@@ -3853,20 +4172,17 @@ export default function Admin() {
                                       />
                                     </svg>
                                   </div>
-                                  <div className="!flex-1 flex items-center flex-col">
-                                    <h6 className="!text-lg !font-bold !text-gray-900 !mb-0.5 !leading-tight">
+                                  <div className="!flex-1 !text-left">
+                                    <h6 className="!text-base sm:!text-lg !font-bold !text-gray-900 !mb-0.5 !leading-tight">
                                       Hostel Attendance
                                     </h6>
-                                    <p className="!text-xs !text-gray-500 !leading-tight">
-                                      Track hostel entry and exit
-                                    </p>
                                   </div>
                                 </div>
 
-                                <div className="!grid !grid-cols-2 !gap-3">
-                                  <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2.5 !px-4 !py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
+                                <div className="!grid !grid-cols-2 !gap-2 sm:!gap-3">
+                                  <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2 sm:!space-y-2.5 !px-3 sm:!px-4 !py-4 sm:!py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
                                     <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 group-hover/btn:!opacity-100 !transition-opacity !duration-300"></div>
-                                    <div className="!relative !w-11 !h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
+                                    <div className="!relative !w-10 !h-10 sm:!w-11 sm:!h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
                                       <svg
                                         className="!w-5 !h-5 !text-gray-700 group-hover/btn:!text-white !transition-colors !duration-300"
                                         fill="none"
@@ -3881,14 +4197,14 @@ export default function Admin() {
                                         />
                                       </svg>
                                     </div>
-                                    <span className="!relative !text-sm !font-bold !tracking-wide">
+                                    <span className="!relative !text-xs sm:!text-sm !font-bold !tracking-wide">
                                       Hostel In
                                     </span>
                                   </button>
 
-                                  <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2.5 !px-4 !py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
+                                  <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2 sm:!space-y-2.5 !px-3 sm:!px-4 !py-4 sm:!py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
                                     <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 group-hover/btn:!opacity-100 !transition-opacity !duration-300"></div>
-                                    <div className="!relative !w-11 !h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
+                                    <div className="!relative !w-10 !h-10 sm:!w-11 sm:!h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
                                       <svg
                                         className="!w-5 !h-5 !text-gray-700 group-hover/btn:!text-white !transition-colors !duration-300"
                                         fill="none"
@@ -3903,19 +4219,18 @@ export default function Admin() {
                                         />
                                       </svg>
                                     </div>
-                                    <span className="!relative !text-sm !font-bold !tracking-wide">
+                                    <span className="!relative !text-xs sm:!text-sm !font-bold !tracking-wide">
                                       Hostel Out
                                     </span>
                                   </button>
                                 </div>
                               </div>
 
-                              {/* Mess Attendance Section */}
-                              <div className="group !bg-white !rounded-2xl !p-6 !border !border-gray-200 hover:!border-gray-300 !transition-all !duration-300 !shadow-sm hover:!shadow-lg">
-                                <div className="!flex !items-center !gap-3 !mb-6">
-                                  <div className="!w-11 !h-11 !bg-gray-900 !rounded-xl !flex !items-center !justify-center !shadow-md">
+                              <div className="group !bg-white !rounded-2xl !p-4 sm:!p-6 !border !border-gray-200 hover:!border-gray-300 !transition-all !duration-300 !shadow-sm hover:!shadow-lg">
+                                <div className="!flex !items-center !gap-2 sm:!gap-3 !mb-4 sm:!mb-6">
+                                  <div className="!w-10 !h-10 sm:!w-11 sm:!h-11 !bg-gray-900 !rounded-xl !flex !items-center !justify-center !shadow-md !flex-shrink-0">
                                     <svg
-                                      className="!w-6 !h-6 !text-white"
+                                      className="!w-5 !h-5 sm:!w-6 sm:!h-6 !text-white"
                                       fill="none"
                                       stroke="currentColor"
                                       viewBox="0 0 24 24"
@@ -3928,20 +4243,17 @@ export default function Admin() {
                                       />
                                     </svg>
                                   </div>
-                                  <div className="!flex-1  flex items-center flex-col">
-                                    <h6 className="!text-lg !font-bold !text-gray-900 !mb-0.5 !leading-tight">
+                                  <div className="!flex-1 !text-left">
+                                    <h6 className="!text-base sm:!text-lg !font-bold !text-gray-900 !mb-0.5 !leading-tight">
                                       Mess Attendance
                                     </h6>
-                                    <p className="!text-xs !text-gray-500 !leading-tight">
-                                      Track meal attendance
-                                    </p>
                                   </div>
                                 </div>
 
-                                <div className="!grid !grid-cols-2 !gap-3">
-                                  <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2.5 !px-4 !py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
+                                <div className="!grid !grid-cols-2 !gap-2 sm:!gap-3">
+                                  <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2 sm:!space-y-2.5 !px-3 sm:!px-4 !py-4 sm:!py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
                                     <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 group-hover/btn:!opacity-100 !transition-opacity !duration-300"></div>
-                                    <div className="!relative !w-11 !h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
+                                    <div className="!relative !w-10 !h-10 sm:!w-11 sm:!h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
                                       <svg
                                         className="!w-5 !h-5 !text-gray-700 group-hover/btn:!text-white !transition-colors !duration-300"
                                         fill="none"
@@ -3956,14 +4268,14 @@ export default function Admin() {
                                         />
                                       </svg>
                                     </div>
-                                    <span className="!relative !text-sm !font-bold !tracking-wide">
+                                    <span className="!relative !text-xs sm:!text-sm !font-bold !tracking-wide">
                                       Mess In
                                     </span>
                                   </button>
 
-                                  <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2.5 !px-4 !py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
+                                  <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2 sm:!space-y-2.5 !px-3 sm:!px-4 !py-4 sm:!py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
                                     <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 group-hover/btn:!opacity-100 !transition-opacity !duration-300"></div>
-                                    <div className="!relative !w-11 !h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
+                                    <div className="!relative !w-10 !h-10 sm:!w-11 sm:!h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
                                       <svg
                                         className="!w-5 !h-5 !text-gray-700 group-hover/btn:!text-white !transition-colors !duration-300"
                                         fill="none"
@@ -3978,7 +4290,7 @@ export default function Admin() {
                                         />
                                       </svg>
                                     </div>
-                                    <span className="!relative !text-sm !font-bold !tracking-wide">
+                                    <span className="!relative !text-xs sm:!text-sm !font-bold !tracking-wide">
                                       Mess Out
                                     </span>
                                   </button>
@@ -3986,12 +4298,11 @@ export default function Admin() {
                               </div>
                             </div>
 
-                            {/* Additional Controls Section */}
-                            <div className="group !bg-white !rounded-2xl !p-6 !border !border-gray-200 hover:!border-gray-300 !transition-all !duration-300 !shadow-sm hover:!shadow-lg">
-                              <div className="!flex !items-center !gap-3 !mb-6">
-                                <div className="!w-11 !h-11 !bg-gray-900 !rounded-xl !flex !items-center !justify-center !shadow-md">
+                            <div className="group !bg-white !rounded-2xl !p-4 sm:!p-6 !border !border-gray-200 hover:!border-gray-300 !transition-all !duration-300 !shadow-sm hover:!shadow-lg">
+                              <div className="!flex !items-center !gap-2 sm:!gap-3 !mb-4 sm:!mb-6">
+                                <div className="!w-10 !h-10 sm:!w-11 sm:!h-11 !bg-gray-900 !rounded-xl !flex !items-center !justify-center !shadow-md !flex-shrink-0">
                                   <svg
-                                    className="!w-6 !h-6 !text-white"
+                                    className="!w-5 !h-5 sm:!w-6 sm:!h-6 !text-white"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
@@ -4004,20 +4315,17 @@ export default function Admin() {
                                     />
                                   </svg>
                                 </div>
-                                <div className="!flex-1  flex items-center flex-col">
-                                  <h6 className="!text-lg !font-bold !text-gray-900 !mb-0.5 !leading-tight">
+                                <div className="!flex-1 !text-left">
+                                  <h6 className="!text-base sm:!text-lg !font-bold !text-gray-900 !mb-0.5 !leading-tight">
                                     Additional Controls
                                   </h6>
-                                  <p className="!text-xs !text-gray-500 !leading-tight">
-                                    Activity management options
-                                  </p>
                                 </div>
                               </div>
 
-                              <div className="!grid !grid-cols-1 sm:!grid-cols-3 !gap-3">
-                                <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2.5 !px-4 !py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
+                              <div className="!grid !grid-cols-2 md:!grid-cols-3 !gap-2 sm:!gap-3">
+                                <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2 sm:!space-y-2.5 !px-3 sm:!px-4 !py-4 sm:!py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
                                   <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 group-hover/btn:!opacity-100 !transition-opacity !duration-300"></div>
-                                  <div className="!relative !w-11 !h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
+                                  <div className="!relative !w-10 !h-10 sm:!w-11 sm:!h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
                                     <svg
                                       className="!w-5 !h-5 !text-gray-700 group-hover/btn:!text-white !transition-colors !duration-300"
                                       fill="none"
@@ -4032,14 +4340,14 @@ export default function Admin() {
                                       />
                                     </svg>
                                   </div>
-                                  <span className="!relative !text-sm !font-bold !tracking-wide">
+                                  <span className="!relative !text-xs sm:!text-sm !font-bold !tracking-wide !text-center">
                                     Mark Late
                                   </span>
                                 </button>
 
-                                <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2.5 !px-4 !py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
+                                <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2 sm:!space-y-2.5 !px-3 sm:!px-4 !py-4 sm:!py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
                                   <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 group-hover/btn:!opacity-100 !transition-opacity !duration-300"></div>
-                                  <div className="!relative !w-11 !h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
+                                  <div className="!relative !w-10 !h-10 sm:!w-11 sm:!h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
                                     <svg
                                       className="!w-5 !h-5 !text-gray-700 group-hover/btn:!text-white !transition-colors !duration-300"
                                       fill="none"
@@ -4054,14 +4362,14 @@ export default function Admin() {
                                       />
                                     </svg>
                                   </div>
-                                  <span className="!relative !text-sm !font-bold !tracking-wide">
-                                    View Logs
+                                  <span className="!relative !text-xs sm:!text-sm !font-bold !tracking-wide !text-center">
+                                    Export Student's Logs
                                   </span>
                                 </button>
 
-                                <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2.5 !px-4 !py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
+                                <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2 sm:!space-y-2.5 !px-3 sm:!px-4 !py-4 sm:!py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95 !col-span-2 md:!col-span-1">
                                   <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 group-hover/btn:!opacity-100 !transition-opacity !duration-300"></div>
-                                  <div className="!relative !w-11 !h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
+                                  <div className="!relative !w-10 !h-10 sm:!w-11 sm:!h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
                                     <svg
                                       className="!w-5 !h-5 !text-gray-700 group-hover/btn:!text-white !transition-colors !duration-300"
                                       fill="none"
@@ -4076,16 +4384,15 @@ export default function Admin() {
                                       />
                                     </svg>
                                   </div>
-                                  <span className="!relative !text-sm !font-bold !tracking-wide">
+                                  <span className="!relative !text-xs sm:!text-sm !font-bold !tracking-wide !text-center">
                                     Issue Warning
                                   </span>
                                 </button>
                               </div>
                             </div>
-                            
                           </div>
                         </div>
-                      )}                      
+                      )}
                     </div>
                   )}
 
@@ -4128,7 +4435,6 @@ export default function Admin() {
                         {studentDetails && (
                           <div className="bg-white rounded-xl border border-gray-200 p-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              {/* Student Info */}
                               <div>
                                 <h4 className="text-xl font-semibold text-gray-800 mb-4">
                                   Student Information
