@@ -12,6 +12,8 @@ import {
 
 const router = express.Router();
 
+
+// router.use("/", messAttendanceRouter);
 router.get("/snacks/:roll", checkIfOptedForSnacks);
 router.put("/snacks/:roll/true", checkIfCommittee, addToSnacksList);
 router.put("/snacks/:roll/false", checkIfCommittee, removeFromSnacksList);

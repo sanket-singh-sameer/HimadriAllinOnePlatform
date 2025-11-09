@@ -47,8 +47,12 @@ export default function Admin() {
   const [selectedOutpasses, setSelectedOutpasses] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [complaintsCurrentPage, setComplaintsCurrentPage] = useState(1);
+  const [complaintsItemsPerPage] = useState(10);
   const [showConfirmAction, setShowConfirmAction] = useState(false);
   const [confirmActionType, setConfirmActionType] = useState(null);
+  const [nfcScanning, setNfcScanning] = useState(false);
+  const [nfcSupported, setNfcSupported] = useState(false);
   const [noticeForm, setNoticeForm] = useState({
     title: "",
     description: "",
@@ -519,19 +523,70 @@ export default function Admin() {
       setStudentDetails(null);
     }
   };
+
+  // NFC Handler Functions
+  const startNFCScan = async () => {
+    if (!('NDEFReader' in window)) {
+      toast.error('NFC is not supported on this device');
+      return;
+    }
+
+    try {
+      const ndef = new NDEFReader();
+      await ndef.scan();
+      setNfcScanning(true);
+      toast.info('NFC scanning started. Tap a card...');
+
+      ndef.onreading = (event) => {
+        const { serialNumber } = event;
+        setSearchRollNumber(serialNumber.toUpperCase());
+        handleRollSearchText({ target: { value: serialNumber.toUpperCase() } });
+        setNfcScanning(false);
+        toast.success('NFC card detected!');
+      };
+
+      ndef.onreadingerror = () => {
+        toast.error('Error reading NFC tag');
+        setNfcScanning(false);
+      };
+
+    } catch (error) {
+      console.error('Error starting NFC scan:', error);
+      toast.error('Failed to start NFC scanning');
+      setNfcScanning(false);
+    }
+  };
+
+  const handleNFCInput = (e) => {
+    const value = e.target.value;
+    setSearchRollNumber(value);
+    
+    // Auto-submit when Enter is pressed (for NFC readers that send Enter)
+    if (value.includes('\n') || value.includes('\r')) {
+      const cleanValue = value.replace(/[\n\r]/g, '').trim();
+      if (cleanValue) {
+        setSearchRollNumber(cleanValue.toUpperCase());
+        handleRollSearchText({ target: { value: cleanValue.toUpperCase() } });
+      }
+    }
+  };
+
   const handleFilterChangeByStatus = (status) => {
     setSelectedStatusFilter(status);
+    setComplaintsCurrentPage(1); // Reset to first page when filter changes
     applyFilters(status, selectedCategoryFilter, roomSearchFilter);
   };
 
   const handleFilterChangeByCategory = (category) => {
     setSelectedCategoryFilter(category);
+    setComplaintsCurrentPage(1); // Reset to first page when filter changes
     applyFilters(selectedStatusFilter, category, roomSearchFilter);
   };
 
   const handleRoomSearchChange = (e) => {
     const roomValue = e.target.value;
     setRoomSearchFilter(roomValue);
+    setComplaintsCurrentPage(1); // Reset to first page when filter changes
     applyFilters(selectedStatusFilter, selectedCategoryFilter, roomValue);
   };
 
@@ -638,36 +693,14 @@ export default function Admin() {
 
   const fetchOutpassRequests = async () => {
     try {
-      //HNN YHA PAR API CALL KAR
-      const dummyData = [
-        {
-          name: "Divyam Singh",
-          roll: "24BCS041",
-          room: "509",
-          placeOfVisit: "Market",
-          outDate: "2025-11-05",
-          outTime: "10:00",
-          returnTime: "18:00",
-          studentContact: "7698630094",
-          parentContact: "8849967312",
-          status: "Pending",
-        },
-        {
-          name: "Sanket Singh",
-          roll: "24BMA031",
-          room: "509",
-          placeOfVisit: "Kotha",
-          outDate: "2025-11-03",
-          outTime: "08:00",
-          returnTime: "20:00",
-          studentContact: "7698630094",
-          parentContact: "8849967312",
-          status: "Approved",
-          requestedOn: "2025-11-01T14:20:00",
-        },
-      ];
-      setOutpassRequests(dummyData);
-      setFilteredOutpasses(dummyData);
+      const response = await axiosInstance.get(API_PATHS.GET_ALL_OUTPASSES);
+      
+      // Show all outpass requests (pending, approved, and rejected)
+      const allOutpasses = response.data.outpasses;
+      
+      setOutpassRequests(allOutpasses);
+      setFilteredOutpasses(allOutpasses);
+      console.log("Outpass requests fetched:", allOutpasses);
     } catch (error) {
       console.error("Error fetching outpass requests:", error);
       toast.error("Failed to fetch outpass requests");
@@ -680,30 +713,33 @@ export default function Admin() {
     if (outpassSearchTerm) {
       filtered = filtered.filter(
         (outpass) =>
-          outpass.name
-            .toLowerCase()
+          outpass.fullName
+            ?.toLowerCase()
             .includes(outpassSearchTerm.toLowerCase()) ||
-          outpass.roll
-            .toLowerCase()
+          outpass.rollNumber
+            ?.toLowerCase()
             .includes(outpassSearchTerm.toLowerCase()) ||
-          outpass.room
-            .toLowerCase()
+          outpass.roomNumber
+            ?.toLowerCase()
             .includes(outpassSearchTerm.toLowerCase()) ||
           outpass.placeOfVisit
-            .toLowerCase()
+            ?.toLowerCase()
             .includes(outpassSearchTerm.toLowerCase())
       );
     }
 
     if (outpassStatusFilter) {
       filtered = filtered.filter(
-        (outpass) => outpass.status === outpassStatusFilter
+        (outpass) => outpass.status === outpassStatusFilter.toLowerCase()
       );
     }
 
     if (outpassDateFilter) {
       filtered = filtered.filter(
-        (outpass) => outpass.outDate === outpassDateFilter
+        (outpass) => {
+          const outDate = new Date(outpass.outDate).toISOString().split('T')[0];
+          return outDate === outpassDateFilter;
+        }
       );
     }
 
@@ -714,28 +750,29 @@ export default function Admin() {
   const handleOutpassAction = async (outpassId, action) => {
     setLocalIsLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      setOutpassRequests((prev) =>
-        prev.map((outpass) =>
-          outpass.id === outpassId
-            ? {
-                ...outpass,
-                status: action === "approve" ? "Approved" : "Rejected",
-              }
-            : outpass
-        )
+      const status = action === "approve" ? "approved" : "rejected";
+      
+      const response = await axiosInstance.patch(
+        API_PATHS.UPDATE_OUTPASS_STATUS(outpassId),
+        { status }
       );
 
-      toast.success(
-        `Outpass ${action === "approve" ? "approved" : "rejected"} successfully`
-      );
-      setShowOutpassModal(false);
-      setShowConfirmAction(false);
-      applyOutpassFilters();
+      if (response.status === 200) {
+        toast.success(
+          `Outpass ${action === "approve" ? "approved" : "rejected"} successfully`
+        );
+        
+        // Refresh the outpass list
+        await fetchOutpassRequests();
+        
+        // Close the modal
+        setShowOutpassModal(false);
+        setShowConfirmAction(false);
+        setSelectedOutpass(null);
+      }
     } catch (error) {
       console.error("Error updating outpass:", error);
-      toast.error("Failed to update outpass status");
+      toast.error(error.response?.data?.message || "Failed to update outpass status");
     } finally {
       setLocalIsLoading(false);
     }
@@ -751,7 +788,7 @@ export default function Admin() {
     if (selectedOutpasses.length === paginatedOutpasses.length) {
       setSelectedOutpasses([]);
     } else {
-      setSelectedOutpasses(paginatedOutpasses.map((outpass) => outpass.id));
+      setSelectedOutpasses(paginatedOutpasses.map((outpass) => outpass._id));
     }
   };
 
@@ -771,8 +808,21 @@ export default function Admin() {
   );
   const totalPages = Math.ceil(filteredOutpasses.length / itemsPerPage);
 
+  // Complaints Pagination Logic
+  const complaintsIndexOfLastItem = complaintsCurrentPage * complaintsItemsPerPage;
+  const complaintsIndexOfFirstItem = complaintsIndexOfLastItem - complaintsItemsPerPage;
+  const paginatedComplaints = complaintsListTemp.slice(
+    complaintsIndexOfFirstItem,
+    complaintsIndexOfLastItem
+  );
+  const complaintsTotalPages = Math.ceil(complaintsListTemp.length / complaintsItemsPerPage);
+
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
+  };
+
+  const handleComplaintsPageChange = (pageNumber) => {
+    setComplaintsCurrentPage(pageNumber);
   };
 
   useEffect(() => {
@@ -781,6 +831,13 @@ export default function Admin() {
     fetchAllComplaints();
     getWebsiteStats();
     fetchOutpassRequests();
+  }, []);
+
+  useEffect(() => {
+    // Check NFC support
+    if ('NDEFReader' in window) {
+      setNfcSupported(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -1950,7 +2007,7 @@ export default function Admin() {
 
                       <div className="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
                         <div className="space-y-4 sm:space-y-6 lg:space-y-8 py-4 sm:py-6 lg:py-8 px-2 sm:px-4 lg:px-6">
-                          {complaintsListTemp.length === 0 ? (
+                          {paginatedComplaints.length === 0 ? (
                             <div className="text-center py-12">
                               <div className="text-gray-400 text-4xl mb-4">
                                 📋
@@ -1967,7 +2024,7 @@ export default function Admin() {
                               </p>
                             </div>
                           ) : (
-                            complaintsListTemp.map((complaint, index) => (
+                            paginatedComplaints.map((complaint, index) => (
                               <div
                                 key={complaint.serial}
                                 className="border rounded-2xl lg:rounded-3xl shadow-md bg-white transition-all duration-500 hover:shadow-lg"
@@ -2099,6 +2156,123 @@ export default function Admin() {
                           )}
                         </div>
                       </div>
+
+                      {/* Pagination Controls */}
+                      {complaintsTotalPages > 1 && (
+                        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 px-4">
+                          {/* Results Summary */}
+                          <div className="text-sm text-gray-700">
+                            Showing{" "}
+                            <span className="font-medium">
+                              {complaintsIndexOfFirstItem + 1}
+                            </span>{" "}
+                            to{" "}
+                            <span className="font-medium">
+                              {Math.min(
+                                complaintsIndexOfLastItem,
+                                complaintsListTemp.length
+                              )}
+                            </span>{" "}
+                            of{" "}
+                            <span className="font-medium">
+                              {complaintsListTemp.length}
+                            </span>{" "}
+                            complaints
+                          </div>
+
+                          {/* Desktop Pagination */}
+                          <div className="hidden sm:flex items-center gap-2">
+                            <button
+                              onClick={() =>
+                                handleComplaintsPageChange(complaintsCurrentPage - 1)
+                              }
+                              disabled={complaintsCurrentPage === 1}
+                              className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                              Previous
+                            </button>
+
+                            {[...Array(complaintsTotalPages)].map((_, index) => {
+                              const pageNumber = index + 1;
+                              // Show first page, last page, current page, and pages around current
+                              if (
+                                pageNumber === 1 ||
+                                pageNumber === complaintsTotalPages ||
+                                (pageNumber >= complaintsCurrentPage - 1 &&
+                                  pageNumber <= complaintsCurrentPage + 1)
+                              ) {
+                                return (
+                                  <button
+                                    key={pageNumber}
+                                    onClick={() =>
+                                      handleComplaintsPageChange(pageNumber)
+                                    }
+                                    className={`px-4 py-2 rounded-lg border transition-colors ${
+                                      complaintsCurrentPage === pageNumber
+                                        ? "bg-gray-900 text-white border-gray-900"
+                                        : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                                    }`}
+                                  >
+                                    {pageNumber}
+                                  </button>
+                                );
+                              } else if (
+                                pageNumber === complaintsCurrentPage - 2 ||
+                                pageNumber === complaintsCurrentPage + 2
+                              ) {
+                                return (
+                                  <span
+                                    key={pageNumber}
+                                    className="px-2 text-gray-400"
+                                  >
+                                    ...
+                                  </span>
+                                );
+                              }
+                              return null;
+                            })}
+
+                            <button
+                              onClick={() =>
+                                handleComplaintsPageChange(complaintsCurrentPage + 1)
+                              }
+                              disabled={
+                                complaintsCurrentPage === complaintsTotalPages
+                              }
+                              className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                              Next
+                            </button>
+                          </div>
+
+                          {/* Mobile Pagination */}
+                          <div className="flex sm:hidden items-center gap-2">
+                            <button
+                              onClick={() =>
+                                handleComplaintsPageChange(complaintsCurrentPage - 1)
+                              }
+                              disabled={complaintsCurrentPage === 1}
+                              className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              ←
+                            </button>
+                            <span className="text-sm text-gray-700">
+                              Page {complaintsCurrentPage} of {complaintsTotalPages}
+                            </span>
+                            <button
+                              onClick={() =>
+                                handleComplaintsPageChange(complaintsCurrentPage + 1)
+                              }
+                              disabled={
+                                complaintsCurrentPage === complaintsTotalPages
+                              }
+                              className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              →
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -2847,7 +3021,7 @@ export default function Admin() {
                                     checked={
                                       paginatedOutpasses.length > 0 &&
                                       paginatedOutpasses.every((o) =>
-                                        selectedOutpasses.includes(o.id)
+                                        selectedOutpasses.includes(o._id)
                                       )
                                     }
                                     onChange={handleSelectAllOutpasses}
@@ -2925,13 +3099,13 @@ export default function Admin() {
                                       <input
                                         type="checkbox"
                                         checked={selectedOutpasses.includes(
-                                          outpass.id
+                                          outpass._id
                                         )}
                                         onChange={() =>
-                                          handleSelectOutpass(outpass.id)
+                                          handleSelectOutpass(outpass._id)
                                         }
                                         className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
-                                        aria-label={`Select ${outpass.name}`}
+                                        aria-label={`Select ${outpass.fullName}`}
                                       />
                                     </td>
 
@@ -2939,10 +3113,10 @@ export default function Admin() {
                                     <td className="px-6 py-4">
                                       <div className="flex flex-col">
                                         <span className="!text-sm !font-medium !text-gray-900">
-                                          {outpass.name}
+                                          {outpass.fullName}
                                         </span>
                                         <span className="!text-xs !text-gray-500 mt-0.5">
-                                          {outpass.roll}
+                                          {outpass.rollNumber}
                                         </span>
                                       </div>
                                     </td>
@@ -2951,10 +3125,10 @@ export default function Admin() {
                                     <td className="px-6 py-4">
                                       <div className="flex flex-col">
                                         <span className="!text-sm !font-medium !text-gray-900">
-                                          {outpass.room}
+                                          {outpass.roomNumber}
                                         </span>
                                         <span className="!text-xs !text-gray-500 mt-0.5">
-                                          {outpass.hostelBlock}
+                                          {outpass.semester ? `Sem ${outpass.semester}` : ''}
                                         </span>
                                       </div>
                                     </td>
@@ -2989,7 +3163,7 @@ export default function Admin() {
                                       <div className="flex flex-col">
                                         <span className="!text-sm !font-medium !text-gray-900">
                                           {new Date(
-                                            outpass.returnDate
+                                            outpass.outDate
                                           ).toLocaleDateString("en-US", {
                                             month: "short",
                                             day: "numeric",
@@ -2997,7 +3171,7 @@ export default function Admin() {
                                           })}
                                         </span>
                                         <span className="!text-xs !text-gray-500 mt-0.5">
-                                          {outpass.returnTime}
+                                          {outpass.expectedReturnTime}
                                         </span>
                                       </div>
                                     </td>
@@ -3006,14 +3180,14 @@ export default function Admin() {
                                     <td className="px-6 py-4">
                                       <span
                                         className={`inline-flex items-center px-2.5 py-1 rounded-full !text-xs !font-medium ${
-                                          outpass.status === "Pending"
+                                          outpass.status === "pending"
                                             ? "bg-amber-50 text-amber-700 border border-amber-200"
-                                            : outpass.status === "Approved"
+                                            : outpass.status === "approved"
                                             ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                                             : "bg-rose-50 text-rose-700 border border-rose-200"
                                         }`}
                                       >
-                                        {outpass.status}
+                                        {outpass.status.charAt(0).toUpperCase() + outpass.status.slice(1)}
                                       </span>
                                     </td>
 
@@ -3292,7 +3466,7 @@ export default function Admin() {
                                       Student Name
                                     </span>
                                     <span className="!text-sm !font-medium !text-gray-900 text-right">
-                                      {selectedOutpass.name}
+                                      {selectedOutpass.fullName}
                                     </span>
                                   </div>
                                   <div className="flex justify-between items-start py-2">
@@ -3300,7 +3474,7 @@ export default function Admin() {
                                       Roll Number
                                     </span>
                                     <span className="!text-sm !font-medium !text-gray-900 text-right">
-                                      {selectedOutpass.roll}
+                                      {selectedOutpass.rollNumber}
                                     </span>
                                   </div>
                                   <div className="flex justify-between items-start py-2">
@@ -3308,7 +3482,15 @@ export default function Admin() {
                                       Room Number
                                     </span>
                                     <span className="!text-sm !font-medium !text-gray-900 text-right">
-                                      {selectedOutpass.room}
+                                      {selectedOutpass.roomNumber}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-start py-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Semester
+                                    </span>
+                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
+                                      {selectedOutpass.semester}
                                     </span>
                                   </div>
                                   <div className="flex justify-between items-start py-2">
@@ -3319,12 +3501,20 @@ export default function Admin() {
                                       {selectedOutpass.studentContact}
                                     </span>
                                   </div>
-                                  <div className="flex justify-between items-start py-2 md:col-span-2">
+                                  <div className="flex justify-between items-start py-2">
                                     <span className="!text-sm !text-gray-500">
-                                      Parent Phone
+                                      Emergency Contact
                                     </span>
                                     <span className="!text-sm !font-medium !text-gray-900 text-right">
-                                      {selectedOutpass.parentContact}
+                                      {selectedOutpass.emergencyContact}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-start py-2 md:col-span-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Email
+                                    </span>
+                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
+                                      {selectedOutpass.email}
                                     </span>
                                   </div>
                                 </div>
@@ -3342,14 +3532,6 @@ export default function Admin() {
                                     </span>
                                     <span className="!text-sm !font-medium !text-gray-900 text-right">
                                       {selectedOutpass.placeOfVisit}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between items-start py-2">
-                                    <span className="!text-sm !text-gray-500">
-                                      Purpose
-                                    </span>
-                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
-                                      {selectedOutpass.purpose}
                                     </span>
                                   </div>
                                   <div className="flex justify-between items-start py-2">
@@ -3372,45 +3554,19 @@ export default function Admin() {
                                   </div>
                                   <div className="flex justify-between items-start py-2">
                                     <span className="!text-sm !text-gray-500">
-                                      Return Date
+                                      Expected Return Time
                                     </span>
                                     <span className="!text-sm !font-medium !text-gray-900 text-right">
-                                      {new Date(
-                                        selectedOutpass.returnDate
-                                      ).toLocaleDateString()}
+                                      {selectedOutpass.expectedReturnTime}
                                     </span>
                                   </div>
-                                  <div className="flex justify-between items-start py-2">
-                                    <span className="!text-sm !text-gray-500">
-                                      Return Time
-                                    </span>
-                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
-                                      {selectedOutpass.returnTime}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between items-start py-2">
-                                    <span className="!text-sm !text-gray-500">
-                                      Parent Name
-                                    </span>
-                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
-                                      {selectedOutpass.parentName}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between items-start py-2">
-                                    <span className="!text-sm !text-gray-500">
-                                      Emergency Contact
-                                    </span>
-                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
-                                      {selectedOutpass.emergencyContact}
-                                    </span>
-                                  </div>
-                                  {selectedOutpass.additionalNotes && (
+                                  {selectedOutpass.remarks && (
                                     <div className="flex flex-col gap-2 py-2 md:col-span-2">
                                       <span className="!text-sm !text-gray-500">
-                                        Additional Notes
+                                        Remarks
                                       </span>
                                       <span className="!text-sm !text-gray-700 bg-gray-50 p-3 rounded border border-gray-100">
-                                        {selectedOutpass.additionalNotes}
+                                        {selectedOutpass.remarks}
                                       </span>
                                     </div>
                                   )}
@@ -3427,17 +3583,17 @@ export default function Admin() {
                                     <span className="!text-sm !text-gray-500">
                                       Request ID
                                     </span>
-                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
-                                      {selectedOutpass.id}
+                                    <span className="!text-xs !font-medium !text-gray-900 text-right font-mono">
+                                      {selectedOutpass._id}
                                     </span>
                                   </div>
                                   <div className="flex justify-between items-start py-2">
                                     <span className="!text-sm !text-gray-500">
-                                      Requested On
+                                      Created At
                                     </span>
                                     <span className="!text-sm !font-medium !text-gray-900 text-right">
                                       {new Date(
-                                        selectedOutpass.requestedOn
+                                        selectedOutpass.createdAt
                                       ).toLocaleString()}
                                     </span>
                                   </div>
@@ -3447,40 +3603,39 @@ export default function Admin() {
                                     </span>
                                     <span
                                       className={`inline-flex items-center px-3 py-1 rounded !text-xs !font-medium ${
-                                        selectedOutpass.status === "Pending"
+                                        selectedOutpass.status === "pending"
                                           ? "bg-amber-50 text-amber-700 border border-amber-200"
-                                          : selectedOutpass.status ===
-                                            "Approved"
+                                          : selectedOutpass.status === "approved"
                                           ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                                           : "bg-rose-50 text-rose-700 border border-rose-200"
                                       }`}
                                     >
-                                      {selectedOutpass.status}
+                                      {selectedOutpass.status.charAt(0).toUpperCase() + selectedOutpass.status.slice(1)}
                                     </span>
                                   </div>
                                 </div>
                               </div>
 
                               {/* Action Section */}
-                              {selectedOutpass.status === "Pending" && (
+                              {selectedOutpass.status === "pending" && (
                                 <div className="pt-2">
                                   {!showConfirmAction ? (
                                     <div className="flex gap-3">
                                       <button
                                         onClick={() => {
-                                          setConfirmAction("approve");
+                                          setConfirmActionType("approve");
                                           setShowConfirmAction(true);
                                         }}
-                                        className="flex-1 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all duration-200 !text-sm !font-medium shadow-sm hover:shadow"
+                                        className="flex-1 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all duration-200 !text-sm !font-medium shadow-sm hover:shadow cursor-pointer"
                                       >
                                         Approve
                                       </button>
                                       <button
                                         onClick={() => {
-                                          setConfirmAction("reject");
+                                          setConfirmActionType("reject");
                                           setShowConfirmAction(true);
                                         }}
-                                        className="flex-1 px-6 py-3 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-all duration-200 !text-sm !font-medium shadow-sm hover:shadow"
+                                        className="flex-1 px-6 py-3 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-all duration-200 !text-sm !font-medium shadow-sm hover:shadow cursor-pointer"
                                       >
                                         Reject
                                       </button>
@@ -3490,7 +3645,7 @@ export default function Admin() {
                                       <p className="!text-sm !text-gray-700 !mb-4">
                                         Are you sure you want to{" "}
                                         <span className="!font-semibold">
-                                          {confirmAction}
+                                          {confirmActionType}
                                         </span>{" "}
                                         this outpass request?
                                       </p>
@@ -3498,12 +3653,12 @@ export default function Admin() {
                                         <button
                                           onClick={() =>
                                             handleOutpassAction(
-                                              selectedOutpass.id,
-                                              confirmAction
+                                              selectedOutpass._id,
+                                              confirmActionType
                                             )
                                           }
                                           disabled={localIsLoading}
-                                          className="flex-1 px-4 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 !text-sm !font-medium"
+                                          className="flex-1 px-4 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 !text-sm !font-medium cursor-pointer"
                                         >
                                           {localIsLoading
                                             ? "Processing..."
@@ -3514,7 +3669,7 @@ export default function Admin() {
                                             setShowConfirmAction(false)
                                           }
                                           disabled={localIsLoading}
-                                          className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 !text-sm !font-medium"
+                                          className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 !text-sm !font-medium cursor-pointer"
                                         >
                                           Cancel
                                         </button>
@@ -3541,13 +3696,13 @@ export default function Admin() {
                         </div>
                       </div>
 
-                      {/* Search Section */}
+                      {/* Search Section with NFC Support */}
                       <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl p-6 border border-gray-200 shadow-sm">
                         <div className="flex flex-col sm:flex-row items-center gap-4">
                           <div className="relative w-full sm:flex-1">
                             <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
                               <svg
-                                className="w-5 h-5 text-gray-400"
+                                className={`w-5 h-5 ${nfcScanning ? 'text-green-500 animate-pulse' : 'text-gray-400'}`}
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -3562,18 +3717,40 @@ export default function Admin() {
                             </div>
                             <input
                               type="text"
-                              placeholder="Enter roll number (e.g., 24BCS001)"
+                              placeholder="Tap NFC card or enter roll number (e.g., 24BCS001)"
                               className="w-full px-4 py-3 pl-12 pr-4 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400 transition-all duration-300 bg-white"
-                              onChange={handleRollSearchText}
+                              onChange={handleNFCInput}
                               value={searchRollNumber}
+                              autoFocus
                             />
                           </div>
+                          
+                          {/* NFC Scan Button (only show if supported) */}
+                          {nfcSupported && (
+                            <button
+                              onClick={startNFCScan}
+                              disabled={nfcScanning}
+                              className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg ${
+                                nfcScanning
+                                  ? 'bg-green-500 text-white animate-pulse'
+                                  : 'bg-blue-600 text-white hover:bg-blue-700'
+                              }`}
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                              </svg>
+                              <span>{nfcScanning ? 'Scanning...' : 'NFC Scan'}</span>
+                            </button>
+                          )}
+
                           <button
-                            onClick={() =>
-                              handleRollSearchText({
-                                target: { value: searchRollNumber },
-                              })
-                            }
+                            onClick={() => {
+                              if (searchRollNumber) {
+                                handleRollSearchText({
+                                  target: { value: searchRollNumber },
+                                });
+                              }
+                            }}
                             className="w-full sm:w-auto px-8 py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-gray-800 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl cursor-pointer"
                           >
                             <svg
@@ -3591,6 +3768,13 @@ export default function Admin() {
                             </svg>
                             <span>Search</span>
                           </button>
+                        </div>
+
+                        {/* Instructions */}
+                        <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                          <p className="text-xs text-blue-800">
+                            <strong>💡 Tip:</strong> {nfcSupported ? 'Click "NFC Scan" and tap your card, or simply' : 'Simply'} tap your NFC card when the input is focused, or type the roll number manually and press Enter.
+                          </p>
                         </div>
                       </div>
 
