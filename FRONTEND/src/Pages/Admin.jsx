@@ -36,6 +36,19 @@ export default function Admin() {
   const [activeTab, setActiveTab] = useState("profile");
   const [showAddNoticeForm, setShowAddNoticeForm] = useState(false);
   const [passwordError, setPasswordError] = useState(null);
+
+  const [outpassRequests, setOutpassRequests] = useState([]);
+  const [filteredOutpasses, setFilteredOutpasses] = useState([]);
+  const [selectedOutpass, setSelectedOutpass] = useState(null);
+  const [showOutpassModal, setShowOutpassModal] = useState(false);
+  const [outpassSearchTerm, setOutpassSearchTerm] = useState("");
+  const [outpassStatusFilter, setOutpassStatusFilter] = useState("");
+  const [outpassDateFilter, setOutpassDateFilter] = useState("");
+  const [selectedOutpasses, setSelectedOutpasses] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [showConfirmAction, setShowConfirmAction] = useState(false);
+  const [confirmActionType, setConfirmActionType] = useState(null);
   const [noticeForm, setNoticeForm] = useState({
     title: "",
     description: "",
@@ -71,7 +84,6 @@ export default function Admin() {
   const handleMediaChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Check file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         toast.error("File size must be less than 5MB");
         e.target.value = "";
@@ -104,12 +116,10 @@ export default function Admin() {
     e.preventDefault();
     setLocalIsLoading(true);
     try {
-      // Create FormData to handle file upload
       const formData = new FormData();
       formData.append("title", noticeForm.title);
       formData.append("description", noticeForm.description);
 
-      // Only append media if it exists
       if (noticeForm.media) {
         formData.append("media", noticeForm.media);
       }
@@ -127,7 +137,6 @@ export default function Admin() {
       if (response.status === 200 || response.status === 201) {
         fetchAllNotices();
         setNoticeForm({ title: "", description: "", media: null });
-        // Clear the file input
         const fileInput = document.getElementById("media-upload");
         if (fileInput) fileInput.value = "";
         toast.success(response.data.message);
@@ -627,16 +636,165 @@ export default function Admin() {
     }
   };
 
+  const fetchOutpassRequests = async () => {
+    try {
+      //HNN YHA PAR API CALL KAR
+      const dummyData = [
+        {
+          name: "Divyam Singh",
+          roll: "24BCS041",
+          room: "509",
+          placeOfVisit: "Market",
+          outDate: "2025-11-05",
+          outTime: "10:00",
+          returnTime: "18:00",
+          studentContact: "7698630094",
+          parentContact: "8849967312",
+          status: "Pending",
+        },
+        {
+          name: "Sanket Singh",
+          roll: "24BMA031",
+          room: "509",
+          placeOfVisit: "Kotha",
+          outDate: "2025-11-03",
+          outTime: "08:00",
+          returnTime: "20:00",
+          studentContact: "7698630094",
+          parentContact: "8849967312",
+          status: "Approved",
+          requestedOn: "2025-11-01T14:20:00",
+        },
+      ];
+      setOutpassRequests(dummyData);
+      setFilteredOutpasses(dummyData);
+    } catch (error) {
+      console.error("Error fetching outpass requests:", error);
+      toast.error("Failed to fetch outpass requests");
+    }
+  };
+
+  const applyOutpassFilters = () => {
+    let filtered = [...outpassRequests];
+
+    if (outpassSearchTerm) {
+      filtered = filtered.filter(
+        (outpass) =>
+          outpass.name
+            .toLowerCase()
+            .includes(outpassSearchTerm.toLowerCase()) ||
+          outpass.roll
+            .toLowerCase()
+            .includes(outpassSearchTerm.toLowerCase()) ||
+          outpass.room
+            .toLowerCase()
+            .includes(outpassSearchTerm.toLowerCase()) ||
+          outpass.placeOfVisit
+            .toLowerCase()
+            .includes(outpassSearchTerm.toLowerCase())
+      );
+    }
+
+    if (outpassStatusFilter) {
+      filtered = filtered.filter(
+        (outpass) => outpass.status === outpassStatusFilter
+      );
+    }
+
+    if (outpassDateFilter) {
+      filtered = filtered.filter(
+        (outpass) => outpass.outDate === outpassDateFilter
+      );
+    }
+
+    setFilteredOutpasses(filtered);
+    setCurrentPage(1);
+  };
+
+  const handleOutpassAction = async (outpassId, action) => {
+    setLocalIsLoading(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      setOutpassRequests((prev) =>
+        prev.map((outpass) =>
+          outpass.id === outpassId
+            ? {
+                ...outpass,
+                status: action === "approve" ? "Approved" : "Rejected",
+              }
+            : outpass
+        )
+      );
+
+      toast.success(
+        `Outpass ${action === "approve" ? "approved" : "rejected"} successfully`
+      );
+      setShowOutpassModal(false);
+      setShowConfirmAction(false);
+      applyOutpassFilters();
+    } catch (error) {
+      console.error("Error updating outpass:", error);
+      toast.error("Failed to update outpass status");
+    } finally {
+      setLocalIsLoading(false);
+    }
+  };
+
+  const handleSelectOutpass = (id) => {
+    setSelectedOutpasses((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAllOutpasses = () => {
+    if (selectedOutpasses.length === paginatedOutpasses.length) {
+      setSelectedOutpasses([]);
+    } else {
+      setSelectedOutpasses(paginatedOutpasses.map((outpass) => outpass.id));
+    }
+  };
+
+  const clearOutpassFilters = () => {
+    setOutpassSearchTerm("");
+    setOutpassStatusFilter("");
+    setOutpassDateFilter("");
+    setFilteredOutpasses(outpassRequests);
+    setCurrentPage(1);
+  };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const paginatedOutpasses = filteredOutpasses.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+  const totalPages = Math.ceil(filteredOutpasses.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   useEffect(() => {
     fetchTodaysMenu();
     fetchAllNotices();
     fetchAllComplaints();
     getWebsiteStats();
+    fetchOutpassRequests();
   }, []);
 
   useEffect(() => {
     applyFilters();
   }, [complaintsList]);
+
+  useEffect(() => {
+    applyOutpassFilters();
+  }, [
+    outpassSearchTerm,
+    outpassStatusFilter,
+    outpassDateFilter,
+    outpassRequests,
+  ]);
 
   const COLORS = ["#4ade80", "#f87171"];
 
@@ -1521,6 +1679,27 @@ export default function Admin() {
                   >
                     Today’s Mess Menu
                   </button>
+
+                  <button
+                    onClick={() => setActiveFeature("outpass")}
+                    className={`w-full cursor-pointer px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl transition-all duration-300 font-bold tracking-wide border-2 hover:shadow-md hover:scale-105 ${
+                      activeFeature === "outpass"
+                        ? "bg-gray-900 text-white border-gray-900"
+                        : "bg-white text-gray-900 border-gray-200 hover:border-gray-400"
+                    }`}
+                  >
+                    Manage Outpasses
+                  </button>
+                  <button
+                    onClick={() => setActiveFeature("attendance")}
+                    className={`w-full cursor-pointer px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl transition-all duration-300 font-bold tracking-wide border-2 hover:shadow-md hover:scale-105 ${
+                      activeFeature === "attendance"
+                        ? "bg-gray-900 text-white border-gray-900"
+                        : "bg-white text-gray-900 border-gray-200 hover:border-gray-400"
+                    }`}
+                  >
+                    Attendance Manager
+                  </button>
                 </div>
 
                 <div className="lg:col-span-3 bg-gray-50 rounded-2xl border border-gray-100 p-3 sm:p-4 md:p-5 lg:p-6 shadow-inner">
@@ -2070,13 +2249,11 @@ export default function Admin() {
                                   <tr className="hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100">
                                     <td className="px-8 py-6">
                                       <div className="flex items-center gap-6">
-                                        {/* Avatar */}
                                         <div className="w-14 h-14 bg-gradient-to-br from-gray-700 to-gray-900 rounded-full flex items-center justify-center text-white font-semibold text-xl shadow-md">
                                           {studentDetails.name?.charAt(0) ||
                                             "S"}
                                         </div>
 
-                                        {/* Details */}
                                         <div className="flex flex-col gap-1">
                                           <div className="text-lg font-semibold text-gray-900 leading-tight">
                                             {studentDetails.name || "N/A"}
@@ -2599,6 +2776,1135 @@ export default function Admin() {
                     </div>
                   )}
 
+                  {activeFeature === "outpass" && (
+                    <div className="w-full space-y-6">
+                      <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+                        <h2 className="!text-3xl !font-bold !text-gray-900 !mb-2">
+                          Outpass Requests
+                        </h2>
+                      </div>
+
+                      <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                          <div className="md:col-span-2">
+                            <input
+                              type="text"
+                              placeholder="Search by name, roll, room, or place..."
+                              value={outpassSearchTerm}
+                              onChange={(e) =>
+                                setOutpassSearchTerm(e.target.value)
+                              }
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                          </div>
+                          <div>
+                            <select
+                              value={outpassStatusFilter}
+                              onChange={(e) =>
+                                setOutpassStatusFilter(e.target.value)
+                              }
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                              <option value="">All Status</option>
+                              <option value="Pending">Pending</option>
+                              <option value="Approved">Approved</option>
+                              <option value="Rejected">Rejected</option>
+                            </select>
+                          </div>
+                          <div>
+                            <input
+                              type="date"
+                              value={outpassDateFilter}
+                              onChange={(e) =>
+                                setOutpassDateFilter(e.target.value)
+                              }
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                          </div>
+                        </div>
+                        {(outpassSearchTerm ||
+                          outpassStatusFilter ||
+                          outpassDateFilter) && (
+                          <button
+                            onClick={clearOutpassFilters}
+                            className="mt-4 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+                          >
+                            Clear Filters
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="hidden md:block bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                        <div className="overflow-x-auto">
+                          <table className="w-full">
+                            {/* Table Header */}
+                            <thead className="bg-gray-50 border-b border-gray-200">
+                              <tr>
+                                {/* Checkbox Column */}
+                                <th className="w-12 px-4 py-3.5 text-left">
+                                  <input
+                                    type="checkbox"
+                                    checked={
+                                      paginatedOutpasses.length > 0 &&
+                                      paginatedOutpasses.every((o) =>
+                                        selectedOutpasses.includes(o.id)
+                                      )
+                                    }
+                                    onChange={handleSelectAllOutpasses}
+                                    className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
+                                    aria-label="Select all outpasses"
+                                  />
+                                </th>
+
+                                {/* Student Column */}
+                                <th className="px-6 py-3.5 text-left !text-xs !font-semibold !text-gray-600 uppercase tracking-wider">
+                                  Student
+                                </th>
+
+                                {/* Room Column */}
+                                <th className="px-6 py-3.5 text-left !text-xs !font-semibold !text-gray-600 uppercase tracking-wider">
+                                  Room
+                                </th>
+
+                                {/* Destination Column */}
+                                <th className="px-6 py-3.5 text-left !text-xs !font-semibold !text-gray-600 uppercase tracking-wider">
+                                  Destination
+                                </th>
+
+                                {/* Out Time Column */}
+                                <th className="px-6 py-3.5 text-left !text-xs !font-semibold !text-gray-600 uppercase tracking-wider">
+                                  Out Time
+                                </th>
+
+                                {/* Return Time Column */}
+                                <th className="px-6 py-3.5 text-left !text-xs !font-semibold !text-gray-600 uppercase tracking-wider">
+                                  Return Time
+                                </th>
+
+                                {/* Status Column */}
+                                <th className="px-6 py-3.5 text-left !text-xs !font-semibold !text-gray-600 uppercase tracking-wider">
+                                  Status
+                                </th>
+
+                                {/* Actions Column */}
+                                <th className="px-6 py-3.5 text-left !text-xs !font-semibold !text-gray-600 uppercase tracking-wider">
+                                  Actions
+                                </th>
+                              </tr>
+                            </thead>
+
+                            {/* Table Body */}
+                            <tbody className="bg-white divide-y divide-gray-200">
+                              {paginatedOutpasses.length === 0 ? (
+                                // Empty State
+                                <tr>
+                                  <td
+                                    colSpan="8"
+                                    className="px-6 py-16 text-center"
+                                  >
+                                    <div className="flex flex-col items-center justify-center space-y-2">
+                                      <p className="!text-base !font-medium !text-gray-500">
+                                        No outpass requests found
+                                      </p>
+                                      <p className="!text-sm !text-gray-400">
+                                        Try adjusting your filters or search
+                                        criteria
+                                      </p>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ) : (
+                                // Data Rows
+                                paginatedOutpasses.map((outpass) => (
+                                  <tr
+                                    key={outpass.id}
+                                    className="hover:bg-gray-50 transition-colors duration-150"
+                                  >
+                                    {/* Checkbox Cell */}
+                                    <td className="w-12 px-4 py-4">
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedOutpasses.includes(
+                                          outpass.id
+                                        )}
+                                        onChange={() =>
+                                          handleSelectOutpass(outpass.id)
+                                        }
+                                        className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
+                                        aria-label={`Select ${outpass.name}`}
+                                      />
+                                    </td>
+
+                                    {/* Student Info Cell */}
+                                    <td className="px-6 py-4">
+                                      <div className="flex flex-col">
+                                        <span className="!text-sm !font-medium !text-gray-900">
+                                          {outpass.name}
+                                        </span>
+                                        <span className="!text-xs !text-gray-500 mt-0.5">
+                                          {outpass.roll}
+                                        </span>
+                                      </div>
+                                    </td>
+
+                                    {/* Room Info Cell */}
+                                    <td className="px-6 py-4">
+                                      <div className="flex flex-col">
+                                        <span className="!text-sm !font-medium !text-gray-900">
+                                          {outpass.room}
+                                        </span>
+                                        <span className="!text-xs !text-gray-500 mt-0.5">
+                                          {outpass.hostelBlock}
+                                        </span>
+                                      </div>
+                                    </td>
+
+                                    {/* Destination Cell */}
+                                    <td className="px-6 py-4">
+                                      <span className="!text-sm !text-gray-900">
+                                        {outpass.placeOfVisit}
+                                      </span>
+                                    </td>
+
+                                    {/* Out Time Cell */}
+                                    <td className="px-6 py-4">
+                                      <div className="flex flex-col">
+                                        <span className="!text-sm !font-medium !text-gray-900">
+                                          {new Date(
+                                            outpass.outDate
+                                          ).toLocaleDateString("en-US", {
+                                            month: "short",
+                                            day: "numeric",
+                                            year: "numeric",
+                                          })}
+                                        </span>
+                                        <span className="!text-xs !text-gray-500 mt-0.5">
+                                          {outpass.outTime}
+                                        </span>
+                                      </div>
+                                    </td>
+
+                                    {/* Return Time Cell */}
+                                    <td className="px-6 py-4">
+                                      <div className="flex flex-col">
+                                        <span className="!text-sm !font-medium !text-gray-900">
+                                          {new Date(
+                                            outpass.returnDate
+                                          ).toLocaleDateString("en-US", {
+                                            month: "short",
+                                            day: "numeric",
+                                            year: "numeric",
+                                          })}
+                                        </span>
+                                        <span className="!text-xs !text-gray-500 mt-0.5">
+                                          {outpass.returnTime}
+                                        </span>
+                                      </div>
+                                    </td>
+
+                                    {/* Status Cell */}
+                                    <td className="px-6 py-4">
+                                      <span
+                                        className={`inline-flex items-center px-2.5 py-1 rounded-full !text-xs !font-medium ${
+                                          outpass.status === "Pending"
+                                            ? "bg-amber-50 text-amber-700 border border-amber-200"
+                                            : outpass.status === "Approved"
+                                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                            : "bg-rose-50 text-rose-700 border border-rose-200"
+                                        }`}
+                                      >
+                                        {outpass.status}
+                                      </span>
+                                    </td>
+
+                                    {/* Actions Cell */}
+                                    <td className="px-6 py-4">
+                                      <button
+                                        onClick={() => {
+                                          setSelectedOutpass(outpass);
+                                          setShowOutpassModal(true);
+                                        }}
+                                        className="px-3 py-1.5 !text-sm !font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-all duration-150 border border-transparent hover:border-blue-200"
+                                      >
+                                        View Details
+                                      </button>
+                                    </td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        {/* Pagination Controls */}
+                        {totalPages > 1 && (
+                          <div className="px-6 py-4 border-t border-gray-200 bg-white">
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                              {/* Results Summary */}
+                              <div className="!text-sm !text-gray-600">
+                                Showing{" "}
+                                <span className="!font-medium !text-gray-900">
+                                  {indexOfFirstItem + 1}
+                                </span>{" "}
+                                to{" "}
+                                <span className="!font-medium !text-gray-900">
+                                  {Math.min(
+                                    indexOfLastItem,
+                                    filteredOutpasses.length
+                                  )}
+                                </span>{" "}
+                                of{" "}
+                                <span className="!font-medium !text-gray-900">
+                                  {filteredOutpasses.length}
+                                </span>{" "}
+                                requests
+                              </div>
+
+                              {/* Pagination Buttons */}
+                              <div className="flex items-center gap-1">
+                                {/* Previous Button */}
+                                <button
+                                  onClick={() =>
+                                    handlePageChange(currentPage - 1)
+                                  }
+                                  disabled={currentPage === 1}
+                                  className="px-3 py-1.5 !text-sm !font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 transition-all duration-150"
+                                  aria-label="Previous page"
+                                >
+                                  Previous
+                                </button>
+
+                                {/* Page Numbers */}
+                                <div className="hidden sm:flex items-center gap-1 mx-2">
+                                  {[...Array(totalPages)].map((_, i) => {
+                                    const pageNumber = i + 1;
+                                    const isCurrentPage =
+                                      currentPage === pageNumber;
+
+                                    return (
+                                      <button
+                                        key={pageNumber}
+                                        onClick={() =>
+                                          handlePageChange(pageNumber)
+                                        }
+                                        className={`min-w-[36px] px-3 py-1.5 !text-sm !font-medium rounded-md transition-all duration-150 ${
+                                          isCurrentPage
+                                            ? "bg-blue-600 text-white shadow-sm"
+                                            : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 hover:border-gray-400"
+                                        }`}
+                                        aria-label={`Page ${pageNumber}`}
+                                        aria-current={
+                                          isCurrentPage ? "page" : undefined
+                                        }
+                                      >
+                                        {pageNumber}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+
+                                {/* Mobile Page Indicator */}
+                                <div className="sm:hidden px-3 py-1.5 !text-sm !font-medium text-gray-700">
+                                  Page {currentPage} of {totalPages}
+                                </div>
+
+                                {/* Next Button */}
+                                <button
+                                  onClick={() =>
+                                    handlePageChange(currentPage + 1)
+                                  }
+                                  disabled={currentPage === totalPages}
+                                  className="px-3 py-1.5 !text-sm !font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 transition-all duration-150"
+                                  aria-label="Next page"
+                                >
+                                  Next
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="md:hidden space-y-4">
+                        {paginatedOutpasses.length === 0 ? (
+                          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 text-center">
+                            <p className="!text-lg !font-medium !text-gray-500">
+                              No outpass requests found
+                            </p>
+                            <p className="!text-sm !text-gray-400 !mt-1">
+                              Try adjusting your filters
+                            </p>
+                          </div>
+                        ) : (
+                          paginatedOutpasses.map((outpass) => (
+                            <div
+                              key={outpass.id}
+                              className="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
+                            >
+                              <div className="flex items-start justify-between mb-4">
+                                <div className="flex items-start gap-3">
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedOutpasses.includes(
+                                      outpass.id
+                                    )}
+                                    onChange={() =>
+                                      handleSelectOutpass(outpass.id)
+                                    }
+                                    className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                  />
+                                  <div>
+                                    <h3 className="!text-lg !font-semibold !text-gray-900">
+                                      {outpass.name}
+                                    </h3>
+                                    <p className="!text-sm !text-gray-500">
+                                      {outpass.roll}
+                                    </p>
+                                  </div>
+                                </div>
+                                <span
+                                  className={`inline-flex items-center px-3 py-1 rounded-full !text-xs !font-semibold ${
+                                    outpass.status === "Pending"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : outpass.status === "Approved"
+                                      ? "bg-green-100 text-green-800"
+                                      : "bg-red-100 text-red-800"
+                                  }`}
+                                >
+                                  {outpass.status}
+                                </span>
+                              </div>
+
+                              <div className="space-y-2 mb-4">
+                                <div className="flex justify-between">
+                                  <span className="!text-sm !text-gray-500">
+                                    Room:
+                                  </span>
+                                  <span className="!text-sm !font-medium !text-gray-900">
+                                    {outpass.room} ({outpass.hostelBlock})
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="!text-sm !text-gray-500">
+                                    Destination:
+                                  </span>
+                                  <span className="!text-sm !font-medium !text-gray-900">
+                                    {outpass.placeOfVisit}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="!text-sm !text-gray-500">
+                                    Out:
+                                  </span>
+                                  <span className="!text-sm !font-medium !text-gray-900">
+                                    {new Date(
+                                      outpass.outDate
+                                    ).toLocaleDateString()}{" "}
+                                    {outpass.outTime}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="!text-sm !text-gray-500">
+                                    Return:
+                                  </span>
+                                  <span className="!text-sm !font-medium !text-gray-900">
+                                    {new Date(
+                                      outpass.returnDate
+                                    ).toLocaleDateString()}{" "}
+                                    {outpass.returnTime}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <button
+                                onClick={() => {
+                                  setSelectedOutpass(outpass);
+                                  setShowOutpassModal(true);
+                                }}
+                                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors !text-sm !font-medium"
+                              >
+                                View Details
+                              </button>
+                            </div>
+                          ))
+                        )}
+
+                        {totalPages > 1 && (
+                          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4">
+                            <div className="flex justify-between items-center mb-3">
+                              <p className="!text-sm !text-gray-700">
+                                Page {currentPage} of {totalPages}
+                              </p>
+                            </div>
+                            <div className="flex gap-2 justify-center">
+                              <button
+                                onClick={() =>
+                                  handlePageChange(currentPage - 1)
+                                }
+                                disabled={currentPage === 1}
+                                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed !text-sm"
+                              >
+                                Previous
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handlePageChange(currentPage + 1)
+                                }
+                                disabled={currentPage === totalPages}
+                                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed !text-sm"
+                              >
+                                Next
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {showOutpassModal && selectedOutpass && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm animate-fadeIn">
+                          <div className="bg-white rounded-lg shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto animate-slideUp">
+                            {/* Header */}
+                            <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-5 flex items-center justify-between z-10">
+                              <h3 className="!text-2xl !font-semibold !text-gray-900 text-center flex-1">
+                                Outpass Details
+                              </h3>
+                              <button
+                                onClick={() => {
+                                  setShowOutpassModal(false);
+                                  setSelectedOutpass(null);
+                                  setShowConfirmAction(false);
+                                }}
+                                className="text-gray-400 hover:text-gray-700 transition-colors !text-2xl !font-light"
+                              >
+                                ×
+                              </button>
+                            </div>
+
+                            <div className="p-8 space-y-8">
+                              {/* Student Information Section */}
+                              <div className="bg-white border border-gray-200 rounded-lg p-6">
+                                <h6 className="!text-base !font-semibold !text-gray-900 !mb-5 pb-2 border-b border-gray-100">
+                                  Student Information
+                                </h6>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                  <div className="flex justify-between items-start py-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Student Name
+                                    </span>
+                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
+                                      {selectedOutpass.name}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-start py-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Roll Number
+                                    </span>
+                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
+                                      {selectedOutpass.roll}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-start py-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Room Number
+                                    </span>
+                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
+                                      {selectedOutpass.room}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-start py-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Student Phone
+                                    </span>
+                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
+                                      {selectedOutpass.studentContact}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-start py-2 md:col-span-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Parent Phone
+                                    </span>
+                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
+                                      {selectedOutpass.parentContact}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Visit Information Section */}
+                              <div className="bg-white border border-gray-200 rounded-lg p-6">
+                                <h6 className="!text-base !font-semibold !text-gray-900 !mb-5 pb-2 border-b border-gray-100">
+                                  Visit Information
+                                </h6>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                  <div className="flex justify-between items-start py-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Place of Visit
+                                    </span>
+                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
+                                      {selectedOutpass.placeOfVisit}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-start py-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Purpose
+                                    </span>
+                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
+                                      {selectedOutpass.purpose}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-start py-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Out Date
+                                    </span>
+                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
+                                      {new Date(
+                                        selectedOutpass.outDate
+                                      ).toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-start py-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Out Time
+                                    </span>
+                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
+                                      {selectedOutpass.outTime}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-start py-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Return Date
+                                    </span>
+                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
+                                      {new Date(
+                                        selectedOutpass.returnDate
+                                      ).toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-start py-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Return Time
+                                    </span>
+                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
+                                      {selectedOutpass.returnTime}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-start py-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Parent Name
+                                    </span>
+                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
+                                      {selectedOutpass.parentName}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-start py-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Emergency Contact
+                                    </span>
+                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
+                                      {selectedOutpass.emergencyContact}
+                                    </span>
+                                  </div>
+                                  {selectedOutpass.additionalNotes && (
+                                    <div className="flex flex-col gap-2 py-2 md:col-span-2">
+                                      <span className="!text-sm !text-gray-500">
+                                        Additional Notes
+                                      </span>
+                                      <span className="!text-sm !text-gray-700 bg-gray-50 p-3 rounded border border-gray-100">
+                                        {selectedOutpass.additionalNotes}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Request Information Section */}
+                              <div className="bg-white border border-gray-200 rounded-lg p-6">
+                                <h6 className="!text-base !font-semibold !text-gray-900 !mb-5 pb-2 border-b border-gray-100">
+                                  Request Information
+                                </h6>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
+                                  <div className="flex justify-between items-start py-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Request ID
+                                    </span>
+                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
+                                      {selectedOutpass.id}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-start py-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Requested On
+                                    </span>
+                                    <span className="!text-sm !font-medium !text-gray-900 text-right">
+                                      {new Date(
+                                        selectedOutpass.requestedOn
+                                      ).toLocaleString()}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-start py-2">
+                                    <span className="!text-sm !text-gray-500">
+                                      Status
+                                    </span>
+                                    <span
+                                      className={`inline-flex items-center px-3 py-1 rounded !text-xs !font-medium ${
+                                        selectedOutpass.status === "Pending"
+                                          ? "bg-amber-50 text-amber-700 border border-amber-200"
+                                          : selectedOutpass.status ===
+                                            "Approved"
+                                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                          : "bg-rose-50 text-rose-700 border border-rose-200"
+                                      }`}
+                                    >
+                                      {selectedOutpass.status}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Action Section */}
+                              {selectedOutpass.status === "Pending" && (
+                                <div className="pt-2">
+                                  {!showConfirmAction ? (
+                                    <div className="flex gap-3">
+                                      <button
+                                        onClick={() => {
+                                          setConfirmAction("approve");
+                                          setShowConfirmAction(true);
+                                        }}
+                                        className="flex-1 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all duration-200 !text-sm !font-medium shadow-sm hover:shadow"
+                                      >
+                                        Approve
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          setConfirmAction("reject");
+                                          setShowConfirmAction(true);
+                                        }}
+                                        className="flex-1 px-6 py-3 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-all duration-200 !text-sm !font-medium shadow-sm hover:shadow"
+                                      >
+                                        Reject
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-5">
+                                      <p className="!text-sm !text-gray-700 !mb-4">
+                                        Are you sure you want to{" "}
+                                        <span className="!font-semibold">
+                                          {confirmAction}
+                                        </span>{" "}
+                                        this outpass request?
+                                      </p>
+                                      <div className="flex gap-3">
+                                        <button
+                                          onClick={() =>
+                                            handleOutpassAction(
+                                              selectedOutpass.id,
+                                              confirmAction
+                                            )
+                                          }
+                                          disabled={localIsLoading}
+                                          className="flex-1 px-4 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 !text-sm !font-medium"
+                                        >
+                                          {localIsLoading
+                                            ? "Processing..."
+                                            : "Confirm"}
+                                        </button>
+                                        <button
+                                          onClick={() =>
+                                            setShowConfirmAction(false)
+                                          }
+                                          disabled={localIsLoading}
+                                          className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 !text-sm !font-medium"
+                                        >
+                                          Cancel
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {activeFeature === "attendance" && (
+                    <div className="w-full bg-white rounded-3xl shadow-md border border-gray-100 p-4 sm:p-6 md:p-8 lg:p-10 max-w-7xl mx-auto space-y-6 sm:space-y-8">
+                      {/* Header Section */}
+                      <div className="text-center space-y-4">
+                        <div className="flex items-center justify-center space-x-3">
+                          <h3 className="!text-2xl sm:!text-4xl !font-black text-gray-900 tracking-tight">
+                            Attendance Manager
+                          </h3>
+                        </div>
+                      </div>
+
+                      {/* Search Section */}
+                      <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl p-6 border border-gray-200 shadow-sm">
+                        <div className="flex flex-col sm:flex-row items-center gap-4">
+                          <div className="relative w-full sm:flex-1">
+                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                              <svg
+                                className="w-5 h-5 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"
+                                />
+                              </svg>
+                            </div>
+                            <input
+                              type="text"
+                              placeholder="Enter roll number (e.g., 24BCS001)"
+                              className="w-full px-4 py-3 pl-12 pr-4 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400 transition-all duration-300 bg-white"
+                              onChange={handleRollSearchText}
+                              value={searchRollNumber}
+                            />
+                          </div>
+                          <button
+                            onClick={() =>
+                              handleRollSearchText({
+                                target: { value: searchRollNumber },
+                              })
+                            }
+                            className="w-full sm:w-auto px-8 py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-gray-800 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl cursor-pointer"
+                          >
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"
+                              />
+                            </svg>
+                            <span>Search</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Student Details Card - Only shown when a student is found */}
+                      {studentDetails && (
+                        <div className="!bg-white !rounded-3xl !border !border-gray-200 !shadow-2xl !overflow-hidden !max-w-4xl !mx-auto">
+                          {/* Student Info Header */}
+                          <div className="!bg-gradient-to-r !from-gray-900 !via-gray-800 !to-gray-900 !px-8 !py-6">
+                            <div className="!flex !items-center !justify-between">
+                              <div className="!flex-1">
+                                <h6 className="!text-2xl !font-bold !text-white !mb-2 !tracking-tight">
+                                  {studentDetails.name || "N/A"}
+                                </h6>
+                                <div className="!flex !items-center !gap-4 !text-sm !text-gray-300">
+                                  <div className="!flex !items-center !gap-2">
+                                    <svg
+                                      className="!w-4 !h-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                                      />
+                                    </svg>
+                                    <span className="!font-medium">
+                                      {studentDetails.roll || "N/A"}
+                                    </span>
+                                  </div>
+                                  <div className="!w-1 !h-1 !bg-gray-500 !rounded-full"></div>
+                                  <div className="!flex !items-center !gap-2">
+                                    <svg
+                                      className="!w-4 !h-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                                      />
+                                    </svg>
+                                    <span className="!font-medium">
+                                      Room {studentDetails.room || "N/A"}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Action Panels */}
+                          <div className="!p-8 !space-y-6 !bg-gray-50">
+                            {/* Attendance Grid - Combined */}
+                            <div className="!grid !grid-cols-1 lg:!grid-cols-2 !gap-6">
+                              {/* Hostel Attendance Section */}
+                              <div className="group !bg-white !rounded-2xl !p-6 !border !border-gray-200 hover:!border-gray-300 !transition-all !duration-300 !shadow-sm hover:!shadow-lg">
+                                <div className="!flex !items-center !gap-3 !mb-6">
+                                  <div className="!w-11 !h-11 !bg-gray-900 !rounded-xl !flex !items-center !justify-center !shadow-md">
+                                    <svg
+                                      className="!w-6 !h-6 !text-white"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                                      />
+                                    </svg>
+                                  </div>
+                                  <div className="!flex-1 flex items-center flex-col">
+                                    <h6 className="!text-lg !font-bold !text-gray-900 !mb-0.5 !leading-tight">
+                                      Hostel Attendance
+                                    </h6>
+                                    <p className="!text-xs !text-gray-500 !leading-tight">
+                                      Track hostel entry and exit
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="!grid !grid-cols-2 !gap-3">
+                                  <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2.5 !px-4 !py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
+                                    <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 group-hover/btn:!opacity-100 !transition-opacity !duration-300"></div>
+                                    <div className="!relative !w-11 !h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
+                                      <svg
+                                        className="!w-5 !h-5 !text-gray-700 group-hover/btn:!text-white !transition-colors !duration-300"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <span className="!relative !text-sm !font-bold !tracking-wide">
+                                      Hostel In
+                                    </span>
+                                  </button>
+
+                                  <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2.5 !px-4 !py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
+                                    <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 group-hover/btn:!opacity-100 !transition-opacity !duration-300"></div>
+                                    <div className="!relative !w-11 !h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
+                                      <svg
+                                        className="!w-5 !h-5 !text-gray-700 group-hover/btn:!text-white !transition-colors !duration-300"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <span className="!relative !text-sm !font-bold !tracking-wide">
+                                      Hostel Out
+                                    </span>
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Mess Attendance Section */}
+                              <div className="group !bg-white !rounded-2xl !p-6 !border !border-gray-200 hover:!border-gray-300 !transition-all !duration-300 !shadow-sm hover:!shadow-lg">
+                                <div className="!flex !items-center !gap-3 !mb-6">
+                                  <div className="!w-11 !h-11 !bg-gray-900 !rounded-xl !flex !items-center !justify-center !shadow-md">
+                                    <svg
+                                      className="!w-6 !h-6 !text-white"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                                      />
+                                    </svg>
+                                  </div>
+                                  <div className="!flex-1  flex items-center flex-col">
+                                    <h6 className="!text-lg !font-bold !text-gray-900 !mb-0.5 !leading-tight">
+                                      Mess Attendance
+                                    </h6>
+                                    <p className="!text-xs !text-gray-500 !leading-tight">
+                                      Track meal attendance
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="!grid !grid-cols-2 !gap-3">
+                                  <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2.5 !px-4 !py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
+                                    <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 group-hover/btn:!opacity-100 !transition-opacity !duration-300"></div>
+                                    <div className="!relative !w-11 !h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
+                                      <svg
+                                        className="!w-5 !h-5 !text-gray-700 group-hover/btn:!text-white !transition-colors !duration-300"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <span className="!relative !text-sm !font-bold !tracking-wide">
+                                      Mess In
+                                    </span>
+                                  </button>
+
+                                  <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2.5 !px-4 !py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
+                                    <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 group-hover/btn:!opacity-100 !transition-opacity !duration-300"></div>
+                                    <div className="!relative !w-11 !h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
+                                      <svg
+                                        className="!w-5 !h-5 !text-gray-700 group-hover/btn:!text-white !transition-colors !duration-300"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M6 18L18 6M6 6l12 12"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <span className="!relative !text-sm !font-bold !tracking-wide">
+                                      Mess Out
+                                    </span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Additional Controls Section */}
+                            <div className="group !bg-white !rounded-2xl !p-6 !border !border-gray-200 hover:!border-gray-300 !transition-all !duration-300 !shadow-sm hover:!shadow-lg">
+                              <div className="!flex !items-center !gap-3 !mb-6">
+                                <div className="!w-11 !h-11 !bg-gray-900 !rounded-xl !flex !items-center !justify-center !shadow-md">
+                                  <svg
+                                    className="!w-6 !h-6 !text-white"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                                    />
+                                  </svg>
+                                </div>
+                                <div className="!flex-1  flex items-center flex-col">
+                                  <h6 className="!text-lg !font-bold !text-gray-900 !mb-0.5 !leading-tight">
+                                    Additional Controls
+                                  </h6>
+                                  <p className="!text-xs !text-gray-500 !leading-tight">
+                                    Activity management options
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="!grid !grid-cols-1 sm:!grid-cols-3 !gap-3">
+                                <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2.5 !px-4 !py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
+                                  <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 group-hover/btn:!opacity-100 !transition-opacity !duration-300"></div>
+                                  <div className="!relative !w-11 !h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
+                                    <svg
+                                      className="!w-5 !h-5 !text-gray-700 group-hover/btn:!text-white !transition-colors !duration-300"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                      />
+                                    </svg>
+                                  </div>
+                                  <span className="!relative !text-sm !font-bold !tracking-wide">
+                                    Mark Late
+                                  </span>
+                                </button>
+
+                                <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2.5 !px-4 !py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
+                                  <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 group-hover/btn:!opacity-100 !transition-opacity !duration-300"></div>
+                                  <div className="!relative !w-11 !h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
+                                    <svg
+                                      className="!w-5 !h-5 !text-gray-700 group-hover/btn:!text-white !transition-colors !duration-300"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                      />
+                                    </svg>
+                                  </div>
+                                  <span className="!relative !text-sm !font-bold !tracking-wide">
+                                    View Logs
+                                  </span>
+                                </button>
+
+                                <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2.5 !px-4 !py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
+                                  <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 group-hover/btn:!opacity-100 !transition-opacity !duration-300"></div>
+                                  <div className="!relative !w-11 !h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
+                                    <svg
+                                      className="!w-5 !h-5 !text-gray-700 group-hover/btn:!text-white !transition-colors !duration-300"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                      />
+                                    </svg>
+                                  </div>
+                                  <span className="!relative !text-sm !font-bold !tracking-wide">
+                                    Issue Warning
+                                  </span>
+                                </button>
+                              </div>
+                            </div>
+                            
+                          </div>
+                        </div>
+                      )}                      
+                    </div>
+                  )}
+
                   {activeFeature === "manageSnacks" && (
                     <div className="w-full bg-white rounded-3xl shadow-md border border-gray-100 p-4 sm:p-6 md:p-8 lg:p-10 max-w-4xl mx-auto">
                       <h3 className="!text-4xl !font-semibold text-gray-900 text-center mb-6">
@@ -3056,7 +4362,6 @@ export default function Admin() {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-gray-100">
                   <button
                     type="button"
