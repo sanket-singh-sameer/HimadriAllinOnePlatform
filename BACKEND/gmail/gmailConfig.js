@@ -10,34 +10,87 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // Use STARTTLS
-  auth: {
-    user: process.env.GMAIL_SMTP_USER,
-    pass: process.env.GMAIL_SMTP_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false, // Allow self-signed certificates in development
-    ciphers: 'SSLv3'
-  },
-  connectionTimeout: 10000, // 10 seconds
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
-});
+/**
+ * Gmail SMTP Configuration for Email Service
+ * 
+ * IMPORTANT: Gmail SMTP may have connectivity issues in production environments
+ * like Render, Heroku, etc. due to firewall restrictions.
+ * 
+ * Alternative Solutions:
+ * 1. Use Resend (already configured in /resend/mailConfig.js)
+ * 2. Use SendGrid (free tier: 100 emails/day)
+ * 3. Use Mailgun (free tier: 5,000 emails/month)
+ * 4. Use AWS SES (very reliable and cheap)
+ * 
+ * Required Environment Variables:
+ * - GMAIL_SMTP_USER: Your Gmail address
+ * - GMAIL_SMTP_PASS: Gmail App Password (NOT your regular password)
+ *   Generate at: https://myaccount.google.com/apppasswords
+ * - CLIENT_URL: Your frontend URL for reset links
+ */
 
-// Verify transporter configuration on startup
-transporter.verify(function (error, success) {
-  if (error) {
-    console.error('Email transporter verification failed:', error);
-  } else {
-    console.log('✅ Email server is ready to send messages');
+// Try multiple configurations - Gmail can be restrictive in some environments
+const createTransporter = () => {
+  // Configuration 1: Try port 587 with STARTTLS (most common)
+  try {
+    return nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false, // Use STARTTLS
+      auth: {
+        user: process.env.GMAIL_SMTP_USER,
+        pass: process.env.GMAIL_SMTP_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false,
+        ciphers: 'SSLv3'
+      },
+      connectionTimeout: 10000, // 10 seconds
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
+      pool: true, // Use pooled connections
+      maxConnections: 5,
+      rateDelta: 1000,
+      rateLimit: 5
+    });
+  } catch (error) {
+    console.error('Failed to create email transporter:', error.message);
+    // Return a dummy transporter that won't crash the app
+    return null;
   }
-});
+};
+
+const transporter = createTransporter();
+
+// Verify transporter configuration on startup (non-blocking)
+if (transporter) {
+  transporter.verify(function (error, success) {
+    if (error) {
+      console.error('⚠️  Email transporter verification failed:', error.message);
+      console.log('📧 Email sending may be affected. Check your GMAIL_SMTP credentials and network settings.');
+      console.log('💡 Consider using alternative email service (SendGrid, Mailgun, AWS SES)');
+    } else {
+      console.log('✅ Email server is ready to send messages');
+    }
+  });
+} else {
+  console.error('⚠️  Email transporter could not be initialized');
+  console.log('📧 Email functionality will be disabled');
+}
+
+// Helper function to check if email is available
+const isEmailAvailable = () => {
+  return transporter !== null && process.env.GMAIL_SMTP_USER && process.env.GMAIL_SMTP_PASS;
+};
 
 // Helper function to send email with retry logic
-const sendEmailWithRetry = async (mailOptions, maxRetries = 3) => {
+const sendEmailWithRetry = async (mailOptions, maxRetries = 2) => {
+  // Check if email is configured
+  if (!isEmailAvailable()) {
+    console.error('❌ Email service not configured or unavailable');
+    throw new Error('Email service is currently unavailable. Please contact support.');
+  }
+
   let lastError;
   
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -50,8 +103,8 @@ const sendEmailWithRetry = async (mailOptions, maxRetries = 3) => {
       console.error(`❌ Email sending failed (attempt ${attempt}/${maxRetries}):`, error.message);
       
       if (attempt < maxRetries) {
-        // Wait before retrying (exponential backoff)
-        const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+        // Wait before retrying (shorter wait time)
+        const waitTime = 2000; // Fixed 2 seconds
         console.log(`⏳ Retrying in ${waitTime}ms...`);
         await new Promise(resolve => setTimeout(resolve, waitTime));
       }
@@ -59,6 +112,7 @@ const sendEmailWithRetry = async (mailOptions, maxRetries = 3) => {
   }
   
   // If all retries failed, throw the last error
+  console.error('❌ All email retry attempts failed. Email service may be down.');
   throw lastError;
 };
 
