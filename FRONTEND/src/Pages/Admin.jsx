@@ -531,8 +531,8 @@ export default function Admin() {
 
   // NFC Handler Functions
   const startNFCScan = async () => {
-    if (!('NDEFReader' in window)) {
-      toast.error('NFC is not supported on this device');
+    if (!("NDEFReader" in window)) {
+      toast.error("NFC is not supported on this device");
       return;
     }
 
@@ -540,24 +540,23 @@ export default function Admin() {
       const ndef = new NDEFReader();
       await ndef.scan();
       setNfcScanning(true);
-      toast.info('NFC scanning started. Tap a card...');
+      toast.info("NFC scanning started. Tap a card...");
 
       ndef.onreading = (event) => {
         const { serialNumber } = event;
         setSearchRollNumber(serialNumber.toUpperCase());
         handleRollSearchText({ target: { value: serialNumber.toUpperCase() } });
         setNfcScanning(false);
-        toast.success('NFC card detected!');
+        toast.success("NFC card detected!");
       };
 
       ndef.onreadingerror = () => {
-        toast.error('Error reading NFC tag');
+        toast.error("Error reading NFC tag");
         setNfcScanning(false);
       };
-
     } catch (error) {
-      console.error('Error starting NFC scan:', error);
-      toast.error('Failed to start NFC scanning');
+      console.error("Error starting NFC scan:", error);
+      toast.error("Failed to start NFC scanning");
       setNfcScanning(false);
     }
   };
@@ -565,10 +564,10 @@ export default function Admin() {
   const handleNFCInput = (e) => {
     const value = e.target.value;
     setSearchRollNumber(value);
-    
+
     // Auto-submit when Enter is pressed (for NFC readers that send Enter)
-    if (value.includes('\n') || value.includes('\r')) {
-      const cleanValue = value.replace(/[\n\r]/g, '').trim();
+    if (value.includes("\n") || value.includes("\r")) {
+      const cleanValue = value.replace(/[\n\r]/g, "").trim();
       if (cleanValue) {
         setSearchRollNumber(cleanValue.toUpperCase());
         handleRollSearchText({ target: { value: cleanValue.toUpperCase() } });
@@ -685,15 +684,20 @@ export default function Admin() {
         API_PATHS.MARK_MESS_ATTENDANCE(rollNumber)
       );
       toast.success(response.data.message);
-      
+
       // Show which meal was marked
       const markedMeal = response.data.markedMeal;
       if (markedMeal) {
-        toast.info(`${markedMeal.charAt(0).toUpperCase() + markedMeal.slice(1)} attendance marked!`);
+        toast.info(
+          `${
+            markedMeal.charAt(0).toUpperCase() + markedMeal.slice(1)
+          } attendance marked!`
+        );
       }
     } catch (error) {
       console.error("Error marking mess attendance:", error);
-      const errorMessage = error.response?.data?.message || "Error marking mess attendance";
+      const errorMessage =
+        error.response?.data?.message || "Error marking mess attendance";
       toast.error(errorMessage);
     } finally {
       setLocalIsLoading(false);
@@ -754,23 +758,24 @@ export default function Admin() {
         API_PATHS.EXPORT_MESS_ATTENDANCE,
         {
           params,
-          responseType: 'blob', // Important for file download
+          responseType: "blob", // Important for file download
         }
       );
 
       // Create a blob URL and trigger download
-      const blob = new Blob([response.data], { 
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      
+
       // Generate filename based on whether specific student or all students
-      const filename = studentDetails && studentDetails.roll
-        ? `mess_attendance_${studentDetails.roll}_${exportDateRange.startDate}_to_${exportDateRange.endDate}.xlsx`
-        : `mess_attendance_all_students_${exportDateRange.startDate}_to_${exportDateRange.endDate}.xlsx`;
-      
+      const filename =
+        studentDetails && studentDetails.roll
+          ? `mess_attendance_${studentDetails.roll}_${exportDateRange.startDate}_to_${exportDateRange.endDate}.xlsx`
+          : `mess_attendance_all_students_${exportDateRange.startDate}_to_${exportDateRange.endDate}.xlsx`;
+
       link.download = filename;
       document.body.appendChild(link);
       link.click();
@@ -782,7 +787,9 @@ export default function Admin() {
       setExportDateRange({ startDate: "", endDate: "" });
     } catch (error) {
       console.error("Error exporting attendance:", error);
-      toast.error(error.response?.data?.message || "Failed to export attendance");
+      toast.error(
+        error.response?.data?.message || "Failed to export attendance"
+      );
     } finally {
       setLocalIsLoading(false);
     }
@@ -791,10 +798,10 @@ export default function Admin() {
   const fetchOutpassRequests = async () => {
     try {
       const response = await axiosInstance.get(API_PATHS.GET_ALL_OUTPASSES);
-      
+
       // Show all outpass requests (pending, approved, and rejected)
       const allOutpasses = response.data.outpasses;
-      
+
       setOutpassRequests(allOutpasses);
       setFilteredOutpasses(allOutpasses);
       console.log("Outpass requests fetched:", allOutpasses);
@@ -832,12 +839,10 @@ export default function Admin() {
     }
 
     if (outpassDateFilter) {
-      filtered = filtered.filter(
-        (outpass) => {
-          const outDate = new Date(outpass.outDate).toISOString().split('T')[0];
-          return outDate === outpassDateFilter;
-        }
-      );
+      filtered = filtered.filter((outpass) => {
+        const outDate = new Date(outpass.outDate).toISOString().split("T")[0];
+        return outDate === outpassDateFilter;
+      });
     }
 
     setFilteredOutpasses(filtered);
@@ -848,7 +853,7 @@ export default function Admin() {
     setLocalIsLoading(true);
     try {
       const status = action === "approve" ? "approved" : "rejected";
-      
+
       const response = await axiosInstance.patch(
         API_PATHS.UPDATE_OUTPASS_STATUS(outpassId),
         { status }
@@ -856,12 +861,14 @@ export default function Admin() {
 
       if (response.status === 200) {
         toast.success(
-          `Outpass ${action === "approve" ? "approved" : "rejected"} successfully`
+          `Outpass ${
+            action === "approve" ? "approved" : "rejected"
+          } successfully`
         );
-        
+
         // Refresh the outpass list
         await fetchOutpassRequests();
-        
+
         // Close the modal
         setShowOutpassModal(false);
         setShowConfirmAction(false);
@@ -869,7 +876,9 @@ export default function Admin() {
       }
     } catch (error) {
       console.error("Error updating outpass:", error);
-      toast.error(error.response?.data?.message || "Failed to update outpass status");
+      toast.error(
+        error.response?.data?.message || "Failed to update outpass status"
+      );
     } finally {
       setLocalIsLoading(false);
     }
@@ -906,13 +915,17 @@ export default function Admin() {
   const totalPages = Math.ceil(filteredOutpasses.length / itemsPerPage);
 
   // Complaints Pagination Logic
-  const complaintsIndexOfLastItem = complaintsCurrentPage * complaintsItemsPerPage;
-  const complaintsIndexOfFirstItem = complaintsIndexOfLastItem - complaintsItemsPerPage;
+  const complaintsIndexOfLastItem =
+    complaintsCurrentPage * complaintsItemsPerPage;
+  const complaintsIndexOfFirstItem =
+    complaintsIndexOfLastItem - complaintsItemsPerPage;
   const paginatedComplaints = complaintsListTemp.slice(
     complaintsIndexOfFirstItem,
     complaintsIndexOfLastItem
   );
-  const complaintsTotalPages = Math.ceil(complaintsListTemp.length / complaintsItemsPerPage);
+  const complaintsTotalPages = Math.ceil(
+    complaintsListTemp.length / complaintsItemsPerPage
+  );
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -932,7 +945,7 @@ export default function Admin() {
 
   useEffect(() => {
     // Check NFC support
-    if ('NDEFReader' in window) {
+    if ("NDEFReader" in window) {
       setNfcSupported(true);
     }
   }, []);
@@ -2118,7 +2131,7 @@ export default function Admin() {
 
                   {activeFeature === "complaints" && (
                     <div className="w-full bg-white rounded-3xl shadow-md border border-gray-100 p-4 sm:p-6 md:p-8 lg:p-10 max-w-4xl mx-auto">
-                     <div className="!text-center !pb-6 !border-b-2 !border-gray-900">
+                      <div className="!text-center !pb-6 !border-b-2 !border-gray-900">
                         <h3 className="!text-3xl sm:!text-4xl !font-black !text-gray-900 !tracking-tight">
                           Complaint Register
                         </h3>
@@ -2484,7 +2497,9 @@ export default function Admin() {
                           <div className="hidden sm:flex items-center gap-2">
                             <button
                               onClick={() =>
-                                handleComplaintsPageChange(complaintsCurrentPage - 1)
+                                handleComplaintsPageChange(
+                                  complaintsCurrentPage - 1
+                                )
                               }
                               disabled={complaintsCurrentPage === 1}
                               className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -2492,49 +2507,53 @@ export default function Admin() {
                               Previous
                             </button>
 
-                            {[...Array(complaintsTotalPages)].map((_, index) => {
-                              const pageNumber = index + 1;
-                              // Show first page, last page, current page, and pages around current
-                              if (
-                                pageNumber === 1 ||
-                                pageNumber === complaintsTotalPages ||
-                                (pageNumber >= complaintsCurrentPage - 1 &&
-                                  pageNumber <= complaintsCurrentPage + 1)
-                              ) {
-                                return (
-                                  <button
-                                    key={pageNumber}
-                                    onClick={() =>
-                                      handleComplaintsPageChange(pageNumber)
-                                    }
-                                    className={`px-4 py-2 rounded-lg border transition-colors ${
-                                      complaintsCurrentPage === pageNumber
-                                        ? "bg-gray-900 text-white border-gray-900"
-                                        : "border-gray-300 text-gray-700 hover:bg-gray-50"
-                                    }`}
-                                  >
-                                    {pageNumber}
-                                  </button>
-                                );
-                              } else if (
-                                pageNumber === complaintsCurrentPage - 2 ||
-                                pageNumber === complaintsCurrentPage + 2
-                              ) {
-                                return (
-                                  <span
-                                    key={pageNumber}
-                                    className="px-2 text-gray-400"
-                                  >
-                                    ...
-                                  </span>
-                                );
+                            {[...Array(complaintsTotalPages)].map(
+                              (_, index) => {
+                                const pageNumber = index + 1;
+                                // Show first page, last page, current page, and pages around current
+                                if (
+                                  pageNumber === 1 ||
+                                  pageNumber === complaintsTotalPages ||
+                                  (pageNumber >= complaintsCurrentPage - 1 &&
+                                    pageNumber <= complaintsCurrentPage + 1)
+                                ) {
+                                  return (
+                                    <button
+                                      key={pageNumber}
+                                      onClick={() =>
+                                        handleComplaintsPageChange(pageNumber)
+                                      }
+                                      className={`px-4 py-2 rounded-lg border transition-colors ${
+                                        complaintsCurrentPage === pageNumber
+                                          ? "bg-gray-900 text-white border-gray-900"
+                                          : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                                      }`}
+                                    >
+                                      {pageNumber}
+                                    </button>
+                                  );
+                                } else if (
+                                  pageNumber === complaintsCurrentPage - 2 ||
+                                  pageNumber === complaintsCurrentPage + 2
+                                ) {
+                                  return (
+                                    <span
+                                      key={pageNumber}
+                                      className="px-2 text-gray-400"
+                                    >
+                                      ...
+                                    </span>
+                                  );
+                                }
+                                return null;
                               }
-                              return null;
-                            })}
+                            )}
 
                             <button
                               onClick={() =>
-                                handleComplaintsPageChange(complaintsCurrentPage + 1)
+                                handleComplaintsPageChange(
+                                  complaintsCurrentPage + 1
+                                )
                               }
                               disabled={
                                 complaintsCurrentPage === complaintsTotalPages
@@ -2549,7 +2568,9 @@ export default function Admin() {
                           <div className="flex sm:hidden items-center gap-2">
                             <button
                               onClick={() =>
-                                handleComplaintsPageChange(complaintsCurrentPage - 1)
+                                handleComplaintsPageChange(
+                                  complaintsCurrentPage - 1
+                                )
                               }
                               disabled={complaintsCurrentPage === 1}
                               className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -2557,11 +2578,14 @@ export default function Admin() {
                               ←
                             </button>
                             <span className="text-sm text-gray-700">
-                              Page {complaintsCurrentPage} of {complaintsTotalPages}
+                              Page {complaintsCurrentPage} of{" "}
+                              {complaintsTotalPages}
                             </span>
                             <button
                               onClick={() =>
-                                handleComplaintsPageChange(complaintsCurrentPage + 1)
+                                handleComplaintsPageChange(
+                                  complaintsCurrentPage + 1
+                                )
                               }
                               disabled={
                                 complaintsCurrentPage === complaintsTotalPages
@@ -3505,7 +3529,6 @@ export default function Admin() {
                                         }
                                         className="w-4 h-4 text-gray-900 rounded border-gray-300 focus:ring-2 focus:ring-gray-900 focus:ring-offset-0 cursor-pointer"
                                         aria-label={`Select ${outpass.fullName}`}
-
                                       />
                                     </td>
 
@@ -3526,7 +3549,9 @@ export default function Admin() {
                                           {outpass.roomNumber}
                                         </span>
                                         <span className="!text-xs !text-gray-500 mt-0.5">
-                                          {outpass.semester ? `Sem ${outpass.semester}` : ''}
+                                          {outpass.semester
+                                            ? `Sem ${outpass.semester}`
+                                            : ""}
                                         </span>
                                       </div>
                                     </td>
@@ -3585,7 +3610,10 @@ export default function Admin() {
                                             : "bg-gray-200 text-gray-800 border border-gray-400"
                                         }`}
                                       >
-                                        {outpass.status.charAt(0).toUpperCase() + outpass.status.slice(1)}
+                                        {outpass.status
+                                          .charAt(0)
+                                          .toUpperCase() +
+                                          outpass.status.slice(1)}
                                       </span>
                                     </td>
 
@@ -3991,23 +4019,27 @@ export default function Admin() {
                                       className={`inline-flex items-center px-3 py-1 rounded !text-xs !font-medium ${
                                         selectedOutpass.status === "pending"
                                           ? "bg-yellow-100 text-yellow-700 border border-yellow-300"
-                                          : selectedOutpass.status === "approved"
+                                          : selectedOutpass.status ===
+                                            "approved"
                                           ? "bg-green-100 text-green-700 border border-green-300"
-                                          : selectedOutpass.status === "rejected"
+                                          : selectedOutpass.status ===
+                                            "rejected"
                                           ? "bg-red-100 text-red-700 border border-red-300"
                                           : selectedOutpass.status === "expired"
                                           ? "bg-gray-100 text-gray-700 border border-gray-300"
                                           : "bg-gray-200 text-gray-800 border border-gray-400"
                                       }`}
                                     >
-                                      {selectedOutpass.status.charAt(0).toUpperCase() + selectedOutpass.status.slice(1)}
+                                      {selectedOutpass.status
+                                        .charAt(0)
+                                        .toUpperCase() +
+                                        selectedOutpass.status.slice(1)}
                                     </span>
                                   </div>
                                 </div>
                               </div>
 
                               {selectedOutpass.status === "pending" && (
-
                                 <div className="pt-2">
                                   {!showConfirmAction ? (
                                     <div className="flex gap-3">
@@ -4017,7 +4049,6 @@ export default function Admin() {
                                           setShowConfirmAction(true);
                                         }}
                                         className="flex-1 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 !text-sm !font-medium shadow-sm hover:shadow"
-
                                       >
                                         Approve
                                       </button>
@@ -4119,7 +4150,11 @@ export default function Admin() {
                           <div className="relative w-full sm:flex-1">
                             <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
                               <svg
-                                className={`w-5 h-5 ${nfcScanning ? 'text-green-500 animate-pulse' : 'text-gray-400'}`}
+                                className={`w-5 h-5 ${
+                                  nfcScanning
+                                    ? "text-green-500 animate-pulse"
+                                    : "text-gray-400"
+                                }`}
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -4141,7 +4176,7 @@ export default function Admin() {
                               autoFocus
                             />
                           </div>
-                          
+
                           {/* NFC Scan Button (only show if supported) */}
                           {nfcSupported && (
                             <button
@@ -4149,14 +4184,26 @@ export default function Admin() {
                               disabled={nfcScanning}
                               className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg ${
                                 nfcScanning
-                                  ? 'bg-green-500 text-white animate-pulse'
-                                  : 'bg-blue-600 text-white hover:bg-blue-700'
+                                  ? "bg-green-500 text-white animate-pulse"
+                                  : "bg-blue-600 text-white hover:bg-blue-700"
                               }`}
                             >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                              <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+                                />
                               </svg>
-                              <span>{nfcScanning ? 'Scanning...' : 'NFC Scan'}</span>
+                              <span>
+                                {nfcScanning ? "Scanning..." : "NFC Scan"}
+                              </span>
                             </button>
                           )}
 
@@ -4190,7 +4237,12 @@ export default function Admin() {
                         {/* Instructions */}
                         <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                           <p className="text-xs text-blue-800">
-                            <strong>💡 Tip:</strong> {nfcSupported ? 'Click "NFC Scan" and tap your card, or simply' : 'Simply'} tap your NFC card when the input is focused, or type the roll number manually and press Enter.
+                            <strong>💡 Tip:</strong>{" "}
+                            {nfcSupported
+                              ? 'Click "NFC Scan" and tap your card, or simply'
+                              : "Simply"}{" "}
+                            tap your NFC card when the input is focused, or type
+                            the roll number manually and press Enter.
                           </p>
                         </div>
                       </div>
@@ -4344,10 +4396,15 @@ export default function Admin() {
                                 </div>
 
                                 <div className="!grid !grid-cols-2 !gap-2 sm:!gap-3">
-                                  <button 
-                                    onClick={() => handleMarkMessAttendance(studentDetails?.roll)}
+                                  <button
+                                    onClick={() =>
+                                      handleMarkMessAttendance(
+                                        studentDetails?.roll
+                                      )
+                                    }
                                     disabled={!studentDetails || localIsLoading}
-                                    className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2 sm:!space-y-2.5 !px-3 sm:!px-4 !py-4 sm:!py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95 disabled:!opacity-50 disabled:!cursor-not-allowed disabled:hover:!scale-100">
+                                    className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2 sm:!space-y-2.5 !px-3 sm:!px-4 !py-4 sm:!py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95 disabled:!opacity-50 disabled:!cursor-not-allowed disabled:hover:!scale-100"
+                                  >
                                     <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 group-hover/btn:!opacity-100 !transition-opacity !duration-300"></div>
                                     <div className="!relative !w-10 !h-10 sm:!w-11 sm:!h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
                                       <svg
@@ -4365,7 +4422,9 @@ export default function Admin() {
                                       </svg>
                                     </div>
                                     <span className="!relative !text-xs sm:!text-sm !font-bold !tracking-wide">
-                                      {localIsLoading ? "Processing..." : "Mess In"}
+                                      {localIsLoading
+                                        ? "Processing..."
+                                        : "Mess In"}
                                     </span>
                                   </button>
 
@@ -4489,6 +4548,238 @@ export default function Admin() {
                           </div>
                         </div>
                       )}
+
+                      {/* Today's Attendance Log Section */}
+                      <div className="!mt-8 !bg-white !rounded-2xl !border !border-gray-200 !shadow-lg !overflow-hidden">
+                        {/* Section Header */}
+                        <div className="!bg-black !px-6 !py-5 !border-b !border-gray-800">
+                          <div className="!flex !items-center !justify-between !flex-wrap !gap-4">
+                            <div>
+                              <h6 className="!text-lg sm:!text-xl !font-bold !text-white !mb-1">
+                                Today's Attendance Log
+                              </h6>
+                              
+                            </div>
+                            <div className="!flex !items-center !gap-2 !px-3 !py-1.5 !bg-white/10 !rounded-lg !backdrop-blur-sm">
+                              <svg
+                                className="!w-3.5 !h-3.5 !text-white/80"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                              </svg>
+                              <span className="!text-xs !font-semibold !text-white">
+                                {new Date().toLocaleDateString("en-US", {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Table Container */}
+                        <div className="!overflow-x-auto">
+                          <div className="!max-h-[450px] !overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-50">
+                            <table className="!w-full !border-collapse">
+                              {/* Table Header */}
+                              <thead className="!sticky !top-0 !z-10 !bg-gray-50">
+                                <tr className="!border-b !border-gray-200">
+                                  <th className="!px-6 !py-3.5 !text-left !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider !bg-gray-50">
+                                    Student
+                                  </th>
+                                  <th className="!px-6 !py-3.5 !text-left !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider !bg-gray-50">
+                                    Roll No
+                                  </th>
+                                  <th className="!px-6 !py-3.5 !text-left !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider !bg-gray-50">
+                                    Out Time
+                                  </th>
+                                  <th className="!px-6 !py-3.5 !text-left !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider !bg-gray-50">
+                                    Place of Visit
+                                  </th>
+                                  <th className="!px-6 !py-3.5 !text-center !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider !bg-gray-50">
+                                    Status
+                                  </th>
+                                </tr>
+                              </thead>
+
+                              {/* Table Body */}
+                              <tbody className="!bg-white !divide-y !divide-gray-100">
+                                {/* Sample Data Rows - Replace with actual data */}
+                                {[
+                                  {
+                                    name: "Rahul Sharma",
+                                    roll: "24BCS001",
+                                    outTime: "09:15 AM",
+                                    place: "Library",
+                                    status: "Out",
+                                  },
+                                  {
+                                    name: "Priya Patel",
+                                    roll: "24BCS002",
+                                    outTime: "10:30 AM",
+                                    place: "Medical Store",
+                                    status: "Returned",
+                                  },
+                                  {
+                                    name: "Amit Kumar",
+                                    roll: "24BCS003",
+                                    outTime: "11:00 AM",
+                                    place: "City Market",
+                                    status: "Out",
+                                  },
+                                  {
+                                    name: "Sneha Reddy",
+                                    roll: "24BCS004",
+                                    outTime: "08:45 AM",
+                                    place: "College Campus",
+                                    status: "Returned",
+                                  },
+                                  {
+                                    name: "Vikram Singh",
+                                    roll: "24BCS005",
+                                    outTime: "12:20 PM",
+                                    place: "Sports Complex",
+                                    status: "Out",
+                                  },
+                                  {
+                                    name: "Anjali Verma",
+                                    roll: "24BCS006",
+                                    outTime: "01:45 PM",
+                                    place: "Main Market",
+                                    status: "Out",
+                                  },
+                                  {
+                                    name: "Rohan Gupta",
+                                    roll: "24BCS007",
+                                    outTime: "02:30 PM",
+                                    place: "Bank",
+                                    status: "Returned",
+                                  },
+                                ].map((log, index) => (
+                                  <tr
+                                    key={index}
+                                    className="hover:!bg-gray-50/50 !transition-all !duration-200 group"
+                                  >
+                                    <td className="!px-6 !py-4">
+                                      <span className="!text-sm !font-semibold !text-gray-900">
+                                        {log.name}
+                                      </span>
+                                    </td>
+                                    <td className="!px-6 !py-4">
+                                      <span className="!text-sm !font-mono !font-medium !text-gray-600 !bg-gray-50 !px-2.5 !py-1 !rounded">
+                                        {log.roll}
+                                      </span>
+                                    </td>
+                                    <td className="!px-6 !py-4">
+                                      <div className="!flex !items-center !gap-2">
+                                        <svg
+                                          className="!w-4 !h-4 !text-gray-400"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                          />
+                                        </svg>
+                                        <span className="!text-sm !font-medium !text-gray-700">
+                                          {log.outTime}
+                                        </span>
+                                      </div>
+                                    </td>
+                                    <td className="!px-6 !py-4">
+                                      <span className="!text-sm !font-medium !text-gray-700">
+                                        {log.place}
+                                      </span>
+                                    </td>
+                                    <td className="!px-6 !py-4 !text-center">
+                                      <span
+                                        className={`!inline-flex !items-center !justify-center !px-3 !py-1 !rounded-full !text-xs !font-bold !tracking-wide !min-w-[90px] !transition-all !duration-200 ${
+                                          log.status === "Out"
+                                            ? "!bg-black !text-white"
+                                            : "!bg-white !text-gray-700 !border-2 !border-gray-300"
+                                        }`}
+                                      >
+                                        {log.status}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+
+                            {/* Empty State - Show when no data */}
+                            {false && (
+                              <div className="!flex !flex-col !items-center !justify-center !py-20">
+                                <div className="!w-16 !h-16 !bg-gray-100 !rounded-full !flex !items-center !justify-center !mb-4">
+                                  <svg
+                                    className="!w-8 !h-8 !text-gray-400"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                                    />
+                                  </svg>
+                                </div>
+                                <h4 className="!text-lg !font-semibold !text-gray-900 !mb-1">
+                                  No attendance logs
+                                </h4>
+                                <p className="!text-sm !text-gray-500">
+                                  No records available for today
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Footer Summary */}
+                        <div className="!bg-gray-50 !px-6 !py-4 !border-t !border-gray-200">
+                          <div className="!flex !items-center !justify-between !flex-wrap !gap-4">
+                            <div className="!flex !items-center !gap-8">
+                              <div className="!flex !items-center !gap-2">
+                                <div className="!w-2.5 !h-2.5 !bg-black !rounded-full"></div>
+                                <span className="!text-sm !font-medium !text-gray-600">
+                                  Out:{" "}
+                                  <span className="!font-bold !text-gray-900">
+                                    4
+                                  </span>
+                                </span>
+                              </div>
+                              <div className="!flex !items-center !gap-2">
+                                <div className="!w-2.5 !h-2.5 !bg-white !border-2 !border-gray-400 !rounded-full"></div>
+                                <span className="!text-sm !font-medium !text-gray-600">
+                                  Returned:{" "}
+                                  <span className="!font-bold !text-gray-900">
+                                    3
+                                  </span>
+                                </span>
+                              </div>
+                            </div>
+                            <div className="!text-sm !font-medium !text-gray-500">
+                              Total:{" "}
+                              <span className="!font-bold !text-gray-900">
+                                7
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   )}
 
@@ -4656,6 +4947,258 @@ export default function Admin() {
                             </div>
                           </div>
                         )}
+                      </div>
+
+                      {/* Today's Attendance Log Table */}
+                      <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-200 overflow-hidden">
+                        {/* Table Header */}
+                        <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 px-6 sm:px-8 py-5 sm:py-6">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div>
+                              <h6 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                                Today's Attendance Log
+                              </h6>
+                              <p className="text-sm text-gray-300 mt-1">
+                                Real-time hostel in/out tracking
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-sm">
+                              <svg
+                                className="w-4 h-4 text-gray-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                              </svg>
+                              <span className="text-sm font-semibold text-gray-900">
+                                {new Date().toLocaleDateString("en-GB", {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Desktop Table View */}
+                        <div className="hidden lg:block overflow-x-auto">
+                          <table className="w-full">
+                            <thead>
+                              <tr className="bg-gray-100 border-b-2 border-gray-200">
+                                <th className="px-6 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
+                                  Name
+                                </th>
+                                <th className="px-6 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
+                                  Roll No
+                                </th>
+                                <th className="px-6 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
+                                  Out Time
+                                </th>
+                                <th className="px-6 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
+                                  Place of Visit
+                                </th>
+                                <th className="px-6 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
+                                  Status
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                              {[
+                                {
+                                  name: "Rahul Sharma",
+                                  roll: "24BCS101",
+                                  outTime: "10:30 AM",
+                                  place: "Library",
+                                  status: "Out",
+                                },
+                                {
+                                  name: "Priya Singh",
+                                  roll: "24BCS102",
+                                  outTime: "09:15 AM",
+                                  place: "Market",
+                                  status: "Returned",
+                                },
+                                {
+                                  name: "Amit Kumar",
+                                  roll: "24BCS103",
+                                  outTime: "11:45 AM",
+                                  place: "Medical Center",
+                                  status: "Out",
+                                },
+                                {
+                                  name: "Sneha Patel",
+                                  roll: "24BCS104",
+                                  outTime: "08:00 AM",
+                                  place: "College",
+                                  status: "Returned",
+                                },
+                                {
+                                  name: "Vikram Rao",
+                                  roll: "24BCS105",
+                                  outTime: "02:30 PM",
+                                  place: "Gym",
+                                  status: "Out",
+                                },
+                              ].map((student, index) => (
+                                <tr
+                                  key={index}
+                                  className="hover:bg-gray-50 transition-colors duration-150"
+                                  style={{
+                                    backgroundColor:
+                                      index % 2 === 0
+                                        ? "white"
+                                        : "rgb(249, 250, 251)",
+                                  }}
+                                >
+                                  <td className="px-6 py-4">
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                        {student.name
+                                          .split(" ")
+                                          .map((n) => n[0])
+                                          .join("")}
+                                      </div>
+                                      <span className="text-sm font-semibold text-gray-900">
+                                        {student.name}
+                                      </span>
+                                    </div>
+                                  </td>
+                                  <td className="px-6 py-4">
+                                    <span className="text-sm font-medium text-gray-700">
+                                      {student.roll}
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-4">
+                                    <span className="text-sm text-gray-600">
+                                      {student.outTime}
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-4">
+                                    <span className="text-sm text-gray-700">
+                                      {student.place}
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-4">
+                                    <span
+                                      className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold border-2 transition-all duration-200 ${
+                                        student.status === "Out"
+                                          ? "bg-gray-900 text-white border-gray-900"
+                                          : "bg-white text-gray-700 border-gray-300"
+                                      }`}
+                                    >
+                                      {student.status}
+                                    </span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        {/* Mobile/Tablet Card View */}
+                        <div className="lg:hidden divide-y divide-gray-200">
+                          {[
+                            {
+                              name: "Rahul Sharma",
+                              roll: "24BCS101",
+                              outTime: "10:30 AM",
+                              place: "Library",
+                              status: "Out",
+                            },
+                            {
+                              name: "Priya Singh",
+                              roll: "24BCS102",
+                              outTime: "09:15 AM",
+                              place: "Market",
+                              status: "Returned",
+                            },
+                            {
+                              name: "Amit Kumar",
+                              roll: "24BCS103",
+                              outTime: "11:45 AM",
+                              place: "Medical Center",
+                              status: "Out",
+                            },
+                            {
+                              name: "Sneha Patel",
+                              roll: "24BCS104",
+                              outTime: "08:00 AM",
+                              place: "College",
+                              status: "Returned",
+                            },
+                            {
+                              name: "Vikram Rao",
+                              roll: "24BCS105",
+                              outTime: "02:30 PM",
+                              place: "Gym",
+                              status: "Out",
+                            },
+                          ].map((student, index) => (
+                            <div
+                              key={index}
+                              className="p-4 sm:p-6 hover:bg-gray-50 transition-colors duration-150"
+                              style={{
+                                backgroundColor:
+                                  index % 2 === 0
+                                    ? "white"
+                                    : "rgb(249, 250, 251)",
+                              }}
+                            >
+                              <div className="flex items-start justify-between mb-4">
+                                <div className="flex items-center gap-3 flex-1">
+                                  <div className="w-12 h-12 bg-gray-900 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                                    {student.name
+                                      .split(" ")
+                                      .map((n) => n[0])
+                                      .join("")}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="text-base font-bold text-gray-900 truncate">
+                                      {student.name}
+                                    </h4>
+                                    <p className="text-sm text-gray-600 mt-0.5">
+                                      {student.roll}
+                                    </p>
+                                  </div>
+                                </div>
+                                <span
+                                  className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold border-2 flex-shrink-0 ml-2 ${
+                                    student.status === "Out"
+                                      ? "bg-gray-900 text-white border-gray-900"
+                                      : "bg-white text-gray-700 border-gray-300"
+                                  }`}
+                                >
+                                  {student.status}
+                                </span>
+                              </div>
+                              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
+                                    Out Time
+                                  </p>
+                                  <p className="text-sm font-medium text-gray-900">
+                                    {student.outTime}
+                                  </p>
+                                </div>
+                                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
+                                    Destination
+                                  </p>
+                                  <p className="text-sm font-medium text-gray-900">
+                                    {student.place}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -5073,7 +5616,8 @@ export default function Admin() {
                         Exporting for: {studentDetails.name}
                       </p>
                       <p className="text-xs text-green-700">
-                        Roll: {studentDetails.roll} • Room: {studentDetails.room || "N/A"}
+                        Roll: {studentDetails.roll} • Room:{" "}
+                        {studentDetails.room || "N/A"}
                       </p>
                     </div>
                   </div>
@@ -5099,7 +5643,8 @@ export default function Admin() {
                         Exporting for: All Students
                       </p>
                       <p className="text-xs text-blue-700">
-                        Complete attendance records for all students in the selected date range.
+                        Complete attendance records for all students in the
+                        selected date range.
                       </p>
                     </div>
                   </div>
@@ -5156,7 +5701,11 @@ export default function Admin() {
               </button>
               <button
                 onClick={handleExportAttendance}
-                disabled={localIsLoading || !exportDateRange.startDate || !exportDateRange.endDate}
+                disabled={
+                  localIsLoading ||
+                  !exportDateRange.startDate ||
+                  !exportDateRange.endDate
+                }
                 className="flex-1 px-6 py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {localIsLoading ? (
