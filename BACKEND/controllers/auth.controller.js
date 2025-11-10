@@ -14,7 +14,7 @@ import {
   welcomeGMail,
   resetPasswordGMail,
   passwordResetSuccessGMail,
-} from "../gmail/gmailConfig.js";
+} from "../resend/mailConfig.js";
 export const signupController = async (req, res) => {
   const { name, email, password } = req.body;
   try {
