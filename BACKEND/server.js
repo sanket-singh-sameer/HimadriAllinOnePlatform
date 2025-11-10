@@ -22,8 +22,10 @@ const app = express();
 const __dirname = path.resolve();
 
 const allowedOrigins = [
-  "https://nith.org.in", 
+  "https://nith.org.in",
+  "https://himadri.nith.org.in",
   "http://localhost:5173",
+  "https://himadriallinoneplatform.onrender.com",
   process.env.CLIENT_URL
 ]
 
