@@ -19,6 +19,9 @@ const messAttendenceSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+// Create compound index to ensure one record per user per day
+messAttendenceSchema.index({ user: 1, date: 1 }, { unique: true });
+
 const MessAttendence = mongoose.model("MessAttendence", messAttendenceSchema);
 
 export default MessAttendence;

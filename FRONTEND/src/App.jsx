@@ -15,6 +15,7 @@ import { FullPageLoader } from "./Components/LoadingSpinner";
 import ForgotPassword from "./Pages/ForgotPassword";
 import ResetPassword from "./Pages/ResetPassword";
 import MessSnacks from "./Pages/MessSnacks";
+import RoleBasedID from "./Pages/RoleBasedID";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -148,6 +149,14 @@ function App() {
           }
         />
         <Route path="/mess/:roll" element={<MessSnacks />} />
+        <Route 
+          path="/id/:roll" 
+          element={
+            <ProtectedRoute>
+              <RoleBasedID />
+            </ProtectedRoute>
+          } 
+        />
         <Route path="/test" element={<div>Test Route Works!</div>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

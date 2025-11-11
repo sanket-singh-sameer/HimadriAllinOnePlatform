@@ -1,7 +1,7 @@
 import User from "../../models/user.model.js";
 import { getUserId } from "../../utils/getUserId.js";
 
-export const checkIfCleaningCommittee = async (req, res, next) => {
+export const checkIfCollegeGate = async (req, res, next) => {
   try {
     const userId = getUserId(req);
     if (!userId) {
@@ -13,17 +13,17 @@ export const checkIfCleaningCommittee = async (req, res, next) => {
       return res.status(403).json({ message: "Access denied. User not found." });
     }
 
-    // Allow cleaning-committee
-    const allowedRoles = ["cleaning-committee"];
+    // Allow college-gate
+    const allowedRoles = ["college-gate"];
     if (!allowedRoles.includes(user.role)) {
       return res.status(403).json({ 
-        message: "Access denied. Only cleaning committee members can perform this action." 
+        message: "Access denied. Only college gate staff can perform this action." 
       });
     }
 
     next();
   } catch (error) {
-    console.error("Error checking cleaning committee access:", error);
+    console.error("Error checking college gate access:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

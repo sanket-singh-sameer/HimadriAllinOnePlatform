@@ -32,6 +32,8 @@ const userSchema = new mongoose.Schema(
         "cleaning-committee",
         "commonroom-committee",
         "hostel-committee",
+        "guard",
+        "college-gate",
         "student",
         "admin",
         "super-admin",

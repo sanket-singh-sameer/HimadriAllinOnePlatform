@@ -58,6 +58,8 @@ export const markMessAttendence = async (req, res) => {
       if (isNaN(attendanceDate.getTime())) {
         return res.status(400).json({ message: "Invalid date format" });
       }
+      // Normalize to midnight
+      attendanceDate.setHours(0, 0, 0, 0);
     } else {
       // Set to today's date at midnight
       attendanceDate = new Date();
@@ -98,13 +100,48 @@ export const markMessAttendence = async (req, res) => {
     }
 
     // Check if attendance for this date already exists
+    // Use date range to ensure we get the record for the exact day
+    const startOfDay = new Date(attendanceDate);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(attendanceDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
     let messAttendance = await MessAttendence.findOne({ 
       user: user._id, 
-      date: attendanceDate 
+      date: {
+        $gte: startOfDay,
+        $lte: endOfDay
+      }
     });
 
     if (messAttendance) {
-      // Update only the meal for current time slot
+      // Check if this specific meal is already marked
+      let alreadyMarked = false;
+      let alreadyMarkedMessage = "";
+
+      if (attendance.breakfast && messAttendance.attendence.breakfast.attended) {
+        alreadyMarked = true;
+        alreadyMarkedMessage = "Breakfast attendance was already marked earlier today";
+      }
+      if (attendance.lunch && messAttendance.attendence.lunch.attended) {
+        alreadyMarked = true;
+        alreadyMarkedMessage = "Lunch attendance was already marked earlier today";
+      }
+      if (attendance.dinner && messAttendance.attendence.dinner.attended) {
+        alreadyMarked = true;
+        alreadyMarkedMessage = "Dinner attendance was already marked earlier today";
+      }
+
+      if (alreadyMarked) {
+        return res.status(200).json({
+          message: alreadyMarkedMessage,
+          attendance: messAttendance,
+          markedMeal: mealType,
+          alreadyMarked: true
+        });
+      }
+
+      // Update only the meal for current time slot if not already marked
       if (attendance.breakfast) {
         messAttendance.attendence.breakfast.attended = true;
         messAttendance.attendence.breakfast.markedAt = currentTime;
@@ -122,7 +159,8 @@ export const markMessAttendence = async (req, res) => {
       return res.status(200).json({
         message: `${mealType.charAt(0).toUpperCase() + mealType.slice(1)} attendance marked for ${roll} on ${attendanceDate.toDateString()}`,
         attendance: messAttendance,
-        markedMeal: mealType
+        markedMeal: mealType,
+        alreadyMarked: false
       });
     } else {
       // Create new attendance record with the appropriate meal marked
@@ -149,7 +187,8 @@ export const markMessAttendence = async (req, res) => {
       return res.status(201).json({
         message: `${mealType.charAt(0).toUpperCase() + mealType.slice(1)} attendance marked for ${roll} on ${attendanceDate.toDateString()}`,
         attendance: messAttendance,
-        markedMeal: mealType
+        markedMeal: mealType,
+        alreadyMarked: false
       });
     }
   } catch (error) {
@@ -579,5 +618,57 @@ export const exportMessAttendance = async (req, res) => {
   } catch (error) {
     console.error("Error in exportMessAttendance:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Cleanup duplicate attendance records (admin utility)
+export const cleanupDuplicateAttendance = async (req, res) => {
+  try {
+    console.log("Starting cleanup of duplicate attendance records...");
+    
+    // Find all attendance records
+    const allRecords = await MessAttendence.find({}).sort({ user: 1, date: 1, createdAt: 1 });
+    
+    const seen = new Map(); // Map to track user+date combinations
+    const duplicates = [];
+    
+    for (const record of allRecords) {
+      const key = `${record.user}_${record.date.toISOString().split('T')[0]}`;
+      
+      if (seen.has(key)) {
+        // This is a duplicate - merge data and delete
+        const original = seen.get(key);
+        
+        // Merge attendance data (keep any marked meals)
+        if (record.attendence.breakfast.attended && !original.attendence.breakfast.attended) {
+          original.attendence.breakfast = record.attendence.breakfast;
+        }
+        if (record.attendence.lunch.attended && !original.attendence.lunch.attended) {
+          original.attendence.lunch = record.attendence.lunch;
+        }
+        if (record.attendence.dinner.attended && !original.attendence.dinner.attended) {
+          original.attendence.dinner = record.attendence.dinner;
+        }
+        
+        await original.save();
+        await MessAttendence.findByIdAndDelete(record._id);
+        duplicates.push(record._id);
+        
+        console.log(`Merged and deleted duplicate: ${key}`);
+      } else {
+        seen.set(key, record);
+      }
+    }
+    
+    console.log(`Cleanup complete. Removed ${duplicates.length} duplicate records.`);
+    
+    res.status(200).json({
+      message: "Duplicate cleanup completed",
+      duplicatesRemoved: duplicates.length,
+      duplicateIds: duplicates
+    });
+  } catch (error) {
+    console.error("Error in cleanupDuplicateAttendance:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
