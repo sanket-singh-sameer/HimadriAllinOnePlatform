@@ -66,6 +66,7 @@ export const signupController = async (req, res) => {
     });
     await newUser.save();
     await otpVerificationGMail(email, otp);
+    localStorage.setItem("email", email); // Store email for OTP verification
     return res.status(201).json({
       message: "User registered successfully",
       user: { ...newUser._doc, password: undefined },
