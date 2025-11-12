@@ -50,22 +50,22 @@ const RoleBasedID = () => {
 // Guard Page Component (Placeholder)
 const GuardPage = ({ roll }) => {
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 p-4">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 text-center">
-          <div className="text-8xl mb-4">🛡️</div>
-          <h1 className="text-4xl font-black text-white mb-2">Guard Portal</h1>
-          <p className="text-blue-100 text-lg">Hostel Gate Security</p>
+    <div className="min-h-screen flex justify-center items-center bg-white p-6">
+      <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] max-w-2xl w-full overflow-hidden border border-gray-100">
+        <div className="bg-black p-10 text-center">
+          <div className="text-7xl mb-6 filter grayscale">🛡️</div>
+          <h1 className="text-4xl font-bold text-white mb-3 tracking-tight">Guard Portal</h1>
+          <p className="text-gray-300 text-base font-light">Hostel Gate Security</p>
         </div>
-        <div className="p-8">
-          <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 mb-6">
-            <p className="text-blue-900 font-bold text-lg text-center">
-              Roll Number: <span className="bg-blue-200 px-4 py-1 rounded-lg ml-2">{roll?.toUpperCase()}</span>
+        <div className="p-10">
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-8 mb-8">
+            <p className="text-black font-semibold text-lg text-center tracking-wide">
+              Roll Number: <span className="bg-black text-white px-6 py-2 rounded-lg ml-3 font-mono">{roll?.toUpperCase()}</span>
             </p>
           </div>
           <div className="text-center text-gray-600">
-            <p className="mb-4">🚧 Guard module coming soon...</p>
-            <p className="text-sm">Features: Hostel entry/exit logs, Visitor management</p>
+            <p className="mb-4 text-base font-medium">🚧 Guard module coming soon...</p>
+            <p className="text-sm text-gray-500 font-light">Features: Hostel entry/exit logs, Visitor management</p>
           </div>
         </div>
       </div>
@@ -146,18 +146,18 @@ const CollegeGatePage = ({ roll }) => {
   // Loading State
   if (loading) {
     return (
-      <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 p-4">
-        <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 text-center">
-            <div className="text-8xl mb-4">🛡️</div>
-            <h1 className="text-4xl font-black text-white mb-2">Guard Portal</h1>
-            <p className="text-blue-100 text-lg">Verifying Outpass...</p>
+      <div className="min-h-screen flex justify-center items-center bg-white p-6">
+        <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] max-w-2xl w-full overflow-hidden border border-gray-100">
+          <div className="bg-black p-10 text-center">
+            <div className="text-7xl mb-6 filter grayscale">🛡️</div>
+            <h1 className="text-4xl font-bold text-white mb-3 tracking-tight">Guard Portal</h1>
+            <p className="text-gray-300 text-base font-light">Verifying Outpass...</p>
           </div>
-          <div className="p-8">
-            <div className="flex justify-center items-center">
-              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
+          <div className="p-10">
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-black"></div>
             </div>
-            <p className="text-center text-gray-600 mt-4">Please wait...</p>
+            <p className="text-center text-gray-600 mt-6 font-light">Please wait...</p>
           </div>
         </div>
       </div>
@@ -167,25 +167,25 @@ const CollegeGatePage = ({ roll }) => {
   // Error State
   if (error) {
     return (
-      <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-red-500 via-pink-500 to-rose-500 p-4">
-        <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden">
-          <div className="bg-gradient-to-r from-red-600 to-pink-700 p-8 text-center">
-            <div className="text-8xl mb-4">❌</div>
-            <h1 className="text-4xl font-black text-white mb-2">Verification Failed</h1>
-            <p className="text-red-100 text-lg">Outpass Issue Detected</p>
+      <div className="min-h-screen flex justify-center items-center bg-white p-6">
+        <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] max-w-2xl w-full overflow-hidden border border-gray-100">
+          <div className="bg-black p-10 text-center">
+            <div className="text-7xl mb-6 filter grayscale">❌</div>
+            <h1 className="text-4xl font-bold text-white mb-3 tracking-tight">Verification Failed</h1>
+            <p className="text-gray-300 text-base font-light">Outpass Issue Detected</p>
           </div>
-          <div className="p-8">
-            <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-6 mb-6">
-              <p className="text-red-900 font-bold text-lg text-center mb-2">
-                Roll Number: <span className="bg-red-200 px-4 py-1 rounded-lg ml-2">{roll?.toUpperCase()}</span>
+          <div className="p-10">
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-8 mb-8">
+              <p className="text-black font-semibold text-lg text-center mb-4 tracking-wide">
+                Roll Number: <span className="bg-black text-white px-6 py-2 rounded-lg ml-3 font-mono">{roll?.toUpperCase()}</span>
               </p>
-              <div className="bg-red-100 rounded-lg p-4 mt-4">
-                <p className="text-red-800 text-center font-semibold">{error}</p>
+              <div className="bg-white border-2 border-black rounded-lg p-6 mt-6">
+                <p className="text-black text-center font-medium">{error}</p>
               </div>
             </div>
             <button
               onClick={handleNewScan}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+              className="w-full bg-black text-white py-4 px-6 rounded-xl font-semibold text-base tracking-wide hover:bg-gray-800 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
             >
               Scan Another Student
             </button>
