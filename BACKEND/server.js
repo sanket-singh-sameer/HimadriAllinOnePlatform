@@ -25,6 +25,7 @@ const allowedOrigins = [
   "https://nith.org.in",
   "https://himadri.nith.org.in",
   "http://localhost:5173",
+  "http://localhost:8080",
   "https://himadriallinoneplatform.onrender.com",
   process.env.CLIENT_URL
 ]

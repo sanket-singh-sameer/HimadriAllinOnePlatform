@@ -14,7 +14,7 @@ import {
   welcomeGMail,
   resetPasswordGMail,
   passwordResetSuccessGMail,
-} from "../gmail/gmailConfig.js";
+} from "../resend/mailConfig.js";
 export const signupController = async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -66,6 +66,7 @@ export const signupController = async (req, res) => {
     });
     await newUser.save();
     await otpVerificationGMail(email, otp);
+    localStorage.setItem("email", email); // Store email for OTP verification
     return res.status(201).json({
       message: "User registered successfully",
       user: { ...newUser._doc, password: undefined },

@@ -58,6 +58,8 @@ export const markMessAttendence = async (req, res) => {
       if (isNaN(attendanceDate.getTime())) {
         return res.status(400).json({ message: "Invalid date format" });
       }
+      // Normalize to midnight
+      attendanceDate.setHours(0, 0, 0, 0);
     } else {
       // Set to today's date at midnight
       attendanceDate = new Date();
@@ -98,13 +100,48 @@ export const markMessAttendence = async (req, res) => {
     }
 
     // Check if attendance for this date already exists
+    // Use date range to ensure we get the record for the exact day
+    const startOfDay = new Date(attendanceDate);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(attendanceDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
     let messAttendance = await MessAttendence.findOne({ 
       user: user._id, 
-      date: attendanceDate 
+      date: {
+        $gte: startOfDay,
+        $lte: endOfDay
+      }
     });
 
     if (messAttendance) {
-      // Update only the meal for current time slot
+      // Check if this specific meal is already marked
+      let alreadyMarked = false;
+      let alreadyMarkedMessage = "";
+
+      if (attendance.breakfast && messAttendance.attendence.breakfast.attended) {
+        alreadyMarked = true;
+        alreadyMarkedMessage = "Breakfast attendance was already marked earlier today";
+      }
+      if (attendance.lunch && messAttendance.attendence.lunch.attended) {
+        alreadyMarked = true;
+        alreadyMarkedMessage = "Lunch attendance was already marked earlier today";
+      }
+      if (attendance.dinner && messAttendance.attendence.dinner.attended) {
+        alreadyMarked = true;
+        alreadyMarkedMessage = "Dinner attendance was already marked earlier today";
+      }
+
+      if (alreadyMarked) {
+        return res.status(200).json({
+          message: alreadyMarkedMessage,
+          attendance: messAttendance,
+          markedMeal: mealType,
+          alreadyMarked: true
+        });
+      }
+
+      // Update only the meal for current time slot if not already marked
       if (attendance.breakfast) {
         messAttendance.attendence.breakfast.attended = true;
         messAttendance.attendence.breakfast.markedAt = currentTime;
@@ -122,7 +159,8 @@ export const markMessAttendence = async (req, res) => {
       return res.status(200).json({
         message: `${mealType.charAt(0).toUpperCase() + mealType.slice(1)} attendance marked for ${roll} on ${attendanceDate.toDateString()}`,
         attendance: messAttendance,
-        markedMeal: mealType
+        markedMeal: mealType,
+        alreadyMarked: false
       });
     } else {
       // Create new attendance record with the appropriate meal marked
@@ -149,7 +187,8 @@ export const markMessAttendence = async (req, res) => {
       return res.status(201).json({
         message: `${mealType.charAt(0).toUpperCase() + mealType.slice(1)} attendance marked for ${roll} on ${attendanceDate.toDateString()}`,
         attendance: messAttendance,
-        markedMeal: mealType
+        markedMeal: mealType,
+        alreadyMarked: false
       });
     }
   } catch (error) {
@@ -224,6 +263,25 @@ export const submitOutpassRequest = async (req, res) => {
     if (selectedDate < today) {
       return res.status(400).json({ 
         message: "Out date cannot be in the past" 
+      });
+    }
+
+    // Check if student already has a pending or approved outpass
+    const existingOutpass = await Outpass.findOne({
+      user: userId,
+      status: { $in: ["pending", "approved"] }
+    });
+
+    if (existingOutpass) {
+      return res.status(400).json({ 
+        message: `You already have a ${existingOutpass.status} outpass. Please wait for it to be processed or expired before applying for a new one.`,
+        existingOutpass: {
+          id: existingOutpass._id,
+          status: existingOutpass.status,
+          outDate: existingOutpass.outDate,
+          placeOfVisit: existingOutpass.placeOfVisit,
+          createdAt: existingOutpass.createdAt
+        }
       });
     }
 
@@ -579,5 +637,199 @@ export const exportMessAttendance = async (req, res) => {
   } catch (error) {
     console.error("Error in exportMessAttendance:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Cleanup duplicate attendance records (admin utility)
+export const cleanupDuplicateAttendance = async (req, res) => {
+  try {
+    console.log("Starting cleanup of duplicate attendance records...");
+    
+    // Find all attendance records
+    const allRecords = await MessAttendence.find({}).sort({ user: 1, date: 1, createdAt: 1 });
+    
+    const seen = new Map(); // Map to track user+date combinations
+    const duplicates = [];
+    
+    for (const record of allRecords) {
+      const key = `${record.user}_${record.date.toISOString().split('T')[0]}`;
+      
+      if (seen.has(key)) {
+        // This is a duplicate - merge data and delete
+        const original = seen.get(key);
+        
+        // Merge attendance data (keep any marked meals)
+        if (record.attendence.breakfast.attended && !original.attendence.breakfast.attended) {
+          original.attendence.breakfast = record.attendence.breakfast;
+        }
+        if (record.attendence.lunch.attended && !original.attendence.lunch.attended) {
+          original.attendence.lunch = record.attendence.lunch;
+        }
+        if (record.attendence.dinner.attended && !original.attendence.dinner.attended) {
+          original.attendence.dinner = record.attendence.dinner;
+        }
+        
+        await original.save();
+        await MessAttendence.findByIdAndDelete(record._id);
+        duplicates.push(record._id);
+        
+        console.log(`Merged and deleted duplicate: ${key}`);
+      } else {
+        seen.set(key, record);
+      }
+    }
+    
+    console.log(`Cleanup complete. Removed ${duplicates.length} duplicate records.`);
+    
+    res.status(200).json({
+      message: "Duplicate cleanup completed",
+      duplicatesRemoved: duplicates.length,
+      duplicateIds: duplicates
+    });
+  } catch (error) {
+    console.error("Error in cleanupDuplicateAttendance:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
+
+// Guard outpass verification and gate entry/exit
+export const guardOutpassVerification = async (req, res) => {
+  let { roll } = req.params;
+  
+  try {
+    roll = roll.toUpperCase();
+    
+    // Find user
+    const user = await User.findOne({ roll });
+    if (!user) {
+      return res.status(404).json({ 
+        success: false,
+        message: "Student not found with this roll number" 
+      });
+    }
+
+    // Find the latest approved outpass for this user
+    const latestOutpass = await Outpass.findOne({ 
+      rollNumber: roll,
+      status: "approved"
+    })
+    .sort({ approvedAt: -1 }) // Get most recent approved outpass
+    .populate('user', 'name roll email phone room');
+
+    if (!latestOutpass) {
+      return res.status(404).json({ 
+        success: false,
+        message: "No approved outpass found for this student",
+        user: {
+          name: user.name,
+          roll: user.roll,
+          room: user.room
+        }
+      });
+    }
+
+    const now = new Date();
+    
+    // Check if outDate matches current date
+    const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const outpassDate = new Date(latestOutpass.outDate.getFullYear(), latestOutpass.outDate.getMonth(), latestOutpass.outDate.getDate());
+    
+    if (currentDate.getTime() !== outpassDate.getTime()) {
+      return res.status(400).json({ 
+        success: false,
+        message: `Outpass is valid for ${latestOutpass.outDate.toLocaleDateString()}, not for today`,
+        outpass: {
+          outDate: latestOutpass.outDate,
+          placeOfVisit: latestOutpass.placeOfVisit,
+          status: latestOutpass.status
+        }
+      });
+    }
+    
+    // Check if outpass has expired
+    if (latestOutpass.approvedAt) {
+      const sixteenHoursLater = new Date(latestOutpass.approvedAt.getTime() + 16 * 60 * 60 * 1000);
+      if (now >= sixteenHoursLater) {
+        latestOutpass.status = "expired";
+        await latestOutpass.save();
+        
+        return res.status(400).json({ 
+          success: false,
+          message: "Outpass has expired",
+          outpass: latestOutpass
+        });
+      }
+    }
+
+    // Determine if this is OUT or IN
+    let action = "";
+    let updatedOutpass;
+
+    if (!latestOutpass.actualOutTime) {
+      // First scan - Student is going OUT
+      latestOutpass.actualOutTime = now;
+      await latestOutpass.save();
+      action = "OUT";
+      
+      return res.status(200).json({
+        success: true,
+        action: "OUT",
+        message: `Exit recorded for ${user.name}`,
+        outpass: latestOutpass,
+        user: {
+          name: user.name,
+          roll: user.roll,
+          room: user.room,
+          phone: user.phone
+        },
+        timestamp: now
+      });
+    } 
+    else if (!latestOutpass.actualInTime) {
+      // Second scan - Student is coming IN
+      latestOutpass.actualInTime = now;
+      await latestOutpass.save();
+      action = "IN";
+
+      // Calculate duration
+      const duration = Math.round((now - latestOutpass.actualOutTime) / (1000 * 60)); // in minutes
+      
+      return res.status(200).json({
+        success: true,
+        action: "IN",
+        message: `Entry recorded for ${user.name}`,
+        outpass: latestOutpass,
+        user: {
+          name: user.name,
+          roll: user.roll,
+          room: user.room,
+          phone: user.phone
+        },
+        timestamp: now,
+        outTime: latestOutpass.actualOutTime,
+        duration: `${Math.floor(duration / 60)}h ${duration % 60}m`
+      });
+    } 
+    else {
+      // Both times are already set - outpass is complete
+      return res.status(400).json({
+        success: false,
+        message: "This outpass has already been used (both OUT and IN recorded)",
+        outpass: latestOutpass,
+        user: {
+          name: user.name,
+          roll: user.roll,
+          room: user.room
+        }
+      });
+    }
+
+  } catch (error) {
+    console.error("Error in guardOutpassVerification:", error);
+    res.status(500).json({ 
+      success: false,
+      message: "Internal server error", 
+      error: error.message 
+    });
   }
 };
