@@ -4428,11 +4428,14 @@ export default function Admin() {
                                     </span>
                                   </button>
 
-                                  <button className="group/btn !cursor-pointer !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2 sm:!space-y-2.5 !px-3 sm:!px-4 !py-4 sm:!py-5 !bg-white hover:!bg-gray-50 !border-2 !border-gray-300 hover:!border-gray-900 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm hover:!shadow-md hover:!scale-[1.02] active:!scale-95">
-                                    <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 group-hover/btn:!opacity-100 !transition-opacity !duration-300"></div>
-                                    <div className="!relative !w-10 !h-10 sm:!w-11 sm:!h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center group-hover/btn:!bg-gray-900 group-hover/btn:!scale-110 !transition-all !duration-300">
+                                  <button
+                                    disabled
+                                    className="group/btn !relative !overflow-hidden !flex !flex-col !items-center !justify-center !space-y-2 sm:!space-y-2.5 !px-3 sm:!px-4 !py-4 sm:!py-5 !bg-white !border-2 !border-gray-300 !text-gray-900 !font-semibold !rounded-xl !transition-all !duration-300 !shadow-sm !opacity-50 !cursor-not-allowed"
+                                  >
+                                    <div className="!absolute !inset-0 !bg-gradient-to-br !from-gray-100/50 !via-transparent !to-transparent !opacity-0 !transition-opacity !duration-300"></div>
+                                    <div className="!relative !w-10 !h-10 sm:!w-11 sm:!h-11 !bg-gray-100 !rounded-xl !flex !items-center !justify-center !transition-all !duration-300">
                                       <svg
-                                        className="!w-5 !h-5 !text-gray-700 group-hover/btn:!text-white !transition-colors !duration-300"
+                                        className="!w-5 !h-5 !text-gray-700 !transition-colors !duration-300"
                                         fill="none"
                                         stroke="currentColor"
                                         viewBox="0 0 24 24"
@@ -4549,16 +4552,13 @@ export default function Admin() {
                         </div>
                       )}
 
-                      {/* Today's Attendance Log Section */}
                       <div className="!mt-8 !bg-white !rounded-2xl !border !border-gray-200 !shadow-lg !overflow-hidden">
-                        {/* Section Header */}
                         <div className="!bg-black !px-6 !py-5 !border-b !border-gray-800">
                           <div className="!flex !items-center !justify-between !flex-wrap !gap-4">
                             <div>
                               <h6 className="!text-lg sm:!text-xl !font-bold !text-white !mb-1">
                                 Today's Attendance Log
                               </h6>
-                              
                             </div>
                             <div className="!flex !items-center !gap-2 !px-3 !py-1.5 !bg-white/10 !rounded-lg !backdrop-blur-sm">
                               <svg
@@ -4585,11 +4585,9 @@ export default function Admin() {
                           </div>
                         </div>
 
-                        {/* Table Container */}
                         <div className="!overflow-x-auto">
                           <div className="!max-h-[450px] !overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-50">
                             <table className="!w-full !border-collapse">
-                              {/* Table Header */}
                               <thead className="!sticky !top-0 !z-10 !bg-gray-50">
                                 <tr className="!border-b !border-gray-200">
                                   <th className="!px-6 !py-3.5 !text-left !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider !bg-gray-50">
@@ -4610,9 +4608,8 @@ export default function Admin() {
                                 </tr>
                               </thead>
 
-                              {/* Table Body */}
                               <tbody className="!bg-white !divide-y !divide-gray-100">
-                                {/* Sample Data Rows - Replace with actual data */}
+                                {/* Replace with actual data */}
                                 {[
                                   {
                                     name: "Rahul Sharma",
