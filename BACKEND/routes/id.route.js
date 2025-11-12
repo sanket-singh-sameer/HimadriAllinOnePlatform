@@ -7,12 +7,14 @@ import {
   submitOutpassRequest,
   getMyOutpasses,
   getAllOutpasses,
-  updateOutpassStatus
+  updateOutpassStatus,
+  guardOutpassVerification
 } from "../controllers/id.controller.js";
 import { checkIfCommittee } from "../middlewares/checkIfCommitte.middleware.js";
 import { verifyTokenFromCookies } from "../middlewares/verifyToken.middleware.js";
 import { checkIfAdmin } from "../middlewares/checkIfAdmin.middleware.js";
 import { checkIfMessCommittee } from "../middlewares/checksForCommittee/messCommitteeCheck.js";
+import { checkIfCollegeGate } from "../middlewares/checksForCommittee/collegeGateCheck.js";
 
 const router = express.Router();
 
@@ -23,6 +25,9 @@ router.get("/:roll", checkIfCommittee, viewIDByRoll);
 router.post("/mess-attendance/cleanup-duplicates", checkIfAdmin, cleanupDuplicateAttendance);
 router.get("/mess-attendance/export", checkIfCommittee, exportMessAttendance);
 router.post("/mess-attendance/:roll", checkIfMessCommittee, markMessAttendence);
+
+// Guard outpass verification route
+router.post("/guard/verify-outpass/:roll", checkIfCollegeGate, guardOutpassVerification);
 
 // Outpass routes
 router.post("/outpass/submit", verifyTokenFromCookies, submitOutpassRequest);

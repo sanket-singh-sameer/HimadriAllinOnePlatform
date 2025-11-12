@@ -266,6 +266,25 @@ export const submitOutpassRequest = async (req, res) => {
       });
     }
 
+    // Check if student already has a pending or approved outpass
+    const existingOutpass = await Outpass.findOne({
+      user: userId,
+      status: { $in: ["pending", "approved"] }
+    });
+
+    if (existingOutpass) {
+      return res.status(400).json({ 
+        message: `You already have a ${existingOutpass.status} outpass. Please wait for it to be processed or expired before applying for a new one.`,
+        existingOutpass: {
+          id: existingOutpass._id,
+          status: existingOutpass.status,
+          outDate: existingOutpass.outDate,
+          placeOfVisit: existingOutpass.placeOfVisit,
+          createdAt: existingOutpass.createdAt
+        }
+      });
+    }
+
     // Create new outpass request
     const outpass = new Outpass({
       user: userId,
@@ -670,5 +689,147 @@ export const cleanupDuplicateAttendance = async (req, res) => {
   } catch (error) {
     console.error("Error in cleanupDuplicateAttendance:", error);
     res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
+
+// Guard outpass verification and gate entry/exit
+export const guardOutpassVerification = async (req, res) => {
+  let { roll } = req.params;
+  
+  try {
+    roll = roll.toUpperCase();
+    
+    // Find user
+    const user = await User.findOne({ roll });
+    if (!user) {
+      return res.status(404).json({ 
+        success: false,
+        message: "Student not found with this roll number" 
+      });
+    }
+
+    // Find the latest approved outpass for this user
+    const latestOutpass = await Outpass.findOne({ 
+      rollNumber: roll,
+      status: "approved"
+    })
+    .sort({ approvedAt: -1 }) // Get most recent approved outpass
+    .populate('user', 'name roll email phone room');
+
+    if (!latestOutpass) {
+      return res.status(404).json({ 
+        success: false,
+        message: "No approved outpass found for this student",
+        user: {
+          name: user.name,
+          roll: user.roll,
+          room: user.room
+        }
+      });
+    }
+
+    const now = new Date();
+    
+    // Check if outDate matches current date
+    const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const outpassDate = new Date(latestOutpass.outDate.getFullYear(), latestOutpass.outDate.getMonth(), latestOutpass.outDate.getDate());
+    
+    if (currentDate.getTime() !== outpassDate.getTime()) {
+      return res.status(400).json({ 
+        success: false,
+        message: `Outpass is valid for ${latestOutpass.outDate.toLocaleDateString()}, not for today`,
+        outpass: {
+          outDate: latestOutpass.outDate,
+          placeOfVisit: latestOutpass.placeOfVisit,
+          status: latestOutpass.status
+        }
+      });
+    }
+    
+    // Check if outpass has expired
+    if (latestOutpass.approvedAt) {
+      const sixteenHoursLater = new Date(latestOutpass.approvedAt.getTime() + 16 * 60 * 60 * 1000);
+      if (now >= sixteenHoursLater) {
+        latestOutpass.status = "expired";
+        await latestOutpass.save();
+        
+        return res.status(400).json({ 
+          success: false,
+          message: "Outpass has expired",
+          outpass: latestOutpass
+        });
+      }
+    }
+
+    // Determine if this is OUT or IN
+    let action = "";
+    let updatedOutpass;
+
+    if (!latestOutpass.actualOutTime) {
+      // First scan - Student is going OUT
+      latestOutpass.actualOutTime = now;
+      await latestOutpass.save();
+      action = "OUT";
+      
+      return res.status(200).json({
+        success: true,
+        action: "OUT",
+        message: `Exit recorded for ${user.name}`,
+        outpass: latestOutpass,
+        user: {
+          name: user.name,
+          roll: user.roll,
+          room: user.room,
+          phone: user.phone
+        },
+        timestamp: now
+      });
+    } 
+    else if (!latestOutpass.actualInTime) {
+      // Second scan - Student is coming IN
+      latestOutpass.actualInTime = now;
+      await latestOutpass.save();
+      action = "IN";
+
+      // Calculate duration
+      const duration = Math.round((now - latestOutpass.actualOutTime) / (1000 * 60)); // in minutes
+      
+      return res.status(200).json({
+        success: true,
+        action: "IN",
+        message: `Entry recorded for ${user.name}`,
+        outpass: latestOutpass,
+        user: {
+          name: user.name,
+          roll: user.roll,
+          room: user.room,
+          phone: user.phone
+        },
+        timestamp: now,
+        outTime: latestOutpass.actualOutTime,
+        duration: `${Math.floor(duration / 60)}h ${duration % 60}m`
+      });
+    } 
+    else {
+      // Both times are already set - outpass is complete
+      return res.status(400).json({
+        success: false,
+        message: "This outpass has already been used (both OUT and IN recorded)",
+        outpass: latestOutpass,
+        user: {
+          name: user.name,
+          roll: user.roll,
+          room: user.room
+        }
+      });
+    }
+
+  } catch (error) {
+    console.error("Error in guardOutpassVerification:", error);
+    res.status(500).json({ 
+      success: false,
+      message: "Internal server error", 
+      error: error.message 
+    });
   }
 };

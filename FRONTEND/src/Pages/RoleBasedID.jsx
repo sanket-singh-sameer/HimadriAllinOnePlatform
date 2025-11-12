@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useParams, Navigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import MarkAttendance from "./MarkAttendance";
+import axiosInstance from "../../Utils/axiosInstance";
+import { API_PATHS } from "../../Utils/apiPaths";
+import { toast } from "react-hot-toast";
 
 const RoleBasedID = () => {
   const { roll } = useParams();
@@ -44,7 +47,7 @@ const RoleBasedID = () => {
   }
 };
 
-// Guard Page Component
+// Guard Page Component (Placeholder)
 const GuardPage = ({ roll }) => {
   return (
     <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 p-4">
@@ -52,7 +55,7 @@ const GuardPage = ({ roll }) => {
         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 text-center">
           <div className="text-8xl mb-4">🛡️</div>
           <h1 className="text-4xl font-black text-white mb-2">Guard Portal</h1>
-          <p className="text-blue-100 text-lg">Gate Entry/Exit Management</p>
+          <p className="text-blue-100 text-lg">Hostel Gate Security</p>
         </div>
         <div className="p-8">
           <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 mb-6">
@@ -62,7 +65,7 @@ const GuardPage = ({ roll }) => {
           </div>
           <div className="text-center text-gray-600">
             <p className="mb-4">🚧 Guard module coming soon...</p>
-            <p className="text-sm">Features: Entry/Exit logs, Visitor management</p>
+            <p className="text-sm">Features: Hostel entry/exit logs, Visitor management</p>
           </div>
         </div>
       </div>
@@ -70,30 +73,235 @@ const GuardPage = ({ roll }) => {
   );
 };
 
-// College Gate Page Component
+// College Gate Page Component (Functional - Outpass Verification)
 const CollegeGatePage = ({ roll }) => {
-  return (
-    <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-green-500 via-teal-500 to-cyan-500 p-4">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden">
-        <div className="bg-gradient-to-r from-green-600 to-teal-700 p-8 text-center">
-          <div className="text-8xl mb-4">🏫</div>
-          <h1 className="text-4xl font-black text-white mb-2">College Gate Portal</h1>
-          <p className="text-green-100 text-lg">Main Gate Access Control</p>
-        </div>
-        <div className="p-8">
-          <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-6 mb-6">
-            <p className="text-green-900 font-bold text-lg text-center">
-              Roll Number: <span className="bg-green-200 px-4 py-1 rounded-lg ml-2">{roll?.toUpperCase()}</span>
-            </p>
+  const [loading, setLoading] = useState(false);
+  const [verificationData, setVerificationData] = useState(null);
+  const [error, setError] = useState(null);
+  const hasVerifiedRef = useRef(false);
+
+  useEffect(() => {
+    // Prevent double execution in React Strict Mode
+    if (hasVerifiedRef.current) return;
+    hasVerifiedRef.current = true;
+
+    const verifyOutpass = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const response = await axiosInstance.post(API_PATHS.GUARD_VERIFY_OUTPASS(roll));
+        
+        if (response.data.success) {
+          setVerificationData(response.data);
+          
+          // Show success toast based on action type
+          if (response.data.action === "OUT") {
+            toast.success(`✅ EXIT recorded for ${response.data.user.name}`, {
+              duration: 5000,
+              style: {
+                background: '#10B981',
+                color: '#fff',
+                fontWeight: 'bold',
+              },
+            });
+          } else if (response.data.action === "IN") {
+            toast.success(`✅ ENTRY recorded for ${response.data.user.name}`, {
+              duration: 5000,
+              style: {
+                background: '#3B82F6',
+                color: '#fff',
+                fontWeight: 'bold',
+              },
+            });
+          }
+        }
+      } catch (err) {
+        const errorMessage = err.response?.data?.message || "Failed to verify outpass";
+        setError(errorMessage);
+        
+        toast.error(errorMessage, {
+          duration: 5000,
+          style: {
+            background: '#EF4444',
+            color: '#fff',
+            fontWeight: 'bold',
+          },
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    verifyOutpass();
+  }, [roll]);
+
+  const handleNewScan = () => {
+    hasVerifiedRef.current = false;
+    setVerificationData(null);
+    setError(null);
+    window.location.reload();
+  };
+
+  // Loading State
+  if (loading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 p-4">
+        <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 text-center">
+            <div className="text-8xl mb-4">🛡️</div>
+            <h1 className="text-4xl font-black text-white mb-2">Guard Portal</h1>
+            <p className="text-blue-100 text-lg">Verifying Outpass...</p>
           </div>
-          <div className="text-center text-gray-600">
-            <p className="mb-4">🚧 College Gate module coming soon...</p>
-            <p className="text-sm">Features: Outpass verification, Vehicle tracking</p>
+          <div className="p-8">
+            <div className="flex justify-center items-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
+            </div>
+            <p className="text-center text-gray-600 mt-4">Please wait...</p>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  // Error State
+  if (error) {
+    return (
+      <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-red-500 via-pink-500 to-rose-500 p-4">
+        <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden">
+          <div className="bg-gradient-to-r from-red-600 to-pink-700 p-8 text-center">
+            <div className="text-8xl mb-4">❌</div>
+            <h1 className="text-4xl font-black text-white mb-2">Verification Failed</h1>
+            <p className="text-red-100 text-lg">Outpass Issue Detected</p>
+          </div>
+          <div className="p-8">
+            <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-6 mb-6">
+              <p className="text-red-900 font-bold text-lg text-center mb-2">
+                Roll Number: <span className="bg-red-200 px-4 py-1 rounded-lg ml-2">{roll?.toUpperCase()}</span>
+              </p>
+              <div className="bg-red-100 rounded-lg p-4 mt-4">
+                <p className="text-red-800 text-center font-semibold">{error}</p>
+              </div>
+            </div>
+            <button
+              onClick={handleNewScan}
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+            >
+              Scan Another Student
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Success State - EXIT
+  if (verificationData && verificationData.action === "OUT") {
+    return (
+      <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 p-4">
+        <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden">
+          <div className="bg-gradient-to-r from-green-600 to-emerald-700 p-8 text-center">
+            <div className="text-8xl mb-4">�‍♂️➡️</div>
+            <h1 className="text-4xl font-black text-white mb-2">EXIT Recorded</h1>
+            <p className="text-green-100 text-lg">Student Leaving Campus</p>
+          </div>
+          <div className="p-8">
+            <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-6 mb-6">
+              <div className="text-center mb-4">
+                <h2 className="text-3xl font-bold text-gray-800">{verificationData.user.name}</h2>
+                <p className="text-green-700 font-bold text-xl mt-2">
+                  Roll: {verificationData.user.roll}
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-4 mt-6">
+                <div className="bg-white rounded-lg p-4 border border-green-200">
+                  <p className="text-gray-500 text-sm">Room</p>
+                  <p className="text-gray-800 font-bold text-lg">{verificationData.user.room || "N/A"}</p>
+                </div>
+                <div className="bg-white rounded-lg p-4 border border-green-200">
+                  <p className="text-gray-500 text-sm">Phone</p>
+                  <p className="text-gray-800 font-bold text-lg">{verificationData.user.phone || "N/A"}</p>
+                </div>
+              </div>
+              <div className="bg-green-100 rounded-lg p-4 mt-4">
+                <p className="text-green-800 text-center font-semibold">
+                  Exit Time: {new Date(verificationData.timestamp).toLocaleString()}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleNewScan}
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+            >
+              Scan Another Student
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Success State - ENTRY
+  if (verificationData && verificationData.action === "IN") {
+    return (
+      <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 p-4">
+        <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 text-center">
+            <div className="text-8xl mb-4">⬅️🚶‍♂️</div>
+            <h1 className="text-4xl font-black text-white mb-2">ENTRY Recorded</h1>
+            <p className="text-blue-100 text-lg">Student Returning to Campus</p>
+          </div>
+          <div className="p-8">
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 mb-6">
+              <div className="text-center mb-4">
+                <h2 className="text-3xl font-bold text-gray-800">{verificationData.user.name}</h2>
+                <p className="text-blue-700 font-bold text-xl mt-2">
+                  Roll: {verificationData.user.roll}
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-4 mt-6">
+                <div className="bg-white rounded-lg p-4 border border-blue-200">
+                  <p className="text-gray-500 text-sm">Room</p>
+                  <p className="text-gray-800 font-bold text-lg">{verificationData.user.room || "N/A"}</p>
+                </div>
+                <div className="bg-white rounded-lg p-4 border border-blue-200">
+                  <p className="text-gray-500 text-sm">Phone</p>
+                  <p className="text-gray-800 font-bold text-lg">{verificationData.user.phone || "N/A"}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="bg-blue-100 rounded-lg p-4">
+                  <p className="text-blue-600 text-sm">Out Time</p>
+                  <p className="text-blue-900 font-bold text-sm">
+                    {new Date(verificationData.outTime).toLocaleTimeString()}
+                  </p>
+                </div>
+                <div className="bg-blue-100 rounded-lg p-4">
+                  <p className="text-blue-600 text-sm">In Time</p>
+                  <p className="text-blue-900 font-bold text-sm">
+                    {new Date(verificationData.timestamp).toLocaleTimeString()}
+                  </p>
+                </div>
+              </div>
+              <div className="bg-purple-100 rounded-lg p-4 mt-4">
+                <p className="text-purple-800 text-center font-semibold">
+                  Duration: {verificationData.duration}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleNewScan}
+              className="w-full bg-gradient-to-r from-green-600 to-emerald-700 text-white py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+            >
+              Scan Another Student
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
 };
 
 // Discipline Committee Page Component
