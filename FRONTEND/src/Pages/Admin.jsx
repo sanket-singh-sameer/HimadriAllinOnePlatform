@@ -49,6 +49,8 @@ export default function Admin() {
   const [itemsPerPage] = useState(10);
   const [complaintsCurrentPage, setComplaintsCurrentPage] = useState(1);
   const [complaintsItemsPerPage] = useState(10);
+  const [attendanceCurrentPage, setAttendanceCurrentPage] = useState(1);
+  const [attendanceItemsPerPage] = useState(10);
   const [showConfirmAction, setShowConfirmAction] = useState(false);
   const [confirmActionType, setConfirmActionType] = useState(null);
   const [nfcScanning, setNfcScanning] = useState(false);
@@ -4602,6 +4604,9 @@ export default function Admin() {
                                     Out Time
                                   </th>
                                   <th className="!px-6 !py-3.5 !text-left !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider !bg-gray-50">
+                                    In Time
+                                  </th>
+                                  <th className="!px-6 !py-3.5 !text-left !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider !bg-gray-50">
                                     Place of Visit
                                   </th>
                                   <th className="!px-6 !py-3.5 !text-center !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider !bg-gray-50">
@@ -4612,110 +4617,160 @@ export default function Admin() {
 
                               {/* Table Body */}
                               <tbody className="!bg-white !divide-y !divide-gray-100">
-                                {/* Sample Data Rows - Replace with actual data */}
-                                {[
-                                  {
-                                    name: "Rahul Sharma",
-                                    roll: "24BCS001",
-                                    outTime: "09:15 AM",
-                                    place: "Library",
-                                    status: "Out",
-                                  },
-                                  {
-                                    name: "Priya Patel",
-                                    roll: "24BCS002",
-                                    outTime: "10:30 AM",
-                                    place: "Medical Store",
-                                    status: "Returned",
-                                  },
-                                  {
-                                    name: "Amit Kumar",
-                                    roll: "24BCS003",
-                                    outTime: "11:00 AM",
-                                    place: "City Market",
-                                    status: "Out",
-                                  },
-                                  {
-                                    name: "Sneha Reddy",
-                                    roll: "24BCS004",
-                                    outTime: "08:45 AM",
-                                    place: "College Campus",
-                                    status: "Returned",
-                                  },
-                                  {
-                                    name: "Vikram Singh",
-                                    roll: "24BCS005",
-                                    outTime: "12:20 PM",
-                                    place: "Sports Complex",
-                                    status: "Out",
-                                  },
-                                  {
-                                    name: "Anjali Verma",
-                                    roll: "24BCS006",
-                                    outTime: "01:45 PM",
-                                    place: "Main Market",
-                                    status: "Out",
-                                  },
-                                  {
-                                    name: "Rohan Gupta",
-                                    roll: "24BCS007",
-                                    outTime: "02:30 PM",
-                                    place: "Bank",
-                                    status: "Returned",
-                                  },
-                                ].map((log, index) => (
-                                  <tr
-                                    key={index}
-                                    className="hover:!bg-gray-50/50 !transition-all !duration-200 group"
-                                  >
-                                    <td className="!px-6 !py-4">
-                                      <span className="!text-sm !font-semibold !text-gray-900">
-                                        {log.name}
-                                      </span>
-                                    </td>
-                                    <td className="!px-6 !py-4">
-                                      <span className="!text-sm !font-mono !font-medium !text-gray-600 !bg-gray-50 !px-2.5 !py-1 !rounded">
-                                        {log.roll}
-                                      </span>
-                                    </td>
-                                    <td className="!px-6 !py-4">
-                                      <div className="!flex !items-center !gap-2">
-                                        <svg
-                                          className="!w-4 !h-4 !text-gray-400"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          viewBox="0 0 24 24"
-                                        >
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                          />
-                                        </svg>
-                                        <span className="!text-sm !font-medium !text-gray-700">
-                                          {log.outTime}
-                                        </span>
+                                {/* Filter today's outpasses with actualOutTime */}
+                                {(() => {
+                                  const todaysAttendance = outpassRequests.filter((outpass) => {
+                                    // Only show outpasses that have actualOutTime (student went out)
+                                    if (!outpass.actualOutTime) return false;
+                                    
+                                    // Check if actualOutTime is today
+                                    const outTime = new Date(outpass.actualOutTime);
+                                    const today = new Date();
+                                    return (
+                                      outTime.getDate() === today.getDate() &&
+                                      outTime.getMonth() === today.getMonth() &&
+                                      outTime.getFullYear() === today.getFullYear()
+                                    );
+                                  });
+
+                                  // Calculate pagination
+                                  const indexOfLastItem = attendanceCurrentPage * attendanceItemsPerPage;
+                                  const indexOfFirstItem = indexOfLastItem - attendanceItemsPerPage;
+                                  const currentItems = todaysAttendance.slice(indexOfFirstItem, indexOfLastItem);
+
+                                  return currentItems.map((outpass, index) => {
+                                    const isReturned = outpass.actualInTime != null;
+                                    const outTime = new Date(outpass.actualOutTime);
+                                    
+                                    return (
+                                      <tr
+                                        key={outpass._id || index}
+                                        className="hover:!bg-gray-50/50 !transition-all !duration-200 group"
+                                      >
+                                        <td className="!px-6 !py-4">
+                                          <span className="!text-sm !font-semibold !text-gray-900">
+                                            {outpass.fullName}
+                                          </span>
+                                        </td>
+                                        <td className="!px-6 !py-4">
+                                          <span className="!text-sm !font-mono !font-medium !text-gray-600 !bg-gray-50 !px-2.5 !py-1 !rounded">
+                                            {outpass.rollNumber}
+                                          </span>
+                                        </td>
+                                        <td className="!px-6 !py-4">
+                                          <div className="!flex !items-center !gap-2">
+                                            <svg
+                                              className="!w-4 !h-4 !text-gray-400"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              viewBox="0 0 24 24"
+                                            >
+                                              <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                              />
+                                            </svg>
+                                            <span className="!text-sm !font-medium !text-gray-700">
+                                              {outTime.toLocaleTimeString("en-US", {
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                                hour12: true,
+                                              })}
+                                            </span>
+                                          </div>
+                                        </td>
+                                        <td className="!px-6 !py-4">
+                                          {isReturned ? (
+                                            <div className="!flex !items-center !gap-2">
+                                              <svg
+                                                className="!w-4 !h-4 !text-green-500"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                              >
+                                                <path
+                                                  strokeLinecap="round"
+                                                  strokeLinejoin="round"
+                                                  strokeWidth={2}
+                                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                />
+                                              </svg>
+                                              <span className="!text-sm !font-medium !text-green-700">
+                                                {new Date(outpass.actualInTime).toLocaleTimeString("en-US", {
+                                                  hour: "2-digit",
+                                                  minute: "2-digit",
+                                                  hour12: true,
+                                                })}
+                                              </span>
+                                            </div>
+                                          ) : (
+                                            <span className="!text-sm !font-medium !text-gray-400 !italic">
+                                              Not returned
+                                            </span>
+                                          )}
+                                        </td>
+                                        <td className="!px-6 !py-4">
+                                          <span className="!text-sm !font-medium !text-gray-700">
+                                            {outpass.placeOfVisit}
+                                          </span>
+                                        </td>
+                                        <td className="!px-6 !py-4 !text-center">
+                                          <span
+                                            className={`!inline-flex !items-center !justify-center !px-3 !py-1 !rounded-full !text-xs !font-bold !tracking-wide !min-w-[90px] !transition-all !duration-200 ${
+                                              !isReturned
+                                                ? "!bg-black !text-white"
+                                                : "!bg-white !text-gray-700 !border-2 !border-gray-300"
+                                            }`}
+                                          >
+                                            {isReturned ? "Returned" : "Out"}
+                                          </span>
+                                        </td>
+                                      </tr>
+                                    );
+                                  });
+                                })()}
+                                
+                                {/* Show message if no records for today */}
+                                {outpassRequests.filter((outpass) => {
+                                  if (!outpass.actualOutTime) return false;
+                                  const outTime = new Date(outpass.actualOutTime);
+                                  const today = new Date();
+                                  return (
+                                    outTime.getDate() === today.getDate() &&
+                                    outTime.getMonth() === today.getMonth() &&
+                                    outTime.getFullYear() === today.getFullYear()
+                                  );
+                                }).length === 0 && (
+                                  <tr>
+                                    <td colSpan="6" className="!px-6 !py-12 !text-center">
+                                      <div className="!flex !flex-col !items-center !justify-center">
+                                        <div className="!w-16 !h-16 !bg-gray-100 !rounded-full !flex !items-center !justify-center !mb-4">
+                                          <svg
+                                            className="!w-8 !h-8 !text-gray-400"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                          >
+                                            <path
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              strokeWidth={2}
+                                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                                            />
+                                          </svg>
+                                        </div>
+                                        <h4 className="!text-lg !font-semibold !text-gray-900 !mb-1">
+                                          No attendance logs
+                                        </h4>
+                                        <p className="!text-sm !text-gray-500">
+                                          No students have checked out today
+                                        </p>
                                       </div>
                                     </td>
-                                    <td className="!px-6 !py-4">
-                                      <span className="!text-sm !font-medium !text-gray-700">
-                                        {log.place}
-                                      </span>
-                                    </td>
-                                    <td className="!px-6 !py-4 !text-center">
-                                      <span
-                                        className={`!inline-flex !items-center !justify-center !px-3 !py-1 !rounded-full !text-xs !font-bold !tracking-wide !min-w-[90px] !transition-all !duration-200 ${
-                                          log.status === "Out"
-                                            ? "!bg-black !text-white"
-                                            : "!bg-white !text-gray-700 !border-2 !border-gray-300"
-                                        }`}
-                                      >
-                                        {log.status}
-                                      </span>
-                                    </td>
                                   </tr>
-                                ))}
+                                )}
                               </tbody>
                             </table>
 
@@ -4757,7 +4812,16 @@ export default function Admin() {
                                 <span className="!text-sm !font-medium !text-gray-600">
                                   Out:{" "}
                                   <span className="!font-bold !text-gray-900">
-                                    4
+                                    {outpassRequests.filter((outpass) => {
+                                      if (!outpass.actualOutTime || outpass.actualInTime) return false;
+                                      const outTime = new Date(outpass.actualOutTime);
+                                      const today = new Date();
+                                      return (
+                                        outTime.getDate() === today.getDate() &&
+                                        outTime.getMonth() === today.getMonth() &&
+                                        outTime.getFullYear() === today.getFullYear()
+                                      );
+                                    }).length}
                                   </span>
                                 </span>
                               </div>
@@ -4766,7 +4830,16 @@ export default function Admin() {
                                 <span className="!text-sm !font-medium !text-gray-600">
                                   Returned:{" "}
                                   <span className="!font-bold !text-gray-900">
-                                    3
+                                    {outpassRequests.filter((outpass) => {
+                                      if (!outpass.actualOutTime || !outpass.actualInTime) return false;
+                                      const outTime = new Date(outpass.actualOutTime);
+                                      const today = new Date();
+                                      return (
+                                        outTime.getDate() === today.getDate() &&
+                                        outTime.getMonth() === today.getMonth() &&
+                                        outTime.getFullYear() === today.getFullYear()
+                                      );
+                                    }).length}
                                   </span>
                                 </span>
                               </div>
@@ -4774,11 +4847,107 @@ export default function Admin() {
                             <div className="!text-sm !font-medium !text-gray-500">
                               Total:{" "}
                               <span className="!font-bold !text-gray-900">
-                                7
+                                {outpassRequests.filter((outpass) => {
+                                  if (!outpass.actualOutTime) return false;
+                                  const outTime = new Date(outpass.actualOutTime);
+                                  const today = new Date();
+                                  return (
+                                    outTime.getDate() === today.getDate() &&
+                                    outTime.getMonth() === today.getMonth() &&
+                                    outTime.getFullYear() === today.getFullYear()
+                                  );
+                                }).length}
                               </span>
                             </div>
                           </div>
                         </div>
+
+                        {/* Pagination Controls */}
+                        {(() => {
+                          const todaysAttendance = outpassRequests.filter((outpass) => {
+                            if (!outpass.actualOutTime) return false;
+                            const outTime = new Date(outpass.actualOutTime);
+                            const today = new Date();
+                            return (
+                              outTime.getDate() === today.getDate() &&
+                              outTime.getMonth() === today.getMonth() &&
+                              outTime.getFullYear() === today.getFullYear()
+                            );
+                          });
+
+                          const totalPages = Math.ceil(todaysAttendance.length / attendanceItemsPerPage);
+
+                          if (totalPages <= 1) return null;
+
+                          return (
+                            <div className="!bg-white !px-6 !py-4 !border-t !border-gray-200">
+                              <div className="!flex !items-center !justify-between !flex-wrap !gap-4">
+                                <div className="!text-sm !text-gray-600">
+                                  Showing {((attendanceCurrentPage - 1) * attendanceItemsPerPage) + 1} to{" "}
+                                  {Math.min(attendanceCurrentPage * attendanceItemsPerPage, todaysAttendance.length)} of{" "}
+                                  {todaysAttendance.length} entries
+                                </div>
+                                <div className="!flex !items-center !gap-2">
+                                  <button
+                                    onClick={() => setAttendanceCurrentPage(prev => Math.max(prev - 1, 1))}
+                                    disabled={attendanceCurrentPage === 1}
+                                    className={`!px-3 !py-1.5 !rounded-lg !text-sm !font-medium !transition-all !duration-200 ${
+                                      attendanceCurrentPage === 1
+                                        ? "!bg-gray-100 !text-gray-400 !cursor-not-allowed"
+                                        : "!bg-gray-100 !text-gray-700 hover:!bg-gray-200"
+                                    }`}
+                                  >
+                                    Previous
+                                  </button>
+                                  
+                                  <div className="!flex !items-center !gap-1">
+                                    {[...Array(totalPages)].map((_, index) => {
+                                      const pageNumber = index + 1;
+                                      // Show first page, last page, current page, and pages around current
+                                      if (
+                                        pageNumber === 1 ||
+                                        pageNumber === totalPages ||
+                                        (pageNumber >= attendanceCurrentPage - 1 && pageNumber <= attendanceCurrentPage + 1)
+                                      ) {
+                                        return (
+                                          <button
+                                            key={pageNumber}
+                                            onClick={() => setAttendanceCurrentPage(pageNumber)}
+                                            className={`!px-3 !py-1.5 !rounded-lg !text-sm !font-medium !transition-all !duration-200 ${
+                                              attendanceCurrentPage === pageNumber
+                                                ? "!bg-black !text-white"
+                                                : "!bg-gray-100 !text-gray-700 hover:!bg-gray-200"
+                                            }`}
+                                          >
+                                            {pageNumber}
+                                          </button>
+                                        );
+                                      } else if (
+                                        pageNumber === attendanceCurrentPage - 2 ||
+                                        pageNumber === attendanceCurrentPage + 2
+                                      ) {
+                                        return <span key={pageNumber} className="!text-gray-400 !px-1">...</span>;
+                                      }
+                                      return null;
+                                    })}
+                                  </div>
+
+                                  <button
+                                    onClick={() => setAttendanceCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                    disabled={attendanceCurrentPage === totalPages}
+                                    className={`!px-3 !py-1.5 !rounded-lg !text-sm !font-medium !transition-all !duration-200 ${
+                                      attendanceCurrentPage === totalPages
+                                        ? "!bg-gray-100 !text-gray-400 !cursor-not-allowed"
+                                        : "!bg-gray-100 !text-gray-700 hover:!bg-gray-200"
+                                    }`}
+                                  >
+                                    Next
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   )}
