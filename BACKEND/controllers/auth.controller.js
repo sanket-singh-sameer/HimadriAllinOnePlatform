@@ -46,7 +46,7 @@ export const signupController = async (req, res) => {
         isUserExists.verificationTokenExpiresAt = Date.now() + 15 * 60 * 1000; // 15 minutes
         isUserExists.tokenRateLimit = 3;
         await isUserExists.save();
-        // await otpVerificationGMail(email, otp);
+        await otpVerificationGMail(email, otp);
         localStorage.setItem("email", email);
 
         return res.status(201).json({
@@ -67,7 +67,7 @@ export const signupController = async (req, res) => {
       verificationTokenExpiresAt: Date.now() + 15 * 60 * 1000, // 15 minutes
     });
     await newUser.save();
-    // await otpVerificationGMail(email, otp);
+    await otpVerificationGMail(email, otp);
     localStorage.setItem("email", email); // Store email for OTP verification
     return res.status(201).json({
       message: "User registered successfully",
@@ -156,14 +156,14 @@ export const otpVerificationController = async (req, res) => {
     }
     localStorage.clear();
     setCookies(res, token);
-    // await welcomeGMail(
-    //   user.email,
-    //   user.name,
-    //   "HBH NITH",
-    //   "https://nith.org.in" || "http://localhost:5173/dashboard",
-    //   "sanketsinghsameer@proton.me",
-    //   process.env.SUPPORT_URL || "https://divyamsingh.me"
-    // );
+    await welcomeGMail(
+      user.email,
+      user.name,
+      "HBH NITH",
+      "https://nith.org.in" || "http://localhost:5173/dashboard",
+      "sanketsinghsameer@proton.me",
+      process.env.SUPPORT_URL || "https://divyamsingh.me"
+    );
     return res.status(200).json({
       message: "Email verified successfully",
       user: { ...user._doc, password: undefined },
