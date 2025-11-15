@@ -38,6 +38,7 @@ export const signupController = async (req, res) => {
         return res.status(400).json({ message: "User already exists" });
       } else if (isUserExists.isVerified === false) {
         const otp = await generateOtp();
+        console.log("Generated OTP for existing unverified user:", otp, "with email:", email);
         const hashedPassword = await bcrypt.hash(password, 10);
         isUserExists.name = name;
         isUserExists.password = hashedPassword;
@@ -45,7 +46,7 @@ export const signupController = async (req, res) => {
         isUserExists.verificationTokenExpiresAt = Date.now() + 15 * 60 * 1000; // 15 minutes
         isUserExists.tokenRateLimit = 3;
         await isUserExists.save();
-        await otpVerificationGMail(email, otp);
+        // await otpVerificationGMail(email, otp);
         localStorage.setItem("email", email);
 
         return res.status(201).json({
@@ -55,6 +56,7 @@ export const signupController = async (req, res) => {
       }
     }
     const otp = await generateOtp();
+    console.log("Generated OTP for new user:", otp, "with email:", email);
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
       name,
@@ -65,7 +67,7 @@ export const signupController = async (req, res) => {
       verificationTokenExpiresAt: Date.now() + 15 * 60 * 1000, // 15 minutes
     });
     await newUser.save();
-    await otpVerificationGMail(email, otp);
+    // await otpVerificationGMail(email, otp);
     localStorage.setItem("email", email); // Store email for OTP verification
     return res.status(201).json({
       message: "User registered successfully",
