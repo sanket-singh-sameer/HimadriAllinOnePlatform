@@ -156,14 +156,14 @@ export const otpVerificationController = async (req, res) => {
     }
     localStorage.clear();
     setCookies(res, token);
-    await welcomeGMail(
-      user.email,
-      user.name,
-      "HBH NITH",
-      "https://nith.org.in" || "http://localhost:5173/dashboard",
-      "sanketsinghsameer@proton.me",
-      process.env.SUPPORT_URL || "https://divyamsingh.me"
-    );
+    // await welcomeGMail(
+    //   user.email,
+    //   user.name,
+    //   "HBH NITH",
+    //   "https://nith.org.in" || "http://localhost:5173/dashboard",
+    //   "sanketsinghsameer@proton.me",
+    //   process.env.SUPPORT_URL || "https://divyamsingh.me"
+    // );
     return res.status(200).json({
       message: "Email verified successfully",
       user: { ...user._doc, password: undefined },
