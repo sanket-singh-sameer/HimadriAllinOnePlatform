@@ -267,23 +267,23 @@ export const submitOutpassRequest = async (req, res) => {
     }
 
     // Check if student already has a pending or approved outpass
-    const existingOutpass = await Outpass.findOne({
-      user: userId,
-      status: { $in: ["pending", "approved"] }
-    });
+    // const existingOutpass = await Outpass.findOne({
+    //   user: userId,
+    //   status: { $in: ["pending", "approved"] }
+    // });
 
-    if (existingOutpass) {
-      return res.status(400).json({ 
-        message: `You already have a ${existingOutpass.status} outpass. Please wait for it to be processed or expired before applying for a new one.`,
-        existingOutpass: {
-          id: existingOutpass._id,
-          status: existingOutpass.status,
-          outDate: existingOutpass.outDate,
-          placeOfVisit: existingOutpass.placeOfVisit,
-          createdAt: existingOutpass.createdAt
-        }
-      });
-    }
+    // if (existingOutpass) {
+    //   return res.status(400).json({ 
+    //     message: `You already have a ${existingOutpass.status} outpass. Please wait for it to be processed or expired before applying for a new one.`,
+    //     existingOutpass: {
+    //       id: existingOutpass._id,
+    //       status: existingOutpass.status,
+    //       outDate: existingOutpass.outDate,
+    //       placeOfVisit: existingOutpass.placeOfVisit,
+    //       createdAt: existingOutpass.createdAt
+    //     }
+    //   });
+    // }
 
     // Create new outpass request
     const outpass = new Outpass({
