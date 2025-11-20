@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import {
+  OUTPASS_APPROVED_TEMPLATE,
   PASSWORD_RESET_REQUEST_TEMPLATE,
   PASSWORD_RESET_SUCCESS_TEMPLATE,
   VERIFICATION_EMAIL_TEMPLATE,
@@ -121,6 +122,40 @@ export const passwordResetSuccessGMail = async (email) => {
     return true;
   } catch (error) {
     console.error('❌ Error sending password reset success email:', error.message);
+    return false;
+  }
+};
+
+export const outpassApprovedGMail = async (email, outpassDetails) => {
+  try {
+    const {
+      studentName,
+      placeOfVisit,
+      outDate,
+      outTime,
+      expectedReturnTime,
+    } = outpassDetails;
+
+    const { data, error } = await resend.emails.send({
+      from: "HBH NITH <noreply@nith.org.in>",
+      to: [email],
+      subject: "Outpass Request Approved - HBH NITH",
+      html: OUTPASS_APPROVED_TEMPLATE.replaceAll("{studentName}", studentName)
+        .replaceAll("{placeOfVisit}", placeOfVisit)
+        .replaceAll("{outDate}", new Date(outDate).toLocaleDateString())
+        .replaceAll("{outTime}", outTime)
+        .replaceAll("{expectedReturnTime}", expectedReturnTime),
+    });
+
+    if (error) {
+      console.error("❌ Error sending outpass approved email:", error);
+      return false;
+    }
+
+    console.log("✅ Outpass approved email sent successfully to", email);
+    return true;
+  } catch (error) {
+    console.error("❌ Error sending outpass approved email:", error.message);
     return false;
   }
 };

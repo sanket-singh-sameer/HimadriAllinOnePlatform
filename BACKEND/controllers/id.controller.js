@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import MessAttendence from "../models/messattendence.model.js";
 import Outpass from "../models/outpass.model.js";
 import ExcelJS from "exceljs";
+import { outpassApprovedGMail } from "../resend/mailConfig.js";
 
 export const viewIDByRoll = async (req, res) => {
   let { roll } = req.params;
@@ -421,6 +422,15 @@ export const updateOutpassStatus = async (req, res) => {
     if (status === "approved") {
       outpass.approvedBy = adminId;
       outpass.approvedAt = new Date();
+
+      // Send approval email
+      await outpassApprovedGMail(outpass.email, {
+        studentName: outpass.fullName,
+        placeOfVisit: outpass.placeOfVisit,
+        outDate: outpass.outDate,
+        outTime: outpass.outTime,
+        expectedReturnTime: outpass.expectedReturnTime,
+      });
     } else {
       outpass.rejectedBy = adminId;
       outpass.rejectedAt = new Date();

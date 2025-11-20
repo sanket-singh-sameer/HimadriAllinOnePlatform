@@ -131,3 +131,36 @@ export const WELCOME_EMAIL_TEMPLATE = `
 </body>
 </html>
 `;
+
+export const OUTPASS_APPROVED_TEMPLATE = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Outpass Approved</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <div style="background: linear-gradient(to right, #4CAF50, #45a049); padding: 20px; text-align: center;">
+    <h1 style="color: white; margin: 0;">Outpass Request Approved</h1>
+  </div>
+  <div style="background-color: #f9f9f9; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    <p>Hello {studentName},</p>
+    <p>Your outpass request has been approved. Please find the details below:</p>
+    <div style="background-color: #ffffff; padding: 15px; border-radius: 5px; border: 1px solid #e0e0e0; margin: 20px 0;">
+      <h3 style="margin-top: 0; color: #4CAF50;">Outpass Details</h3>
+      <p><strong>Place of Visit:</strong> {placeOfVisit}</p>
+      <p><strong>Out Date:</strong> {outDate}</p>
+      <p><strong>Out Time:</strong> {outTime}</p>
+      <p><strong>Expected Return Time:</strong> {expectedReturnTime}</p>
+    </div>
+    <p>Please ensure you follow all the rules and regulations during your time out.</p>
+    <p>Show this email or the outpass section in the app to the guard at the gate.</p>
+    <p>Best regards,<br>Hostel Administration</p>
+  </div>
+  <div style="text-align: center; margin-top: 20px; color: #888; font-size: 0.8em;">
+    <p>This is an automated message, please do not reply to this email.</p>
+  </div>
+</body>
+</html>
+`;
