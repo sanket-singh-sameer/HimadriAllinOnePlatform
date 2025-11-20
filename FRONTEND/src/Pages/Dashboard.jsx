@@ -42,6 +42,8 @@ const Dashboard = () => {
   const [todaysMenu, setTodaysMenu] = useState(null);
   const [myComplaints, setMyComplaints] = useState(null);
   const [activeFeature, setActiveFeature] = useState("knowYourHostel");
+  const [myOutpasses, setMyOutpasses] = useState([]);
+  const [outpassFilter, setOutpassFilter] = useState("All");
   const [complaintForm, setComplaintForm] = useState({
     name: user.name || "",
     room: user.room || "",
@@ -151,12 +153,16 @@ const Dashboard = () => {
           parentName: "",
           emergencyContact: "",
         });
+
+        // Refresh outpasses list
+        fetchMyOutpasses();
       }
 
       setLocalIsLoading(false);
     } catch (error) {
       console.error("Error submitting outpass:", error);
-      const errorMessage = error.response?.data?.message || "Failed to submit outpass request";
+      const errorMessage =
+        error.response?.data?.message || "Failed to submit outpass request";
       toast.error(errorMessage);
       setLocalIsLoading(false);
     }
@@ -215,6 +221,16 @@ const Dashboard = () => {
       console.log("My Complaints:", response.data.complaints);
     } catch (error) {
       console.error("Error fetching my complaints:", error);
+    }
+  };
+
+  const fetchMyOutpasses = async () => {
+    try {
+      const response = await axiosInstance.get(API_PATHS.GET_MY_OUTPASSES);
+      setMyOutpasses(response.data.outpasses || []);
+      console.log("My Outpasses:", response.data.outpasses);
+    } catch (error) {
+      console.error("Error fetching my outpasses:", error);
     }
   };
 
@@ -368,6 +384,7 @@ const Dashboard = () => {
     fetchTodaysMenu();
     fetchMyComplaint();
     fetchAllNotices();
+    fetchMyOutpasses();
   }, []);
 
   const openImage = (e) => {
@@ -2580,6 +2597,344 @@ const Dashboard = () => {
                           </button>
                         </div>
                       </form>
+
+                      {/* My Outpasses Section */}
+                      <div className="mt-10 sm:mt-12 lg:mt-16">
+                        <div className="relative mb-6 sm:mb-8">
+                          <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t-2 border-gray-200"></div>
+                          </div>
+                          <div className="relative flex justify-center">
+                            <div className="bg-white px-6 py-2">
+                              <h3 className="!text-xl sm:!text-2xl lg:!text-3xl !font-black !text-gray-900 tracking-tight text-center">
+                                My Outpasses
+                              </h3>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Filter & Refresh Section */}
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+                          <div className="flex items-center gap-3 w-full sm:w-auto">
+                            <label className="text-sm font-semibold text-gray-700 whitespace-nowrap">
+                              Filter by:
+                            </label>
+                            <select
+                              value={outpassFilter}
+                              onChange={(e) => setOutpassFilter(e.target.value)}
+                              className="flex-1 sm:flex-initial border-2 border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:outline-none shadow-sm transition-all duration-200 text-sm sm:text-base"
+                            >
+                              <option value="All">All Outpasses</option>
+                              <option value="Pending">🟠 Pending</option>
+                              <option value="Approved">🟢 Approved</option>
+                              <option value="Rejected">🔴 Rejected</option>
+                              <option value="Returned">⚪ Returned</option>
+                            </select>
+                          </div>
+
+                          <button
+                            onClick={fetchMyOutpasses}
+                            className="w-full sm:w-auto cursor-pointer flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold rounded-lg border-2 border-gray-300 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                              />
+                            </svg>
+                            <span>Refresh</span>
+                          </button>
+                        </div>
+
+                        {/* Outpasses Table Container */}
+                        <div className="bg-white rounded-xl lg:rounded-2xl shadow-lg border-2 border-gray-100 overflow-hidden">
+                          {myOutpasses && myOutpasses.length > 0 ? (
+                            <>
+                              {/* Desktop Table View */}
+                              <div className="hidden lg:block overflow-x-auto">
+                                <table className="w-full border-collapse">
+                                  <thead>
+                                    <tr className="bg-gray-900 text-white">
+                                      <th className="px-4 py-4 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-700">
+                                        Outpass ID
+                                      </th>
+                                      <th className="px-4 py-4 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-700">
+                                        Place of Visit
+                                      </th>
+                                      <th className="px-4 py-4 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-700">
+                                        Out Date
+                                      </th>
+                                      <th className="px-4 py-4 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-700">
+                                        Out Time
+                                      </th>
+                                      <th className="px-4 py-4 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-700">
+                                        Expected Return
+                                      </th>
+                                      <th className="px-4 py-4 text-center text-sm font-bold uppercase tracking-wider">
+                                        Status
+                                      </th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="divide-y divide-gray-200">
+                                    {myOutpasses
+                                      .filter(
+                                        (outpass) =>
+                                          outpassFilter === "All" ||
+                                          outpass.status === outpassFilter
+                                      )
+                                      .map((outpass, index) => (
+                                        <tr
+                                          key={outpass._id || index}
+                                          className="hover:bg-gray-50 hover:shadow-lg transition-all duration-300 group"
+                                        >
+                                          <td className="px-4 py-4 text-sm font-semibold text-gray-900 border-r border-gray-100">
+                                            #
+                                            {outpass._id
+                                              ?.slice(-6)
+                                              .toUpperCase() || index + 1}
+                                          </td>
+                                          <td className="px-4 py-4 text-sm text-gray-700 border-r border-gray-100">
+                                            {outpass.placeOfVisit || "N/A"}
+                                          </td>
+                                          <td className="px-4 py-4 text-sm text-gray-700 border-r border-gray-100">
+                                            {outpass.outDate
+                                              ? new Date(
+                                                  outpass.outDate
+                                                ).toLocaleDateString("en-GB")
+                                              : "N/A"}
+                                          </td>
+                                          <td className="px-4 py-4 text-sm text-gray-700 border-r border-gray-100">
+                                            {outpass.outTime || "N/A"}
+                                          </td>
+                                          <td className="px-4 py-4 text-sm text-gray-700 border-r border-gray-100">
+                                            {outpass.expectedReturnTime ||
+                                              "N/A"}
+                                          </td>
+                                          <td className="px-4 py-4 text-center">
+                                            <span
+                                              className={`inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-xs font-semibold ${
+                                                outpass.status === "Approved"
+                                                  ? "bg-green-500 text-white"
+                                                  : outpass.status === "Pending"
+                                                  ? "bg-yellow-500 text-white"
+                                                  : outpass.status ===
+                                                    "Rejected"
+                                                  ? "bg-red-500 text-white"
+                                                  : outpass.status ===
+                                                    "Returned"
+                                                  ? "bg-gray-400 text-white"
+                                                  : "bg-gray-300 text-gray-700"
+                                              }`}
+                                            >
+                                              {outpass.status || "Unknown"}
+                                            </span>
+                                          </td>
+                                        </tr>
+                                      ))}
+                                  </tbody>
+                                </table>
+                              </div>
+
+                              {/* Mobile/Tablet Card View */}
+                              <div className="lg:hidden space-y-4 p-4">
+                                {myOutpasses
+                                  .filter(
+                                    (outpass) =>
+                                      outpassFilter === "All" ||
+                                      outpass.status === outpassFilter
+                                  )
+                                  .map((outpass, index) => (
+                                    <div
+                                      key={outpass._id || index}
+                                      className="bg-white rounded-xl shadow-md border-2 border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300"
+                                    >
+                                      {/* Card Header */}
+                                      <div className="bg-gradient-to-r from-gray-900 to-gray-800 px-4 py-3 flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                          <svg
+                                            className="w-5 h-5 text-white"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                          >
+                                            <path
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              strokeWidth={2}
+                                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                            />
+                                          </svg>
+                                          <span className="text-white font-bold text-sm">
+                                            #
+                                            {outpass._id
+                                              ?.slice(-6)
+                                              .toUpperCase() || index + 1}
+                                          </span>
+                                        </div>
+                                        <span
+                                          className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold ${
+                                            outpass.status === "Approved"
+                                              ? "bg-green-500 text-white"
+                                              : outpass.status === "Pending"
+                                              ? "bg-yellow-500 text-white"
+                                              : outpass.status === "Rejected"
+                                              ? "bg-red-500 text-white"
+                                              : outpass.status === "Returned"
+                                              ? "bg-gray-400 text-white"
+                                              : "bg-gray-300 text-gray-700"
+                                          }`}
+                                        >
+                                          {outpass.status || "Unknown"}
+                                        </span>
+                                      </div>
+
+                                      {/* Card Body */}
+                                      <div className="p-4 space-y-3">
+                                        <div className="flex items-start gap-3">
+                                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <svg
+                                              className="w-5 h-5 text-blue-600"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              viewBox="0 0 24 24"
+                                            >
+                                              <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                              />
+                                              <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                              />
+                                            </svg>
+                                          </div>
+                                          <div className="flex-1">
+                                            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
+                                              Place of Visit
+                                            </p>
+                                            <p className="text-base font-bold text-gray-900 mt-0.5">
+                                              {outpass.placeOfVisit || "N/A"}
+                                            </p>
+                                          </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-3">
+                                          <div className="bg-gray-50 rounded-lg p-3">
+                                            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-1">
+                                              Out Date
+                                            </p>
+                                            <p className="text-sm font-semibold text-gray-900">
+                                              {outpass.outDate
+                                                ? new Date(
+                                                    outpass.outDate
+                                                  ).toLocaleDateString("en-GB")
+                                                : "N/A"}
+                                            </p>
+                                          </div>
+                                          <div className="bg-gray-50 rounded-lg p-3">
+                                            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-1">
+                                              Out Time
+                                            </p>
+                                            <p className="text-sm font-semibold text-gray-900">
+                                              {outpass.outTime || "N/A"}
+                                            </p>
+                                          </div>
+                                        </div>
+
+                                        <div className="bg-gray-50 rounded-lg p-3">
+                                          <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-1">
+                                            Expected Return
+                                          </p>
+                                          <p className="text-sm font-semibold text-gray-900">
+                                            {outpass.expectedReturnTime ||
+                                              "N/A"}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                              </div>
+                            </>
+                          ) : (
+                            // Empty State
+                            <div className="flex flex-col items-center justify-center py-16 px-4">
+                              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                <svg
+                                  className="w-10 h-10 text-gray-400"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                  />
+                                </svg>
+                              </div>
+                              <h3 className="!text-lg sm:!text-xl !font-bold !text-gray-900 mb-2 text-center">
+                                No outpasses requested yet
+                              </h3>
+                              <p className="!text-sm sm:!text-base !text-gray-600 text-center max-w-md">
+                                Submit your first outpass request using the form
+                                above to see it here.
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Info Note */}
+                        {myOutpasses && myOutpasses.length > 0 && (
+                          <div className="mt-6 bg-gray-50 rounded-lg border border-gray-200 p-4">
+                            <div className="flex items-start gap-3">
+                              <svg
+                                className="w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                              </svg>
+                              <div className="flex-1">
+                                <p className="text-sm font-semibold text-gray-900 mb-1">
+                                  Outpass Guidelines
+                                </p>
+                                <ul className="text-xs text-gray-600 space-y-1">
+                                  <li>
+                                    • Approved outpasses must be shown to
+                                    security before leaving the hostel
+                                  </li>
+                                  <li>
+                                    • Return to hostel before the expected
+                                    return time mentioned
+                                  </li>
+                                  <li>
+                                    • In case of emergency, contact hostel
+                                    warden immediately
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -2594,3 +2949,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+  
