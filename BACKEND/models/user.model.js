@@ -37,6 +37,7 @@ const userSchema = new mongoose.Schema(
         "student",
         "admin",
         "super-admin",
+        "mmca",
       ],
       default: "student",
     },

@@ -49,6 +49,8 @@ export default function Admin() {
   const [itemsPerPage] = useState(10);
   const [complaintsCurrentPage, setComplaintsCurrentPage] = useState(1);
   const [complaintsItemsPerPage] = useState(10);
+  const [attendanceCurrentPage, setAttendanceCurrentPage] = useState(1);
+  const [attendanceItemsPerPage] = useState(10);
   const [showConfirmAction, setShowConfirmAction] = useState(false);
   const [confirmActionType, setConfirmActionType] = useState(null);
   const [nfcScanning, setNfcScanning] = useState(false);
@@ -2980,265 +2982,7 @@ export default function Admin() {
                           </div>
                         )}
 
-                        {studentDetails && (
-                          <div className="group bg-white rounded-3xl border border-gray-100 shadow-lg hover:shadow-2xl transition-all duration-500 p-6 sm:p-8 md:p-10 relative overflow-hidden">
-                            <div className="relative z-10">
-                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-                                <div className="flex items-center space-x-3">
-                                  <div>
-                                    <h3 className="!text-2xl sm:!text-3xl !font-black !text-gray-900 tracking-tight leading-none">
-                                      Student Management!
-                                    </h3>
-                                    <p className="!text-sm !text-gray-600 !font-medium opacity-90 !text-left">
-                                      Administer student profiles
-                                    </p>
-                                  </div>
-                                </div>
-                                {localIsLoading && (
-                                  <div className="flex items-center space-x-3 bg-gray-50 px-4 py-2.5 rounded-xl border border-gray-200">
-                                    <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></div>
-                                    <span className="text-sm font-semibold text-gray-900">
-                                      Processing...
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-                                <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl p-6 border border-gray-200/50 hover:border-gray-300 transition-all duration-300 group/status">
-                                  <div className="flex items-center justify-between mb-5">
-                                    <h3 className="!text-lg !font-bold !text-gray-900 flex items-center space-x-2">
-                                      <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-200">
-                                        <svg
-                                          className="w-4 h-4 text-gray-700"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          viewBox="0 0 24 24"
-                                        >
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                          />
-                                        </svg>
-                                      </div>
-                                      <span>Current Status!</span>
-                                    </h3>
-                                  </div>
-
-                                  <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm group-hover/status:shadow-md transition-all duration-300">
-                                    <div className="flex items-center justify-between">
-                                      <div className="flex items-center space-x-4">
-                                        <div
-                                          className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${
-                                            studentDetails.snacksInfo
-                                              ?.optedForSnacks
-                                              ? "bg-gray-900 shadow-lg shadow-gray-900/25"
-                                              : "bg-gray-100 border-2 border-dashed border-gray-300"
-                                          }`}
-                                        >
-                                          {studentDetails.snacksInfo
-                                            ?.optedForSnacks ? (
-                                            <svg
-                                              className="w-6 h-6 text-white"
-                                              fill="none"
-                                              stroke="currentColor"
-                                              viewBox="0 0 24 24"
-                                            >
-                                              <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M5 13l4 4L19 7"
-                                              />
-                                            </svg>
-                                          ) : (
-                                            <svg
-                                              className="w-6 h-6 text-gray-400"
-                                              fill="none"
-                                              stroke="currentColor"
-                                              viewBox="0 0 24 24"
-                                            >
-                                              <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M6 18L18 6M6 6l12 12"
-                                              />
-                                            </svg>
-                                          )}
-                                        </div>
-                                        <div>
-                                          <p className="!text-base !text-left !font-bold !text-gray-900">
-                                            {studentDetails.snacksInfo
-                                              ?.optedForSnacks
-                                              ? "Opted for Snacks!"
-                                              : "Not Opted for Snacks"}
-                                          </p>
-                                          <p className="!text-sm !text-gray-600 !opacity-90">
-                                            {studentDetails.snacksInfo
-                                              ?.optedForSnacks
-                                              ? "Student will receive snacks"
-                                              : "Student will not receive snacks"}
-                                          </p>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl p-6 border border-gray-200/50 hover:border-gray-300 transition-all duration-300 group/actions">
-                                  <div className="flex items-center justify-between mb-5">
-                                    <h3 className="!text-lg !font-bold !text-gray-900 flex items-center space-x-2">
-                                      <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-200">
-                                        <svg
-                                          className="w-4 h-4 text-gray-700"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          viewBox="0 0 24 24"
-                                        >
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a1 1 0 01-1-1V9a1 1 0 011-1h1a2 2 0 100-4H4a1 1 0 01-1-1V4a1 1 0 011-1h3a1 1 0 001-1v-1z"
-                                          />
-                                        </svg>
-                                      </div>
-                                      <span>Quick Actions!</span>
-                                    </h3>
-                                  </div>
-
-                                  <div className="space-y-4">
-                                    {!studentDetails.snacksInfo
-                                      ?.optedForSnacks ? (
-                                      <button
-                                        onClick={() =>
-                                          handleAddToSnacksList(
-                                            studentDetails.roll
-                                          )
-                                        }
-                                        disabled={localIsLoading}
-                                        className="w-full group/btn cursor-pointer px-6 py-4 bg-gray-900 text-white font-bold rounded-xl hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl hover:shadow-gray-900/25 hover:scale-[1.02] active:scale-[0.98] border-2 border-gray-900"
-                                      >
-                                        <div className="w-5 h-5 bg-white/20 rounded-lg flex items-center justify-center group-hover/btn:bg-white/30 transition-colors duration-300">
-                                          <svg
-                                            className="w-3 h-3"
-                                            fill="currentColor"
-                                            viewBox="0 0 24 24"
-                                          >
-                                            <path
-                                              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                                              stroke="currentColor"
-                                              strokeWidth={2}
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                            />
-                                          </svg>
-                                        </div>
-                                        <span className="group-hover/btn:translate-x-0.5 transition-transform duration-300">
-                                          {localIsLoading
-                                            ? "Processing..."
-                                            : "Add to Snacks List"}
-                                        </span>
-                                      </button>
-                                    ) : (
-                                      <button
-                                        onClick={() =>
-                                          handleRemoveFromSnacksList(
-                                            studentDetails.roll
-                                          )
-                                        }
-                                        disabled={localIsLoading}
-                                        className="w-full group/btn cursor-pointer px-6 py-4 bg-white text-gray-900 font-bold rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl border-2 border-gray-900 hover:border-black hover:scale-[1.02] active:scale-[0.98]"
-                                      >
-                                        <div className="w-5 h-5 bg-gray-900/10 rounded-lg flex items-center justify-center group-hover/btn:bg-gray-900/20 transition-colors duration-300">
-                                          <svg
-                                            className="w-3 h-3"
-                                            fill="currentColor"
-                                            viewBox="0 0 24 24"
-                                          >
-                                            <path
-                                              d="M20 12H4"
-                                              stroke="currentColor"
-                                              strokeWidth={2}
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                            />
-                                          </svg>
-                                        </div>
-                                        <span className="group-hover/btn:translate-x-0.5 transition-transform duration-300">
-                                          {localIsLoading
-                                            ? "Processing..."
-                                            : "Remove from Snacks List"}
-                                        </span>
-                                      </button>
-                                    )}
-
-                                    <button
-                                      onClick={() =>
-                                        handleToggleSnacksStatus(
-                                          studentDetails.roll
-                                        )
-                                      }
-                                      disabled={localIsLoading}
-                                      className="w-full group/btn cursor-pointer px-6 py-4 bg-gray-100 text-gray-900 font-bold rounded-xl hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center space-x-3 border-2 border-gray-300 hover:border-gray-400 hover:scale-[1.02] active:scale-[0.98]"
-                                    >
-                                      <div className="w-5 h-5 bg-gray-900/10 rounded-lg flex items-center justify-center group-hover/btn:bg-gray-900/20 transition-colors duration-300">
-                                        <svg
-                                          className="w-3 h-3"
-                                          fill="currentColor"
-                                          viewBox="0 0 24 24"
-                                        >
-                                          <path
-                                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-                                            stroke="currentColor"
-                                            strokeWidth={2}
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                          />
-                                        </svg>
-                                      </div>
-                                      <span className="group-hover/btn:translate-x-0.5 transition-transform duration-300">
-                                        {localIsLoading
-                                          ? "Processing..."
-                                          : "Toggle Status"}
-                                      </span>
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="mt-8 relative">
-                                <div className="absolute inset-0 bg-gradient-to-r from-gray-900/5 to-black/10 rounded-2xl blur-xl"></div>
-                                <div className="relative bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                                  <div className="flex items-start space-x-4">
-                                    <div className="flex-1">
-                                      <h3 className="!text-sm !font-bold !text-gray-900 mb-2">
-                                        Important Note!
-                                      </h3>
-                                      <p className="!text-sm !text-gray-700 !leading-relaxed !opacity-90">
-                                        Changes will be reflected immediately.
-                                        Students will receive snacks during
-                                        snack time if they are opted in. Please
-                                        ensure accurate updates to maintain
-                                        proper meal planning and inventory
-                                        management.
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
-                                    <span>
-                                      Last updated:{" "}
-                                      {new Date().toLocaleTimeString()}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
+                        
                       </div>
                     </div>
                   )}
@@ -4600,6 +4344,9 @@ export default function Admin() {
                                     Out Time
                                   </th>
                                   <th className="!px-6 !py-3.5 !text-left !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider !bg-gray-50">
+                                    In Time
+                                  </th>
+                                  <th className="!px-6 !py-3.5 !text-left !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider !bg-gray-50">
                                     Place of Visit
                                   </th>
                                   <th className="!px-6 !py-3.5 !text-center !text-xs !font-bold !text-gray-700 !uppercase !tracking-wider !bg-gray-50">
@@ -4609,110 +4356,160 @@ export default function Admin() {
                               </thead>
 
                               <tbody className="!bg-white !divide-y !divide-gray-100">
-                                {/* Replace with actual data */}
-                                {[
-                                  {
-                                    name: "Rahul Sharma",
-                                    roll: "24BCS001",
-                                    outTime: "09:15 AM",
-                                    place: "Library",
-                                    status: "Out",
-                                  },
-                                  {
-                                    name: "Priya Patel",
-                                    roll: "24BCS002",
-                                    outTime: "10:30 AM",
-                                    place: "Medical Store",
-                                    status: "Returned",
-                                  },
-                                  {
-                                    name: "Amit Kumar",
-                                    roll: "24BCS003",
-                                    outTime: "11:00 AM",
-                                    place: "City Market",
-                                    status: "Out",
-                                  },
-                                  {
-                                    name: "Sneha Reddy",
-                                    roll: "24BCS004",
-                                    outTime: "08:45 AM",
-                                    place: "College Campus",
-                                    status: "Returned",
-                                  },
-                                  {
-                                    name: "Vikram Singh",
-                                    roll: "24BCS005",
-                                    outTime: "12:20 PM",
-                                    place: "Sports Complex",
-                                    status: "Out",
-                                  },
-                                  {
-                                    name: "Anjali Verma",
-                                    roll: "24BCS006",
-                                    outTime: "01:45 PM",
-                                    place: "Main Market",
-                                    status: "Out",
-                                  },
-                                  {
-                                    name: "Rohan Gupta",
-                                    roll: "24BCS007",
-                                    outTime: "02:30 PM",
-                                    place: "Bank",
-                                    status: "Returned",
-                                  },
-                                ].map((log, index) => (
-                                  <tr
-                                    key={index}
-                                    className="hover:!bg-gray-50/50 !transition-all !duration-200 group"
-                                  >
-                                    <td className="!px-6 !py-4">
-                                      <span className="!text-sm !font-semibold !text-gray-900">
-                                        {log.name}
-                                      </span>
-                                    </td>
-                                    <td className="!px-6 !py-4">
-                                      <span className="!text-sm !font-mono !font-medium !text-gray-600 !bg-gray-50 !px-2.5 !py-1 !rounded">
-                                        {log.roll}
-                                      </span>
-                                    </td>
-                                    <td className="!px-6 !py-4">
-                                      <div className="!flex !items-center !gap-2">
-                                        <svg
-                                          className="!w-4 !h-4 !text-gray-400"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          viewBox="0 0 24 24"
-                                        >
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                          />
-                                        </svg>
-                                        <span className="!text-sm !font-medium !text-gray-700">
-                                          {log.outTime}
-                                        </span>
+                                {/* Filter today's outpasses with actualOutTime */}
+                                {(() => {
+                                  const todaysAttendance = outpassRequests.filter((outpass) => {
+                                    // Only show outpasses that have actualOutTime (student went out)
+                                    if (!outpass.actualOutTime) return false;
+                                    
+                                    // Check if actualOutTime is today
+                                    const outTime = new Date(outpass.actualOutTime);
+                                    const today = new Date();
+                                    return (
+                                      outTime.getDate() === today.getDate() &&
+                                      outTime.getMonth() === today.getMonth() &&
+                                      outTime.getFullYear() === today.getFullYear()
+                                    );
+                                  });
+
+                                  // Calculate pagination
+                                  const indexOfLastItem = attendanceCurrentPage * attendanceItemsPerPage;
+                                  const indexOfFirstItem = indexOfLastItem - attendanceItemsPerPage;
+                                  const currentItems = todaysAttendance.slice(indexOfFirstItem, indexOfLastItem);
+
+                                  return currentItems.map((outpass, index) => {
+                                    const isReturned = outpass.actualInTime != null;
+                                    const outTime = new Date(outpass.actualOutTime);
+                                    
+                                    return (
+                                      <tr
+                                        key={outpass._id || index}
+                                        className="hover:!bg-gray-50/50 !transition-all !duration-200 group"
+                                      >
+                                        <td className="!px-6 !py-4">
+                                          <span className="!text-sm !font-semibold !text-gray-900">
+                                            {outpass.fullName}
+                                          </span>
+                                        </td>
+                                        <td className="!px-6 !py-4">
+                                          <span className="!text-sm !font-mono !font-medium !text-gray-600 !bg-gray-50 !px-2.5 !py-1 !rounded">
+                                            {outpass.rollNumber}
+                                          </span>
+                                        </td>
+                                        <td className="!px-6 !py-4">
+                                          <div className="!flex !items-center !gap-2">
+                                            <svg
+                                              className="!w-4 !h-4 !text-gray-400"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              viewBox="0 0 24 24"
+                                            >
+                                              <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                              />
+                                            </svg>
+                                            <span className="!text-sm !font-medium !text-gray-700">
+                                              {outTime.toLocaleTimeString("en-US", {
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                                hour12: true,
+                                              })}
+                                            </span>
+                                          </div>
+                                        </td>
+                                        <td className="!px-6 !py-4">
+                                          {isReturned ? (
+                                            <div className="!flex !items-center !gap-2">
+                                              <svg
+                                                className="!w-4 !h-4 !text-green-500"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                              >
+                                                <path
+                                                  strokeLinecap="round"
+                                                  strokeLinejoin="round"
+                                                  strokeWidth={2}
+                                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                />
+                                              </svg>
+                                              <span className="!text-sm !font-medium !text-green-700">
+                                                {new Date(outpass.actualInTime).toLocaleTimeString("en-US", {
+                                                  hour: "2-digit",
+                                                  minute: "2-digit",
+                                                  hour12: true,
+                                                })}
+                                              </span>
+                                            </div>
+                                          ) : (
+                                            <span className="!text-sm !font-medium !text-gray-400 !italic">
+                                              Not returned
+                                            </span>
+                                          )}
+                                        </td>
+                                        <td className="!px-6 !py-4">
+                                          <span className="!text-sm !font-medium !text-gray-700">
+                                            {outpass.placeOfVisit}
+                                          </span>
+                                        </td>
+                                        <td className="!px-6 !py-4 !text-center">
+                                          <span
+                                            className={`!inline-flex !items-center !justify-center !px-3 !py-1 !rounded-full !text-xs !font-bold !tracking-wide !min-w-[90px] !transition-all !duration-200 ${
+                                              !isReturned
+                                                ? "!bg-black !text-white"
+                                                : "!bg-white !text-gray-700 !border-2 !border-gray-300"
+                                            }`}
+                                          >
+                                            {isReturned ? "Returned" : "Out"}
+                                          </span>
+                                        </td>
+                                      </tr>
+                                    );
+                                  });
+                                })()}
+                                
+                                {/* Show message if no records for today */}
+                                {outpassRequests.filter((outpass) => {
+                                  if (!outpass.actualOutTime) return false;
+                                  const outTime = new Date(outpass.actualOutTime);
+                                  const today = new Date();
+                                  return (
+                                    outTime.getDate() === today.getDate() &&
+                                    outTime.getMonth() === today.getMonth() &&
+                                    outTime.getFullYear() === today.getFullYear()
+                                  );
+                                }).length === 0 && (
+                                  <tr>
+                                    <td colSpan="6" className="!px-6 !py-12 !text-center">
+                                      <div className="!flex !flex-col !items-center !justify-center">
+                                        <div className="!w-16 !h-16 !bg-gray-100 !rounded-full !flex !items-center !justify-center !mb-4">
+                                          <svg
+                                            className="!w-8 !h-8 !text-gray-400"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                          >
+                                            <path
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              strokeWidth={2}
+                                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                                            />
+                                          </svg>
+                                        </div>
+                                        <h4 className="!text-lg !font-semibold !text-gray-900 !mb-1">
+                                          No attendance logs
+                                        </h4>
+                                        <p className="!text-sm !text-gray-500">
+                                          No students have checked out today
+                                        </p>
                                       </div>
                                     </td>
-                                    <td className="!px-6 !py-4">
-                                      <span className="!text-sm !font-medium !text-gray-700">
-                                        {log.place}
-                                      </span>
-                                    </td>
-                                    <td className="!px-6 !py-4 !text-center">
-                                      <span
-                                        className={`!inline-flex !items-center !justify-center !px-3 !py-1 !rounded-full !text-xs !font-bold !tracking-wide !min-w-[90px] !transition-all !duration-200 ${
-                                          log.status === "Out"
-                                            ? "!bg-black !text-white"
-                                            : "!bg-white !text-gray-700 !border-2 !border-gray-300"
-                                        }`}
-                                      >
-                                        {log.status}
-                                      </span>
-                                    </td>
                                   </tr>
-                                ))}
+                                )}
                               </tbody>
                             </table>
 
@@ -4754,7 +4551,16 @@ export default function Admin() {
                                 <span className="!text-sm !font-medium !text-gray-600">
                                   Out:{" "}
                                   <span className="!font-bold !text-gray-900">
-                                    4
+                                    {outpassRequests.filter((outpass) => {
+                                      if (!outpass.actualOutTime || outpass.actualInTime) return false;
+                                      const outTime = new Date(outpass.actualOutTime);
+                                      const today = new Date();
+                                      return (
+                                        outTime.getDate() === today.getDate() &&
+                                        outTime.getMonth() === today.getMonth() &&
+                                        outTime.getFullYear() === today.getFullYear()
+                                      );
+                                    }).length}
                                   </span>
                                 </span>
                               </div>
@@ -4763,7 +4569,16 @@ export default function Admin() {
                                 <span className="!text-sm !font-medium !text-gray-600">
                                   Returned:{" "}
                                   <span className="!font-bold !text-gray-900">
-                                    3
+                                    {outpassRequests.filter((outpass) => {
+                                      if (!outpass.actualOutTime || !outpass.actualInTime) return false;
+                                      const outTime = new Date(outpass.actualOutTime);
+                                      const today = new Date();
+                                      return (
+                                        outTime.getDate() === today.getDate() &&
+                                        outTime.getMonth() === today.getMonth() &&
+                                        outTime.getFullYear() === today.getFullYear()
+                                      );
+                                    }).length}
                                   </span>
                                 </span>
                               </div>
@@ -4771,11 +4586,107 @@ export default function Admin() {
                             <div className="!text-sm !font-medium !text-gray-500">
                               Total:{" "}
                               <span className="!font-bold !text-gray-900">
-                                7
+                                {outpassRequests.filter((outpass) => {
+                                  if (!outpass.actualOutTime) return false;
+                                  const outTime = new Date(outpass.actualOutTime);
+                                  const today = new Date();
+                                  return (
+                                    outTime.getDate() === today.getDate() &&
+                                    outTime.getMonth() === today.getMonth() &&
+                                    outTime.getFullYear() === today.getFullYear()
+                                  );
+                                }).length}
                               </span>
                             </div>
                           </div>
                         </div>
+
+                        {/* Pagination Controls */}
+                        {(() => {
+                          const todaysAttendance = outpassRequests.filter((outpass) => {
+                            if (!outpass.actualOutTime) return false;
+                            const outTime = new Date(outpass.actualOutTime);
+                            const today = new Date();
+                            return (
+                              outTime.getDate() === today.getDate() &&
+                              outTime.getMonth() === today.getMonth() &&
+                              outTime.getFullYear() === today.getFullYear()
+                            );
+                          });
+
+                          const totalPages = Math.ceil(todaysAttendance.length / attendanceItemsPerPage);
+
+                          if (totalPages <= 1) return null;
+
+                          return (
+                            <div className="!bg-white !px-6 !py-4 !border-t !border-gray-200">
+                              <div className="!flex !items-center !justify-between !flex-wrap !gap-4">
+                                <div className="!text-sm !text-gray-600">
+                                  Showing {((attendanceCurrentPage - 1) * attendanceItemsPerPage) + 1} to{" "}
+                                  {Math.min(attendanceCurrentPage * attendanceItemsPerPage, todaysAttendance.length)} of{" "}
+                                  {todaysAttendance.length} entries
+                                </div>
+                                <div className="!flex !items-center !gap-2">
+                                  <button
+                                    onClick={() => setAttendanceCurrentPage(prev => Math.max(prev - 1, 1))}
+                                    disabled={attendanceCurrentPage === 1}
+                                    className={`!px-3 !py-1.5 !rounded-lg !text-sm !font-medium !transition-all !duration-200 ${
+                                      attendanceCurrentPage === 1
+                                        ? "!bg-gray-100 !text-gray-400 !cursor-not-allowed"
+                                        : "!bg-gray-100 !text-gray-700 hover:!bg-gray-200"
+                                    }`}
+                                  >
+                                    Previous
+                                  </button>
+                                  
+                                  <div className="!flex !items-center !gap-1">
+                                    {[...Array(totalPages)].map((_, index) => {
+                                      const pageNumber = index + 1;
+                                      // Show first page, last page, current page, and pages around current
+                                      if (
+                                        pageNumber === 1 ||
+                                        pageNumber === totalPages ||
+                                        (pageNumber >= attendanceCurrentPage - 1 && pageNumber <= attendanceCurrentPage + 1)
+                                      ) {
+                                        return (
+                                          <button
+                                            key={pageNumber}
+                                            onClick={() => setAttendanceCurrentPage(pageNumber)}
+                                            className={`!px-3 !py-1.5 !rounded-lg !text-sm !font-medium !transition-all !duration-200 ${
+                                              attendanceCurrentPage === pageNumber
+                                                ? "!bg-black !text-white"
+                                                : "!bg-gray-100 !text-gray-700 hover:!bg-gray-200"
+                                            }`}
+                                          >
+                                            {pageNumber}
+                                          </button>
+                                        );
+                                      } else if (
+                                        pageNumber === attendanceCurrentPage - 2 ||
+                                        pageNumber === attendanceCurrentPage + 2
+                                      ) {
+                                        return <span key={pageNumber} className="!text-gray-400 !px-1">...</span>;
+                                      }
+                                      return null;
+                                    })}
+                                  </div>
+
+                                  <button
+                                    onClick={() => setAttendanceCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                    disabled={attendanceCurrentPage === totalPages}
+                                    className={`!px-3 !py-1.5 !rounded-lg !text-sm !font-medium !transition-all !duration-200 ${
+                                      attendanceCurrentPage === totalPages
+                                        ? "!bg-gray-100 !text-gray-400 !cursor-not-allowed"
+                                        : "!bg-gray-100 !text-gray-700 hover:!bg-gray-200"
+                                    }`}
+                                  >
+                                    Next
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   )}

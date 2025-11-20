@@ -38,6 +38,7 @@ export const signupController = async (req, res) => {
         return res.status(400).json({ message: "User already exists" });
       } else if (isUserExists.isVerified === false) {
         const otp = await generateOtp();
+        console.log("Generated OTP for existing unverified user:", otp, "with email:", email);
         const hashedPassword = await bcrypt.hash(password, 10);
         isUserExists.name = name;
         isUserExists.password = hashedPassword;
@@ -55,6 +56,7 @@ export const signupController = async (req, res) => {
       }
     }
     const otp = await generateOtp();
+    console.log("Generated OTP for new user:", otp, "with email:", email);
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
       name,
