@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Footer from "../Components/Footer";
+import Footer from "./Admin/Components/Footer";
 
 export default function Home() {
   return (
