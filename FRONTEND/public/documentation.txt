@@ -1,0 +1,70 @@
+HIMADRIALLINONEPLATFORM/
+├── FRONTEND/
+│   ├── public/
+│   ├── src/
+│   │   ├── Components/
+│   │   │   ├── documentation.txt
+│   │   │   ├── FeedbackForm.jsx
+│   │   │   ├── Footer.jsx
+│   │   │   ├── LoadingSpinner.jsx
+│   │   │   └── SnacksPreference.jsx
+│   │   ├── Pages/
+│   │   │   ├── Admin/
+│   │   │   │   ├── Components/
+│   │   │   │   │   ├── Features/
+│   │   │   │   │   │   ├── Attendance.jsx
+│   │   │   │   │   │   ├── Complaints.jsx
+│   │   │   │   │   │   ├── Mess.jsx
+│   │   │   │   │   │   ├── Outpass.jsx
+│   │   │   │   │   │   ├── Records.jsx
+│   │   │   │   │   │   ├── Routes.jsx
+│   │   │   │   │   │   ├── Snacks.jsx
+│   │   │   │   │   │   └── Stats.jsx
+│   │   │   │   │   ├── Footer.jsx
+│   │   │   │   │   ├── Navbar.jsx
+│   │   │   │   │   ├── Notice.jsx
+│   │   │   │   │   └── Profile.jsx
+│   │   │   │   └── page.jsx
+│   │   │   ├── Dashboard/
+│   │   │   │   ├── Feature/
+│   │   │   │   │   ├── Complaint.jsx
+│   │   │   │   │   ├── Dashboard.jsx
+│   │   │   │   │   ├── DNotice.jsx
+│   │   │   │   │   ├── DProfile.jsx
+│   │   │   │   │   ├── KnowYourHostel.jsx
+│   │   │   │   │   ├── Menu.jsx
+│   │   │   │   │   ├── Nav.jsx
+│   │   │   │   │   ├── OutPass.jsx
+│   │   │   │   │   └── Search.jsx
+│   │   │   │   ├── Dashboard.jsx
+│   │   │   │   └── page.jsx
+│   │   │   ├── ForgotPassword.jsx
+│   │   │   ├── Home.jsx
+│   │   │   ├── Login.jsx
+│   │   │   ├── MarkAttendance.jsx
+│   │   │   ├── MessSnacks.jsx
+│   │   │   ├── OTP-v.jsx
+│   │   │   ├── ResetPassword.jsx
+│   │   │   ├── RoleBasedID.jsx
+│   │   │   └── Signup.jsx
+│   │   ├── store/
+│   │   │   └── authStore.js
+│   │   ├── Utils/
+│   │   ├── App.jsx
+│   │   ├── index.css
+│   │   ├── main.jsx
+│   │   └── tailwind.config.js
+│   ├── .env.development
+│   ├── .env.production
+│   ├── .gitignore
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── README.md
+│   └── vite.config.js
+├── .gitignore
+├── LICENSE
+├── package.json
+├── package-lock.json
+└── README.md
