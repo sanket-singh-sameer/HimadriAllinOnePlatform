@@ -1,9 +1,9 @@
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
 
+import xsam from "./config/env.js";
 import connectDB from "./config/connectDB.js";
 import authRoutes from "./routes/auth.route.js";
 import complaintRoutes from "./routes/complaint.route.js";
@@ -15,8 +15,6 @@ import messRoutes from "./routes/mess.route.js"
 import equipmentRoutes from "./routes/equipment.route.js";
 import idRoutes from "./routes/id.route.js";
 import { isRedisConfigured } from "./utils/redisClient.js";
-
-dotenv.config();
 
 if (!isRedisConfigured()) {
   console.warn("Redis credentials are missing. Cache-backed flows will be disabled.");
@@ -31,7 +29,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:8080",
   "https://himadriallinoneplatform.onrender.com",
-  process.env.CLIENT_URL
+  xsam.env.CLIENT_URL
 ]
 
 app.use(cors({
@@ -68,16 +66,21 @@ app.use("/api/v1/mess", messRoutes);
 app.use("/api/v1/equipment", equipmentRoutes);
 app.use("/api/v1/id", idRoutes);
 
-const PORT = process.env.PORT || 3000;
+const PORT = xsam.env.PORT || 3000;
 
-if(process.env.NODE_ENV === "production"){
+if (xsam.env.NODE_ENV === "production" && !process.env.VERCEL) {
   app.use(express.static(path.join(__dirname, "FRONTEND/dist")));
   app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "FRONTEND", "dist", "index.html"));
   });
 }
 
-app.listen(PORT, () => {
-  connectDB();
-  console.log(`Server is running on port ${PORT}`);
-});
+connectDB();
+
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+export default app;

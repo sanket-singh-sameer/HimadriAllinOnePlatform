@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import xsam from "../config/env.js";
 
 import {
   PASSWORD_RESET_REQUEST_TEMPLATE,
@@ -6,9 +7,6 @@ import {
   VERIFICATION_EMAIL_TEMPLATE,
   WELCOME_EMAIL_TEMPLATE,
 } from "./gmailTemplate.js";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 /**
  * Gmail SMTP Configuration for Email Service
@@ -38,8 +36,8 @@ const createTransporter = () => {
       port: 587,
       secure: false, // Use STARTTLS
       auth: {
-        user: process.env.GMAIL_SMTP_USER,
-        pass: process.env.GMAIL_SMTP_PASS,
+        user: xsam.env.GMAIL_SMTP_USER,
+        pass: xsam.env.GMAIL_SMTP_PASS,
       },
       tls: {
         rejectUnauthorized: false,
@@ -80,7 +78,7 @@ if (transporter) {
 
 // Helper function to check if email is available
 const isEmailAvailable = () => {
-  return transporter !== null && process.env.GMAIL_SMTP_USER && process.env.GMAIL_SMTP_PASS;
+  return transporter !== null && xsam.env.GMAIL_SMTP_USER && xsam.env.GMAIL_SMTP_PASS;
 };
 
 // Helper function to send email with retry logic
@@ -118,7 +116,7 @@ const sendEmailWithRetry = async (mailOptions, maxRetries = 2) => {
 
 export const otpVerificationGMail = async (email, otp) => {
   const mailOptions = {
-    from: `"NITH" <${process.env.GMAIL_SMTP_USER}>`,
+    from: `"NITH" <${xsam.env.GMAIL_SMTP_USER}>`,
     to: email,
     subject: "OTP Verification",
     text: `Your OTP code is ${otp}`,
@@ -140,7 +138,7 @@ export const otpVerificationGMail = async (email, otp) => {
 
 export const welcomeGMail = async (email, userName) => {
   const mailOptions = {
-    from: `"NITH" <${process.env.GMAIL_SMTP_USER}>`,
+    from: `"NITH" <${xsam.env.GMAIL_SMTP_USER}>`,
     to: email,
     subject: "Welcome to HBH NITH",
     html: WELCOME_EMAIL_TEMPLATE.replaceAll("{userName}", userName)
@@ -161,12 +159,12 @@ export const welcomeGMail = async (email, userName) => {
 };
 
 export const resetPasswordGMail = async (email, resetToken) => {
-  const resetURL = process.env.CLIENT_URL 
-    ? `${process.env.CLIENT_URL}/reset-password/${resetToken}`
+  const resetURL = xsam.env.CLIENT_URL 
+    ? `${xsam.env.CLIENT_URL}/reset-password/${resetToken}`
     : `https://himadri.nith.org.in/reset-password/${resetToken}`;
     
   const mailOptions = {
-    from: `"NITH" <${process.env.GMAIL_SMTP_USER}>`,
+    from: `"NITH" <${xsam.env.GMAIL_SMTP_USER}>`,
     to: email,
     subject: "Password Reset",
     html: PASSWORD_RESET_REQUEST_TEMPLATE.replaceAll(
@@ -187,7 +185,7 @@ export const resetPasswordGMail = async (email, resetToken) => {
 
 export const passwordResetSuccessGMail = async (email) => {
   const mailOptions = {
-    from: `"NITH" <${process.env.GMAIL_SMTP_USER}>`,
+    from: `"NITH" <${xsam.env.GMAIL_SMTP_USER}>`,
     to: email,
     subject: "Password Reset Successful",
     html: PASSWORD_RESET_SUCCESS_TEMPLATE.replaceAll(

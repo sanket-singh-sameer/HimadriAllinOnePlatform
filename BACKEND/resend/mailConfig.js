@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import xsam from "../config/env.js";
 import {
   OUTPASS_APPROVED_TEMPLATE,
   PASSWORD_RESET_REQUEST_TEMPLATE,
@@ -6,14 +7,11 @@ import {
   VERIFICATION_EMAIL_TEMPLATE,
   WELCOME_EMAIL_TEMPLATE,
 } from "./mailTemplate.js";
-import dotenv from "dotenv";
 
-dotenv.config();
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(xsam.env.RESEND_API_KEY);
 
 // Verify Resend API key on startup
-if (!process.env.RESEND_API_KEY) {
+if (!xsam.env.RESEND_API_KEY) {
   console.error('⚠️  RESEND_API_KEY not found in environment variables');
   console.log('📧 Email functionality will be limited');
 } else {
@@ -53,7 +51,7 @@ export const welcomeGMail = async (email, userName) => {
       subject: "Welcome to HBH NITH",
       html: WELCOME_EMAIL_TEMPLATE.replaceAll("{userName}", userName)
         .replaceAll("{appName}", "HBH NITH")
-        .replaceAll("{dashboardURL}", process.env.CLIENT_URL || "https://himadri.nith.org.in")
+        .replaceAll("{dashboardURL}", xsam.env.CLIENT_URL || "https://himadri.nith.org.in")
         .replaceAll("{supportEmail}", "support@nith.org.in")
         .replaceAll("{helpCenterURL}", "https://nith.org.in/help")
         .replaceAll("Your App Team", "HBH NITH Team"),
@@ -74,8 +72,8 @@ export const welcomeGMail = async (email, userName) => {
 
 export const resetPasswordGMail = async (email, resetToken) => {
   try {
-    const resetURL = process.env.CLIENT_URL 
-      ? `${process.env.CLIENT_URL}/reset-password/${resetToken}`
+    const resetURL = xsam.env.CLIENT_URL 
+      ? `${xsam.env.CLIENT_URL}/reset-password/${resetToken}`
       : `https://himadri.nith.org.in/reset-password/${resetToken}`;
 
     const { data, error } = await resend.emails.send({

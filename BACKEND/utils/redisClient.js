@@ -1,11 +1,12 @@
 import { Redis } from "@upstash/redis";
+import xsam from "../config/env.js";
 
 let redisClient;
 let hasWarnedAboutRedis = false;
 
 export const isRedisConfigured = () => {
   return Boolean(
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+    xsam.env.UPSTASH_REDIS_REST_URL && xsam.env.UPSTASH_REDIS_REST_TOKEN
   );
 };
 
@@ -26,8 +27,8 @@ export const getRedisClient = () => {
   }
 
   redisClient = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    url: xsam.env.UPSTASH_REDIS_REST_URL,
+    token: xsam.env.UPSTASH_REDIS_REST_TOKEN,
   });
 
   return redisClient;

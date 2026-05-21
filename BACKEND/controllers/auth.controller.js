@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import xsam from "../config/env.js";
 
 import { generateToken } from "../utils/jwtTokenOperations.js";
 import { clearCookies, setCookies } from "../utils/cookieOperations.js";
@@ -204,7 +205,7 @@ export const otpVerificationController = async (req, res) => {
       "HBH NITH",
       "https://nith.org.in" || "http://localhost:5173/dashboard",
       "sanketsinghsameer@proton.me",
-      process.env.SUPPORT_URL || "https://divyamsingh.me"
+      xsam.env.SUPPORT_URL || "https://divyamsingh.me"
     );
     return res.status(200).json({
       message: "Email verified successfully",
