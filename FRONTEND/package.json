@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.12",
+    "@vitejs/plugin-react": "^5.2.0",
     "@zxing/library": "^0.21.3",
     "aos": "^2.3.4",
     "axios": "^1.11.0",
@@ -23,17 +24,16 @@
     "react-toastify": "^11.0.5",
     "rechart": "^0.0.1",
     "tailwindcss": "^4.1.12",
+    "vite": "^7.1.2",
     "zustand": "^5.0.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
-    "@vitejs/plugin-react": "^5.2.0",
     "eslint": "^9.33.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
-    "globals": "^16.3.0",
-    "vite": "^7.1.2"
+    "globals": "^16.3.0"
   }
 }
