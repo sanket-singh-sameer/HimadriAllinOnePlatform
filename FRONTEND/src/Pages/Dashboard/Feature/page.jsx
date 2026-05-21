@@ -43,6 +43,8 @@ const Feature = () => {
   const [formError, setFormError] = useState(null);
   const [passwordError, setPasswordError] = useState(null);
   const [todaysMenu, setTodaysMenu] = useState(null);
+  const [menuLoading, setMenuLoading] = useState(false);
+  const [menuError, setMenuError] = useState(null);
   const [myComplaints, setMyComplaints] = useState(null);
   const [activeFeature, setActiveFeature] = useState("knowYourHostel");
   const [myOutpasses, setMyOutpasses] = useState([]);
@@ -66,15 +68,6 @@ const Feature = () => {
     confirmPassword: "",
   });
 
-  const fetchTodaysMenu = async () => {
-    try {
-      const todaysMenu = await axiosInstance.get(API_PATHS.FETCH_TODAYS_MENU);
-      setTodaysMenu(todaysMenu.data);
-    } catch (error) {
-      console.error("Error fetching today's menu:", error);
-    }
-  };
-
   const fetchAllNotices = async () => {
     try {
       const response = await axiosInstance.get(API_PATHS.FETCH_ALL_NOTICES);
@@ -83,6 +76,26 @@ const Feature = () => {
       console.error("Error fetching all notices:", error);
     }
   };
+
+  const fetchTodaysMenu = async () => {
+    setMenuLoading(true);
+    setMenuError(null);
+
+    try {
+      const response = await axiosInstance.get(API_PATHS.FETCH_TODAYS_MENU);
+      console.log("Today's Menu:", response.data);
+      setTodaysMenu(response.data);
+    } catch (error) {
+      console.error("Error fetching today's menu:", error);
+      setTodaysMenu(null);
+      setMenuError(
+        error.response?.data?.message || "Could not load today's mess menu"
+      );
+    } finally {
+      setMenuLoading(false);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -490,7 +503,13 @@ const Feature = () => {
 
                   {activeFeature === "searchStudent" && <Search/>}
 
-                  {activeFeature === "mess" && <Menu/>}
+                  {activeFeature === "mess" && (
+                    <Menu
+                      todaysMenu={todaysMenu}
+                      menuLoading={menuLoading}
+                      menuError={menuError}
+                    />
+                  )}
                   {activeFeature === "outpass" && <Outpass/>}
                 </div>
               </div>

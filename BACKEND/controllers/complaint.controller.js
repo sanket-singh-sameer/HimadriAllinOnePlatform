@@ -2,6 +2,21 @@ import Complaint from "../models/complaint.model.js";
 import { getCookies } from "../utils/cookieOperations.js";
 import { verifyToken } from "../utils/jwtTokenOperations.js";
 import { getUserId } from "../utils/getUserId.js";
+import { redisDelete, redisGetJson, redisSetJson } from "../utils/redisCache.js";
+
+const complaintMyCacheKey = (userId) => `complaints:mine:${userId}`;
+const complaintDetailCacheKey = (userId, complaintId) => `complaints:detail:${userId}:${complaintId}`;
+const complaintStatsCacheKey = "complaints:stats";
+const complaintAllCacheKey = "complaints:all";
+
+const clearComplaintCaches = async (userId, complaintId) => {
+  await Promise.all([
+    redisDelete(complaintMyCacheKey(userId)),
+    redisDelete(complaintAllCacheKey),
+    redisDelete(complaintStatsCacheKey),
+    complaintId ? redisDelete(complaintDetailCacheKey(userId, complaintId)) : Promise.resolve(),
+  ]);
+};
 
 export const createComplaint = async (req, res) => {
   try {
@@ -26,6 +41,7 @@ export const createComplaint = async (req, res) => {
     });
 
     await newComplaint.save();
+    await clearComplaintCaches(user, newComplaint._id.toString());
     res.status(201).json({
       message: "Complaint created successfully",
       complaint: newComplaint,
@@ -38,7 +54,13 @@ export const createComplaint = async (req, res) => {
 export const viewMyComplaint = async (req, res) => {
   try {
     const user = getUserId(req);
+    const cacheKey = complaintMyCacheKey(user);
+    const cachedComplaints = await redisGetJson(cacheKey);
+    if (cachedComplaints) {
+      return res.status(200).json({ message: "Complaints retrieved successfully", complaints: cachedComplaints });
+    }
     const complaints = await Complaint.find({ user });
+    await redisSetJson(cacheKey, complaints, 60);
     res
       .status(200)
       .json({ message: "Complaints retrieved successfully", complaints });
@@ -48,7 +70,12 @@ export const viewMyComplaint = async (req, res) => {
 };
 export const viewAllComplaint = async (req, res) => {
   try {
+    const cachedComplaints = await redisGetJson(complaintAllCacheKey);
+    if (cachedComplaints) {
+      return res.status(200).json({ message: "Complaints retrieved successfully", complaints: cachedComplaints });
+    }
     const complaints = (await Complaint.find()).reverse();
+    await redisSetJson(complaintAllCacheKey, complaints, 60);
     res
       .status(200)
       .json({ message: "Complaints retrieved successfully", complaints });
@@ -61,12 +88,18 @@ export const viewComplaintDetails = async (req, res) => {
   try {
     const user = getUserId(req);
     const { id } = req.params;
+    const cacheKey = complaintDetailCacheKey(user, id);
+    const cachedComplaint = await redisGetJson(cacheKey);
+    if (cachedComplaint) {
+      return res.status(200).json({ message: "Complaint retrieved successfully", complaint: cachedComplaint });
+    }
     const complaint = await Complaint.findOne({ _id: id, user });
     if (!complaint) {
       return res.status(404).json({
         message: "Complaint not found or you are not authorized to view it.",
       });
     }
+    await redisSetJson(cacheKey, complaint, 60);
     res
       .status(200)
       .json({ message: "Complaint retrieved successfully", complaint });
@@ -89,6 +122,7 @@ export const updateComplaintStatus = async (req, res) => {
     complaint.status = status || complaint.status;
     complaint.updatedBy = user;
     await complaint.save();
+    await clearComplaintCaches(complaint.user.toString(), complaint._id.toString());
     res
       .status(200)
       .json({ message: "Complaint updated successfully", complaint });
@@ -99,6 +133,13 @@ export const updateComplaintStatus = async (req, res) => {
 
 export const totalComplaintsController = async (req, res) => {
   try {
+    const cachedStats = await redisGetJson(complaintStatsCacheKey);
+    if (cachedStats) {
+      return res.status(200).json({
+        message: "Total complaints retrieved successfully",
+        data: cachedStats,
+      });
+    }
     const totalComplaints = await Complaint.countDocuments();
     const pendingComplaints = await Complaint.countDocuments({
       status: "Pending",
@@ -124,6 +165,13 @@ export const totalComplaintsController = async (req, res) => {
           rejectedComplaints,
         },
       });
+      await redisSetJson(complaintStatsCacheKey, {
+        totalComplaints,
+        pendingComplaints,
+        underProgressComplaints,
+        resolvedComplaints,
+        rejectedComplaints,
+      }, 60);
   } catch (error) {
     res
       .status(500)

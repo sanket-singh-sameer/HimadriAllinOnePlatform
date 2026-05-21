@@ -45,6 +45,14 @@ const handleEditFormChange = (e) => {
     setChangePasswordForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const fetchUserData = async () => {
+    try {
+      await useAuthStore.getState().checkAuth();
+    } catch (error) {
+      console.error("Error refreshing user data:", error);
+    }
+  };
+
   const handleEditFormSubmit = async (e) => {
     e.preventDefault();
     setLocalIsLoading(true);

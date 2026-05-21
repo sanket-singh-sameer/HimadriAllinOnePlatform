@@ -1,12 +1,45 @@
       
-      import React, { useState, useEffect } from "react";
-      
-      const Stats = () => {
+import React, { useEffect, useState } from "react";
+import axiosInstance from "../../../../../Utils/axiosInstance";
+import { API_PATHS } from "../../../../../Utils/apiPaths";
 
-          
-          const [websiteStats, setWebsiteStats] = useState(null);
-          
-        return (
+const Stats = () => {
+  const [websiteStats, setWebsiteStats] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [usersResponse, complaintsResponse] = await Promise.all([
+          axiosInstance.get(API_PATHS.FETCH_TOTAL_USERS),
+          axiosInstance.get(API_PATHS.FETCH_TOTAL_COMPLAINTS),
+        ]);
+
+        setWebsiteStats({
+          totalStudents: usersResponse.data.data?.totalUsers || 0,
+          totalComplaints: complaintsResponse.data.data?.totalComplaints || 0,
+          pendingComplaints: complaintsResponse.data.data?.pendingComplaints || 0,
+          resolvedComplaints: complaintsResponse.data.data?.resolvedComplaints || 0,
+          rejectedComplaints: complaintsResponse.data.data?.rejectedComplaints || 0,
+        });
+      } catch (error) {
+        console.error("Error fetching admin stats:", error);
+        setWebsiteStats({
+          totalStudents: 0,
+          totalComplaints: 0,
+          pendingComplaints: 0,
+          resolvedComplaints: 0,
+          rejectedComplaints: 0,
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  return (
           <div>
             
             
@@ -64,7 +97,7 @@
                                   </td>
                                   <td className="!px-6 !py-4 !text-right">
                                     <span className="!text-2xl !font-black !text-gray-900">
-                                      {websiteStats?.totalStudents || 0}
+                                      {isLoading ? "..." : websiteStats?.totalStudents || 0}
                                     </span>
                                   </td>
                                 </tr>
@@ -93,7 +126,7 @@
                                   </td>
                                   <td className="!px-6 !py-4 !text-right">
                                     <span className="!text-2xl !font-black !text-gray-900">
-                                      {websiteStats?.totalComplaints || 0}
+                                      {isLoading ? "..." : websiteStats?.totalComplaints || 0}
                                     </span>
                                   </td>
                                 </tr>
@@ -138,7 +171,7 @@
                                   </td>
                                   <td className="!px-6 !py-4 !text-right">
                                     <span className="!text-2xl !font-black !text-gray-900">
-                                      {websiteStats?.resolvedComplaints || 0}
+                                      {isLoading ? "..." : websiteStats?.resolvedComplaints || 0}
                                     </span>
                                   </td>
                                   <td className="!px-6 !py-4 !text-right">
@@ -182,7 +215,7 @@
                                   </td>
                                   <td className="!px-6 !py-4 !text-right">
                                     <span className="!text-2xl !font-black !text-gray-900">
-                                      {websiteStats?.pendingComplaints || 0}
+                                      {isLoading ? "..." : websiteStats?.pendingComplaints || 0}
                                     </span>
                                   </td>
                                   <td className="!px-6 !py-4 !text-right">
@@ -226,7 +259,7 @@
                                   </td>
                                   <td className="!px-6 !py-4 !text-right">
                                     <span className="!text-2xl !font-black !text-gray-900">
-                                      {websiteStats?.rejectedComplaints || 0}
+                                      {isLoading ? "..." : websiteStats?.rejectedComplaints || 0}
                                     </span>
                                   </td>
                                   <td className="!px-6 !py-4 !text-right">
@@ -267,9 +300,8 @@
                     
           </div>
         )
-      }
-      
-      export default Stats
-      
-      
-      
+    }
+
+    export default Stats;
+
+

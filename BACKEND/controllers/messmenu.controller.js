@@ -1,4 +1,7 @@
 import MessMenu from "../models/messmenu.model.js";
+import { redisDelete, redisGetJson, redisSetJson } from "../utils/redisCache.js";
+
+const todaysMenuCacheKey = (day) => `messmenu:today:${day}`;
 
 
 export const addMenu = async (req, res) => {
@@ -16,6 +19,7 @@ export const addMenu = async (req, res) => {
       dinner,
     });
     await newMenu.save();
+    await redisDelete(todaysMenuCacheKey(newMenu.day));
     res.status(201).json(newMenu);
   } catch (error) {
     res.status(500).json({ message: "Error adding menu", error });
@@ -25,12 +29,18 @@ export const addMenu = async (req, res) => {
 
 export const fetchTodaysMenu = async (req, res) => {
   const today = new Date().toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
+  const cacheKey = todaysMenuCacheKey(today);
 
   try {
+    const cachedMenu = await redisGetJson(cacheKey);
+    if (cachedMenu) {
+      return res.status(200).json(cachedMenu);
+    }
     const menu = await MessMenu.findOne({ day: today });
     if (!menu) {
       return res.status(404).json({ message: "Menu not found for today" });
     }
+    await redisSetJson(cacheKey, menu, 60 * 60 * 12);
     res.status(200).json(menu);
   } catch (error) {
     res.status(500).json({ message: "Error fetching today's menu", error });

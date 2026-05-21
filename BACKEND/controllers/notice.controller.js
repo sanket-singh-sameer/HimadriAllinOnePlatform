@@ -2,6 +2,9 @@ import Notice from "../models/notice.model.js";
 import User from "../models/user.model.js";
 
 import imagekit from "../utils/imagekit.js";
+import { redisDelete, redisGetJson, redisSetJson } from "../utils/redisCache.js";
+
+const ALL_NOTICES_CACHE_KEY = "notices:all";
 
 
 
@@ -24,6 +27,7 @@ export const createNotice = async (req, res) => {
     }
 
     await newNotice.save();
+    await redisDelete(ALL_NOTICES_CACHE_KEY);
     res
       .status(201)
       .json({ message: "Notice created successfully", notice: newNotice });
@@ -35,23 +39,27 @@ export const createNotice = async (req, res) => {
 
 export const viewAllNotices = async (req, res) => {
   try {
+    const cachedNotices = await redisGetJson(ALL_NOTICES_CACHE_KEY);
+    if (cachedNotices) {
+      return res.status(200).json(cachedNotices);
+    }
     const getAuthorNameById = async (authorId) => {
       const user = await User.findById(authorId);
       return user ? user.name : "Unknown";
     };
     const notices = await Notice.find();
-    res
-      .status(200)
-      .json({
-        message: "Notices retrieved successfully",
-        notices: await Promise.all(
-          notices.reverse().map(async (notice) => ({
-            ...notice._doc,
-            authorId: notice.author,
-            author: await getAuthorNameById(notice.author),
-          }))
-        ),
-      });
+    const payload = {
+      message: "Notices retrieved successfully",
+      notices: await Promise.all(
+        notices.reverse().map(async (notice) => ({
+          ...notice._doc,
+          authorId: notice.author,
+          author: await getAuthorNameById(notice.author),
+        }))
+      ),
+    };
+    await redisSetJson(ALL_NOTICES_CACHE_KEY, payload, 120);
+    res.status(200).json(payload);
   } catch (error) {
     console.error("Error retrieving notices:", error);
     res.status(500).json({ message: "Error retrieving notices" });
@@ -71,6 +79,7 @@ export const deleteNotice = async (req, res) => {
       return res.status(403).json({ message: "You don't have permission to delete this notice" });
     }
     await Notice.findByIdAndDelete(noticeId);
+    await redisDelete(ALL_NOTICES_CACHE_KEY);
     res.status(200).json({ message: "Notice deleted successfully" });
   } catch (error) {
     console.error("Error deleting notice:", error);

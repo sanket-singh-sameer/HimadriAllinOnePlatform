@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axiosInstance from '../Utils/axiosInstance';
 
 export default function FeedbackForm() {
   const [feedback, setFeedback] = useState({
@@ -35,30 +34,35 @@ export default function FeedbackForm() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    try {
-      // You can replace this with your actual API endpoint
-      const response = await axiosInstance.post('/feedback', feedback);
-      console.log('Feedback submitted:', response.data);
-      setIsSubmitted(true);
-      
-      // Reset form after successful submission
-      setTimeout(() => {
-        setFeedback({
-          name: '',
-          email: '',
-          category: '',
-          rating: 5,
-          message: '',
-          suggestions: ''
-        });
-        setIsSubmitted(false);
-      }, 3000);
-    } catch (error) {
-      console.error('Error submitting feedback:', error);
-      alert('Failed to submit feedback. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    const subject = encodeURIComponent(`HBH Feedback: ${feedback.category || 'General'}`);
+    const body = encodeURIComponent(
+      [
+        `Name: ${feedback.name}`,
+        `Email: ${feedback.email}`,
+        `Category: ${feedback.category}`,
+        `Rating: ${feedback.rating}/5`,
+        '',
+        feedback.message,
+        '',
+        `Suggestions: ${feedback.suggestions}`,
+      ].join('\n')
+    );
+
+    window.location.href = `mailto:sanketsinghsameer@proton.me?subject=${subject}&body=${body}`;
+    setIsSubmitting(false);
+    setIsSubmitted(true);
+
+    setTimeout(() => {
+      setFeedback({
+        name: '',
+        email: '',
+        category: '',
+        rating: 5,
+        message: '',
+        suggestions: ''
+      });
+      setIsSubmitted(false);
+    }, 3000);
   };
 
   if (isSubmitted) {
@@ -72,7 +76,7 @@ export default function FeedbackForm() {
           </div>
           <h3 className="text-lg font-semibold text-green-800 mb-2">Thank You!</h3>
           <p className="text-green-700">
-            Your feedback has been submitted successfully. We appreciate your input in helping us improve the Himadri Boys Hostel platform.
+            Your email client has been opened so you can send the feedback directly.
           </p>
         </div>
       </div>
@@ -211,9 +215,7 @@ export default function FeedbackForm() {
 
       <div className="mt-6 p-4 bg-gray-50 rounded-md">
         <p className="text-sm text-gray-600">
-          <strong>Note:</strong> Your feedback helps us improve the platform for all hostel residents. 
-          We review every submission and use your input to prioritize updates and new features. 
-          Thank you for being part of our continuous improvement journey!
+          <strong>Note:</strong> There is no feedback API in the backend yet. This form opens your mail client instead.
         </p>
       </div>
     </div>

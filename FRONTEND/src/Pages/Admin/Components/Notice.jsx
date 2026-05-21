@@ -24,6 +24,23 @@ const [noticeForm, setNoticeForm] = useState({
   });
    const { logout, isLoading, error, user } = useAuthStore();
   const [allNotices, setAllNotices] = useState([]);
+
+  const fetchAllNotices = async () => {
+    try {
+      setLocalIsLoading(true);
+      const response = await axiosInstance.get(API_PATHS.FETCH_ALL_NOTICES);
+      setAllNotices(response.data.notices || []);
+    } catch (error) {
+      console.error("Error fetching all notices:", error);
+      toast.error(error.response?.data?.message || "Error fetching notices");
+    } finally {
+      setLocalIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllNotices();
+  }, []);
  
   const handleNoticeFormChange = (e) => {
     const { name, value } = e.target;
@@ -77,7 +94,7 @@ const handleMediaChange = (e) => {
       );
 
       if (response.status === 200 || response.status === 201) {
-        fetchAllNotices();
+        await fetchAllNotices();
         setNoticeForm({ title: "", description: "", media: null });
         const fileInput = document.getElementById("media-upload");
         if (fileInput) fileInput.value = "";
@@ -99,9 +116,7 @@ const handleMediaChange = (e) => {
         API_PATHS.DELETE_NOTICE(noticeId)
       );
       console.log("Notice deleted successfully:", response.data);
-      setAllNotices((prevNotices) =>
-        prevNotices.filter((notice) => notice._id !== noticeId)
-      );
+      await fetchAllNotices();
       toast.success(response.data.message);
     } catch (error) {
       console.error("Error deleting notice:", error);

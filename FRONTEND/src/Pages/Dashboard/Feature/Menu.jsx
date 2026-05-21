@@ -5,7 +5,7 @@ import axiosInstance from "../../../../Utils/axiosInstance";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const Menu= () => {
+const Menu = ({ todaysMenu: todaysMenuProp, menuLoading: menuLoadingProp, menuError: menuErrorProp }) => {
   const navigate = useNavigate();
   const { logout, isLoading, error, user } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
@@ -38,6 +38,8 @@ const Menu= () => {
   const [formError, setFormError] = useState(null);
   const [passwordError, setPasswordError] = useState(null);
   const [todaysMenu, setTodaysMenu] = useState(null);
+  const [menuLoading, setMenuLoading] = useState(false);
+  const [menuError, setMenuError] = useState(null);
   const [myComplaints, setMyComplaints] = useState(null);
   const [activeFeature, setActiveFeature] = useState("mess");
   const [myOutpasses, setMyOutpasses] = useState([]);
@@ -62,11 +64,17 @@ const Menu= () => {
   });
 
   const fetchTodaysMenu = async () => {
+    setMenuLoading(true);
+    setMenuError(null);
     try {
       const todaysMenu = await axiosInstance.get(API_PATHS.FETCH_TODAYS_MENU);
       setTodaysMenu(todaysMenu.data);
     } catch (error) {
+      setTodaysMenu(null);
+      setMenuError(error.response?.data?.message || "Failed to load today's menu");
       console.error("Error fetching today's menu:", error);
+    } finally {
+      setMenuLoading(false);
     }
   };
 
@@ -379,7 +387,9 @@ const Menu= () => {
   };
 
   useEffect(() => {
-    fetchTodaysMenu();
+    if (!todaysMenuProp) {
+      fetchTodaysMenu();
+    }
     fetchMyComplaint();
     fetchAllNotices();
     fetchMyOutpasses();
@@ -390,9 +400,25 @@ const Menu= () => {
     window.open("/mess-menu-30082025-pdf.pdf", "_blank");
   };
 
+  const activeTodaysMenu = todaysMenuProp ?? todaysMenu;
+  const activeMenuLoading = menuLoadingProp ?? menuLoading;
+  const activeMenuError = menuErrorProp ?? menuError;
+
   return (
 <>
  <div className="w-full space-y-6 max-w-6xl mx-auto">
+                      {activeMenuLoading && (
+                        <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-600 shadow-sm">
+                          Loading today's mess menu...
+                        </div>
+                      )}
+
+                      {activeMenuError && !activeMenuLoading && (
+                        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 shadow-sm">
+                          {activeMenuError}
+                        </div>
+                      )}
+
                       {/* Header Section */}
                       <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl shadow-2xl border-2 border-gray-700 p-8 sm:p-10">
                         <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
@@ -411,7 +437,7 @@ const Menu= () => {
                                 Current Day
                               </p>
                               <p className="!text-2xl sm:!text-3xl !font-black !text-gray-900">
-                                {todaysMenu?.day || "N/A"}
+                                {activeTodaysMenu?.day || "N/A"}
                               </p>
                             </div>
                           </div>
@@ -439,7 +465,7 @@ const Menu= () => {
                                   Breakfast
                                 </td>
                                 <td className="px-6 py-5 !text-base !text-gray-700 leading-relaxed">
-                                  {todaysMenu?.breakfast || "N/A"}
+                                  {activeTodaysMenu?.breakfast || "N/A"}
                                 </td>
                               </tr>
                               <tr className="hover:bg-gray-50 transition-colors">
@@ -447,7 +473,7 @@ const Menu= () => {
                                   Lunch
                                 </td>
                                 <td className="px-6 py-5 !text-base !text-gray-700 leading-relaxed">
-                                  {todaysMenu?.lunch || "N/A"}
+                                  {activeTodaysMenu?.lunch || "N/A"}
                                 </td>
                               </tr>
                               <tr className="hover:bg-gray-50 transition-colors">
@@ -455,7 +481,7 @@ const Menu= () => {
                                   Snacks
                                 </td>
                                 <td className="px-6 py-5 !text-base !text-gray-700 leading-relaxed">
-                                  {todaysMenu?.snacks || "N/A"}
+                                  {activeTodaysMenu?.snacks || "N/A"}
                                 </td>
                               </tr>
                               <tr className="hover:bg-gray-50 transition-colors">
@@ -463,7 +489,7 @@ const Menu= () => {
                                   Dinner
                                 </td>
                                 <td className="px-6 py-5 !text-base !text-gray-700 leading-relaxed">
-                                  {todaysMenu?.dinner || "N/A"}
+                                  {activeTodaysMenu?.dinner || "N/A"}
                                 </td>
                               </tr>
                             </tbody>
@@ -479,7 +505,7 @@ const Menu= () => {
                               </h3>
                             </div>
                             <p className="!text-sm !text-gray-700 leading-relaxed">
-                              {todaysMenu?.breakfast || "N/A"}
+                              {activeTodaysMenu?.breakfast || "N/A"}
                             </p>
                           </div>
 
@@ -490,7 +516,7 @@ const Menu= () => {
                               </h3>
                             </div>
                             <p className="!text-sm !text-gray-700 leading-relaxed">
-                              {todaysMenu?.lunch || "N/A"}
+                              {activeTodaysMenu?.lunch || "N/A"}
                             </p>
                           </div>
 
@@ -501,7 +527,7 @@ const Menu= () => {
                               </h3>
                             </div>
                             <p className="!text-sm !text-gray-700 leading-relaxed">
-                              {todaysMenu?.snacks || "N/A"}
+                              {activeTodaysMenu?.snacks || "N/A"}
                             </p>
                           </div>
 
@@ -512,7 +538,7 @@ const Menu= () => {
                               </h3>
                             </div>
                             <p className="!text-sm !text-gray-700 leading-relaxed">
-                              {todaysMenu?.dinner || "N/A"}
+                              {activeTodaysMenu?.dinner || "N/A"}
                             </p>
                           </div>
                         </div>

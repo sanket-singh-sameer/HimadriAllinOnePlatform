@@ -14,9 +14,13 @@ import cgpiRoutes from "./routes/cgpi.route.js";
 import messRoutes from "./routes/mess.route.js"
 import equipmentRoutes from "./routes/equipment.route.js";
 import idRoutes from "./routes/id.route.js";
-import { startOutpassExpirationScheduler } from "./utils/outpassScheduler.js";
+import { isRedisConfigured } from "./utils/redisClient.js";
 
 dotenv.config();
+
+if (!isRedisConfigured()) {
+  console.warn("Redis credentials are missing. Cache-backed flows will be disabled.");
+}
 
 const app = express();
 const __dirname = path.resolve();
@@ -47,6 +51,13 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 
+
+
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "Server is healthy" });
+});
+
+
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/complaints", complaintRoutes);
@@ -68,6 +79,5 @@ if(process.env.NODE_ENV === "production"){
 
 app.listen(PORT, () => {
   connectDB();
-  startOutpassExpirationScheduler();
   console.log(`Server is running on port ${PORT}`);
 });

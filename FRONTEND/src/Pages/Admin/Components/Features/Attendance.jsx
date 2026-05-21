@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from "react";
-      
+import React, { useEffect, useState } from "react";
+import { API_PATHS } from "../../../../../Utils/apiPaths";
+import axiosInstance from "../../../../../Utils/axiosInstance";
+import { toast } from "react-toastify";
+
 const Attendance = () => {
 
     const [localIsLoading, setLocalIsLoading] = useState(false);
@@ -24,6 +27,44 @@ const [nfcScanning, setNfcScanning] = useState(false);
    
     const [activeFeature, setActiveFeature] = useState("attendance");
               const [websiteStats, setWebsiteStats] = useState(null);
+
+  const getStudentByRoll = async (rollNumber) => {
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.FETCH_USER_DETAILS(rollNumber)
+      );
+      return response.data.student;
+    } catch (error) {
+      console.error("Error fetching student by roll number:", error);
+      return null;
+    }
+  };
+
+  const getCGPIByRoll = async (rollNumber) => {
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.FETCH_CGPI_BY_ROLL(rollNumber)
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching CGPI by roll number:", error);
+      return null;
+    }
+  };
+
+  const fetchOutpassRequests = async () => {
+    try {
+      const response = await axiosInstance.get(API_PATHS.GET_ALL_OUTPASSES);
+      setOutpassRequests(response.data.outpasses || []);
+    } catch (error) {
+      console.error("Error fetching outpass requests:", error);
+      toast.error("Failed to fetch outpass records");
+    }
+  };
+
+  useEffect(() => {
+    fetchOutpassRequests();
+  }, []);
              
               const handleNFCInput = (e) => {
     const value = e.target.value;

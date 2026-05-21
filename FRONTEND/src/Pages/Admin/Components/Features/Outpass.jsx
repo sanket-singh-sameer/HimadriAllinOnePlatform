@@ -1,10 +1,17 @@
-import React, { useState, useEffect } from "react";
-      
+import React, { useEffect, useState } from "react";
+import { API_PATHS } from "../../../../../Utils/apiPaths";
+import axiosInstance from "../../../../../Utils/axiosInstance";
+import { toast } from "react-toastify";
+
 const Outpass = () => {
 
      const [selectedOutpass, setSelectedOutpass] = useState(null);
  
  const [selectedOutpasses, setSelectedOutpasses] = useState([]);
+ const [outpassRequests, setOutpassRequests] = useState([]);
+ const [localIsLoading, setLocalIsLoading] = useState(false);
+ const [showConfirmAction, setShowConfirmAction] = useState(false);
+ const [confirmActionType, setConfirmActionType] = useState("");
  
 const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -64,6 +71,10 @@ const [currentPage, setCurrentPage] = useState(1);
     setCurrentPage(1);
   };
 
+  useEffect(() => {
+    applyOutpassFilters();
+  }, [outpassRequests, outpassSearchTerm, outpassStatusFilter, outpassDateFilter]);
+
 
   const handleSelectAllOutpasses = () => {
     if (selectedOutpasses.length === paginatedOutpasses.length) {
@@ -71,6 +82,24 @@ const [currentPage, setCurrentPage] = useState(1);
     } else {
       setSelectedOutpasses(paginatedOutpasses.map((outpass) => outpass._id));
     }
+  };
+
+  const handleSelectOutpass = (outpassId) => {
+    setSelectedOutpasses((currentSelected) =>
+      currentSelected.includes(outpassId)
+        ? currentSelected.filter((selectedId) => selectedId !== outpassId)
+        : [...currentSelected, outpassId]
+    );
+  };
+
+  const clearOutpassFilters = () => {
+    setOutpassSearchTerm("");
+    setOutpassStatusFilter("");
+    setOutpassDateFilter("");
+  };
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(Math.max(1, Math.min(pageNumber, totalPages || 1)));
   };
 
   const fetchOutpassRequests = async () => {
@@ -88,6 +117,35 @@ const [currentPage, setCurrentPage] = useState(1);
       toast.error("Failed to fetch outpass requests");
     }
   };
+
+  const handleOutpassAction = async (outpassId, actionType) => {
+    setLocalIsLoading(true);
+    try {
+      const response = await axiosInstance.patch(
+        API_PATHS.UPDATE_OUTPASS_STATUS(outpassId),
+        {
+          status: actionType === "approve" ? "approved" : "rejected",
+        }
+      );
+
+      toast.success(response.data.message || "Outpass updated successfully");
+      setShowConfirmAction(false);
+      setConfirmActionType("");
+      setSelectedOutpass(null);
+      await fetchOutpassRequests();
+    } catch (error) {
+      console.error("Error updating outpass status:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to update outpass status"
+      );
+    } finally {
+      setLocalIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOutpassRequests();
+  }, []);
 
     const totalPages = Math.ceil(filteredOutpasses.length / itemsPerPage);
 
@@ -225,7 +283,7 @@ const [currentPage, setCurrentPage] = useState(1);
                                   // Data Rows
                                   paginatedOutpasses.map((outpass) => (
                                     <tr
-                                      key={outpass.id}
+                                      key={outpass._id}
                                       className="hover:bg-gray-50 transition-colors duration-150"
                                     >
                                       <td className="w-12 px-4 py-4">
@@ -438,7 +496,7 @@ const [currentPage, setCurrentPage] = useState(1);
                           ) : (
                             paginatedOutpasses.map((outpass) => (
                               <div
-                                key={outpass.id}
+                                key={outpass._id}
                                 className="bg-white rounded-xl shadow-lg border border-gray-200 p-6"
                               >
                                 <div className="flex items-start justify-between mb-4">

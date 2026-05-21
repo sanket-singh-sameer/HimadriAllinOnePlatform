@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/jwtTokenOperations.js";
 import { setCookies } from "../utils/cookieOperations.js";
 import { getUserId } from "../utils/getUserId.js";
+import { redisGetJson, redisSetJson } from "../utils/redisCache.js";
 
 export const loginAdminController = async (req, res) => {
   const { email, password } = req.body;
@@ -92,17 +93,24 @@ export const getStudentByRoll = async (req, res) => {
     }else{
       rollNumber = rollNumber.toUpperCase();
     }
+    const cacheKey = `users:roll:${rollNumber}`;
+    const cachedStudent = await redisGetJson(cacheKey);
+    if (cachedStudent) {
+      return res.status(200).json(cachedStudent);
+    }
     const student = await User.findOne({ roll:rollNumber });
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
-    res.status(200).json({
+    const payload = {
       message: "Student found",
       student: {
         ...student._doc,
         password: undefined,
       },
-    });
+    };
+    await redisSetJson(cacheKey, payload, 300);
+    res.status(200).json(payload);
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
