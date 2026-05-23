@@ -448,6 +448,121 @@ export const updateOutpassStatus = async (req, res) => {
   }
 };
 
+export const guardCheckOutpassStatus = async (req, res) => {
+  let { roll } = req.params;
+
+  try {
+    roll = roll.toUpperCase();
+
+    const user = await User.findOne({ roll });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found with this roll number",
+      });
+    }
+
+    const latestOutpass = await Outpass.findOne({
+      rollNumber: roll,
+      status: "approved",
+    })
+      .sort({ approvedAt: -1 })
+      .populate("user", "name roll email phone room");
+
+    if (!latestOutpass) {
+      return res.status(404).json({
+        success: false,
+        message: "No approved outpass found for this student",
+        user: {
+          name: user.name,
+          roll: user.roll,
+          room: user.room,
+          phone: user.phone,
+        },
+      });
+    }
+
+    const now = new Date();
+    const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const outpassDate = new Date(
+      latestOutpass.outDate.getFullYear(),
+      latestOutpass.outDate.getMonth(),
+      latestOutpass.outDate.getDate()
+    );
+
+    if (currentDate.getTime() !== outpassDate.getTime()) {
+      return res.status(400).json({
+        success: false,
+        message: `Outpass is valid for ${latestOutpass.outDate.toLocaleDateString()}, not for today`,
+        outpass: {
+          outDate: latestOutpass.outDate,
+          placeOfVisit: latestOutpass.placeOfVisit,
+          status: latestOutpass.status,
+        },
+      });
+    }
+
+    if (latestOutpass.approvedAt) {
+      const sixteenHoursLater = new Date(latestOutpass.approvedAt.getTime() + 16 * 60 * 60 * 1000);
+      if (now >= sixteenHoursLater) {
+        latestOutpass.status = "expired";
+        await latestOutpass.save();
+
+        return res.status(400).json({
+          success: false,
+          message: "Outpass has expired",
+          outpass: latestOutpass,
+        });
+      }
+    }
+
+    let currentState = "IN";
+    let nextAction = "MARK_OUT";
+    let statusMessage = "Student is inside campus. Mark OUT to record departure.";
+
+    if (latestOutpass.actualOutTime && !latestOutpass.actualInTime) {
+      currentState = "OUT";
+      nextAction = "MARK_IN";
+      statusMessage = "Student is outside campus. Mark IN to record return.";
+    } else if (latestOutpass.actualOutTime && latestOutpass.actualInTime) {
+      currentState = "COMPLETE";
+      nextAction = "NONE";
+      statusMessage = "This outpass has already been completed.";
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: statusMessage,
+      currentState,
+      nextAction,
+      canMarkOut: nextAction === "MARK_OUT",
+      canMarkIn: nextAction === "MARK_IN",
+      user: {
+        name: user.name,
+        roll: user.roll,
+        room: user.room,
+        phone: user.phone,
+      },
+      outpass: {
+        id: latestOutpass._id,
+        status: latestOutpass.status,
+        outDate: latestOutpass.outDate,
+        placeOfVisit: latestOutpass.placeOfVisit,
+        outTime: latestOutpass.outTime,
+        expectedReturnTime: latestOutpass.expectedReturnTime,
+        actualOutTime: latestOutpass.actualOutTime,
+        actualInTime: latestOutpass.actualInTime,
+      },
+    });
+  } catch (error) {
+    console.error("Error in guardCheckOutpassStatus:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 export const exportMessAttendance = async (req, res) => {
   try {
     const { startDate, endDate, roll } = req.query;

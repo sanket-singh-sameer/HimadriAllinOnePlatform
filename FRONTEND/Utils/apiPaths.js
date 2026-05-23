@@ -52,5 +52,6 @@ export const API_PATHS = {
   EXPORT_MESS_ATTENDANCE: "/id/mess-attendance/export",
 
   // Guard Outpass Verification
+  GUARD_CHECK_OUTPASS: (roll) => `/id/guard/check-outpass/${roll}`,
   GUARD_VERIFY_OUTPASS: (roll) => `/id/guard/verify-outpass/${roll}`,
 };

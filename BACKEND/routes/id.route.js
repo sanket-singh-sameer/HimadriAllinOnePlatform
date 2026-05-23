@@ -8,6 +8,7 @@ import {
   getMyOutpasses,
   getAllOutpasses,
   updateOutpassStatus,
+  guardCheckOutpassStatus,
   guardOutpassVerification
 } from "../controllers/id.controller.js";
 import { checkIfCommittee } from "../middlewares/checkIfCommitte.middleware.js";
@@ -27,6 +28,7 @@ router.get("/mess-attendance/export", checkIfCommittee, exportMessAttendance);
 router.post("/mess-attendance/:roll", checkIfMessCommittee, markMessAttendence);
 
 // Guard outpass verification route
+router.get("/guard/check-outpass/:roll", checkIfCollegeGate, guardCheckOutpassStatus);
 router.post("/guard/verify-outpass/:roll", checkIfCollegeGate, guardOutpassVerification);
 
 // Outpass routes

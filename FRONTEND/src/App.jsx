@@ -16,6 +16,7 @@ import ForgotPassword from "./Pages/ForgotPassword";
 import ResetPassword from "./Pages/ResetPassword";
 import MessSnacks from "./Pages/MessSnacks";
 import RoleBasedID from "./Pages/RoleBasedID";
+import IDEntry from "./Pages/IDEntry";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -149,6 +150,14 @@ function App() {
           }
         />
         <Route path="/mess/:roll" element={<MessSnacks />} />
+        <Route
+          path="/id"
+          element={
+            <ProtectedRoute>
+              <IDEntry />
+            </ProtectedRoute>
+          }
+        />
         <Route 
           path="/id/:roll" 
           element={
